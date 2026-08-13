@@ -1,0 +1,146 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.home {
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+/* ---------------- HEADER ---------------- */
+
+.header {
+    height: 76px;
+    padding: 0 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #374151;
+    font-size: 15px;
+}
+
+.nav-links a:hover {
+    color: #2563eb;
+}
+
+.register-btn {
+    padding: 10px 20px;
+    background: #2563eb;
+    color: white !important;
+    border-radius: 6px;
+}
+
+/* ---------------- HERO ---------------- */
+
+.hero {
+    min-height: calc(100vh - 76px);
+
+    padding: 70px 7%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 60px;
+}
+
+.hero-content {
+    max-width: 600px;
+}
+
+.hero-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #2563eb;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-size: 58px;
+    line-height: 1.05;
+    margin: 0 0 25px;
+    color: #111827;
+}
+
+.hero h1 span {
+    color: #2563eb;
+}
+
+.hero-description {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #6b7280;
+    max-width: 540px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 35px;
+}
+
+.primary-btn,
+.secondary-btn {
+    padding: 13px 24px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.primary-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.secondary-btn {
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background: white;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+}
+
+.secondary-btn:hover {
+    background: #f3f4f6;
+}
+
+/* ---------------- HERO IMAGE ---------------- */
+
+.hero-image {
+    width: 48%;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 500px;
+    display: block;
+    object-fit: cover;
+
+    border-radius: 18px;
+}
