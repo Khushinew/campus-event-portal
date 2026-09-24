@@ -6,16 +6,20 @@ import Register from "./pages/Register";
 
 import StudentDashboard from "./pages/StudentDashboard";
 import ViewEvents from "./pages/StudentEvents/ViewEvents";
+import RegisterEvent from "./pages/StudentEvents/RegisterEvent";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
+        {/* Home */}
         <Route path="/" element={<Home />} />
 
+        {/* Login */}
         <Route path="/login" element={<Login />} />
 
+        {/* Registration */}
         <Route path="/register" element={<Register />} />
 
         {/* Student Dashboard */}
@@ -28,6 +32,12 @@ function App() {
         <Route
           path="/student/events"
           element={<ViewEvents />}
+        />
+
+        {/* Student Register Event */}
+        <Route
+          path="/student/register-event"
+          element={<RegisterEvent />}
         />
 
       </Routes>
