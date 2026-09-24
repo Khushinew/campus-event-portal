@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import StudentDashboard from "./pages/StudentDashboard";
 import ViewEvents from "./pages/StudentEvents/ViewEvents";
 import RegisterEvent from "./pages/StudentEvents/RegisterEvent";
+import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 
 function App() {
   return (
@@ -38,6 +39,12 @@ function App() {
         <Route
           path="/student/register-event"
           element={<RegisterEvent />}
+        />
+
+        {/* Student Registered Events */}
+        <Route
+          path="/student/registered-events"
+          element={<RegisteredEvents />}
         />
 
       </Routes>
