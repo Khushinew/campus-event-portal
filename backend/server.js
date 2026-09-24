@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const User = require("./models/User");
 const Event = require("./models/Event");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const app = express();
@@ -118,9 +119,22 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
+        const token = jwt.sign(
+            {
+                userId: user._id,
+                role: user.role
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1h"
+            }
+        );
+
         res.status(200).json({
             message: "Login successful",
 
+            message:"Login successful",
+            token: token,
             user: {
                 id: user._id,
                 name: user.name,
@@ -132,6 +146,8 @@ app.post("/api/login", async (req, res) => {
                 designation: user.designation
             }
         });
+            
+        
 
     } catch (error) {
         console.error("Login error:", error);
