@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const app = express();
@@ -66,14 +67,28 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
+        const token = jwt.sign(
+            {
+                userId: user._id,
+                role: user.role
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1h"
+            }
+        );
+
         res.status(200).json({
-            message: "Login successful",
+            message:"Login successful",
+            token: token,
             user: {
                 name: user.name,
                 email: user.email,
                 role: user.role
             }
         });
+            
+        
 
     } catch (error) {
         res.status(500).json({
