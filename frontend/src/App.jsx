@@ -8,6 +8,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import ViewEvents from "./pages/StudentEvents/ViewEvents";
 import RegisterEvent from "./pages/StudentEvents/RegisterEvent";
 import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
+import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 
 function App() {
   return (
@@ -45,6 +46,12 @@ function App() {
         <Route
           path="/student/registered-events"
           element={<RegisteredEvents />}
+        />
+
+        {/* Student Personal Calendar */}
+        <Route
+          path="/student/calendar"
+          element={<PersonalCalendar />}
         />
 
       </Routes>
