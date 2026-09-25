@@ -10,6 +10,7 @@ import RegisterEvent from "./pages/StudentEvents/RegisterEvent";
 import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 import EventDetails from "./pages/StudentEvents/EventDetails";
+import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent";
 
 function App() {
   return (
@@ -59,6 +60,12 @@ function App() {
         <Route
           path="/student/calendar"
           element={<PersonalCalendar />}
+        />
+
+        {/* Student Add Personal Event */}
+        <Route
+          path="/student/add-event"
+          element={<AddPersonalEvent />}
         />
 
       </Routes>
