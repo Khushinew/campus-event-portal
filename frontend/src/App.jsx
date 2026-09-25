@@ -9,6 +9,7 @@ import ViewEvents from "./pages/StudentEvents/ViewEvents";
 import RegisterEvent from "./pages/StudentEvents/RegisterEvent";
 import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
+import EventDetails from "./pages/StudentEvents/EventDetails";
 
 function App() {
   return (
@@ -34,6 +35,12 @@ function App() {
         <Route
           path="/student/events"
           element={<ViewEvents />}
+        />
+
+        {/* Student Event Details */}
+        <Route
+          path="/student/event-details"
+          element={<EventDetails />}
         />
 
         {/* Student Register Event */}
