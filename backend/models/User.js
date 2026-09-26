@@ -1,4 +1,4 @@
-const Event = require("./models/Event");
+const Event = require("./Event");
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(

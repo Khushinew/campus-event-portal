@@ -8,6 +8,7 @@ function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -19,6 +20,7 @@ function Login() {
 
                 headers: {
                     "Content-Type": "application/json"
+                    
                 },
 
                 body: JSON.stringify({
@@ -37,6 +39,7 @@ function Login() {
 
                 // Save user information
                 localStorage.setItem("user", JSON.stringify(data.user));
+                localStorage.setItem("token", JSON.stringify(data.token));
 
                 // Go to home page
                 navigate("/");

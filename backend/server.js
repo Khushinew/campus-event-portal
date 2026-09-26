@@ -12,6 +12,38 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Middleware to verify JWT
+function verifyToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    // Check whether the token was provided
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({
+            message: "Access denied. No token provided."
+        });
+    }
+
+    // Extract the token from "Bearer <token>"
+    const token = authHeader.split(" ")[1];
+
+    try {
+        // Verify the token using the secret key
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
+
+        // Make the decoded user information available to the route
+        req.user = decoded;
+
+        next();
+    } catch (error) {
+        return res.status(401).json({
+            message: "Invalid or expired token."
+        });
+    }
+}
+
 const PORT = 5000;
 
 // ===============================
@@ -163,17 +195,22 @@ app.post("/api/login", async (req, res) => {
 // CREATE EVENT
 // ===============================
 
-app.post("/api/events", async (req, res) => {
+app.post("/api/events", verifyToken, async (req, res) => {
     try {
+        // Only faculty can create events
+        if (req.user.role !== "faculty") {
+            return res.status(403).json({
+                message: "Only faculty can create events"
+            });
+        }
+
         const {
             title,
             description,
             date,
             time,
             venue,
-            category,
-            organizer,
-            organizerName
+            category
         } = req.body;
 
         if (
@@ -182,25 +219,19 @@ app.post("/api/events", async (req, res) => {
             !date ||
             !time ||
             !venue ||
-            !category ||
-            !organizer
+            !category
         ) {
             return res.status(400).json({
                 message: "Please fill all event fields"
             });
         }
 
-        const faculty = await User.findById(organizer);
+        // Identify the organizer using the verified token
+        const faculty = await User.findById(req.user.userId);
 
         if (!faculty) {
             return res.status(404).json({
                 message: "Faculty user not found"
-            });
-        }
-
-        if (faculty.role !== "faculty") {
-            return res.status(403).json({
-                message: "Only faculty can create events"
             });
         }
 
@@ -211,8 +242,8 @@ app.post("/api/events", async (req, res) => {
             time,
             venue,
             category,
-            organizer,
-            organizerName: organizerName || faculty.name
+            organizer: faculty._id,
+            organizerName: faculty.name
         });
 
         await newEvent.save();
