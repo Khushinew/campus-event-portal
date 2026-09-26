@@ -23,4 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
+# Faculty email allowlist
+backend/config/facultyEmails.js
+
 .env

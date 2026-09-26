@@ -5,6 +5,7 @@ const User = require("./models/User");
 const Event = require("./models/Event");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const facultyEmails = require("./config/facultyEmails");
 require("dotenv").config();
 
 const app = express();
@@ -74,20 +75,29 @@ app.post("/api/register", async (req, res) => {
             name,
             email,
             password,
-            role,
             department,
             semester,
             facultyId,
             designation
         } = req.body;
 
-        if (!name || !email || !password || !role) {
-            return res.status(400).json({
-                message: "Please fill all required fields"
-            });
-        }
+        if (!name || !email || !password) {
+    return res.status(400).json({
+        message: "Please fill all required fields"
+    });
+}
 
-        const existingUser = await User.findOne({ email });
+const normalizedEmail = email.trim().toLowerCase();
+
+const role = facultyEmails
+    .map(email => email.trim().toLowerCase())
+    .includes(normalizedEmail)
+        ? "faculty"
+        : "student";
+
+        const existingUser = await User.findOne({
+    email: normalizedEmail
+});
 
         if (existingUser) {
             return res.status(400).json({
@@ -101,7 +111,7 @@ app.post("/api/register", async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role,
+            email: normalizedEmail,
             department,
             semester,
             facultyId,
