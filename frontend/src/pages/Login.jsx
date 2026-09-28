@@ -11,6 +11,7 @@ function Login() {
     const [error, setError] = useState("");
 
     const handleLogin = async (e) => {
+        setError("");
         e.preventDefault();
 
         try {
@@ -33,20 +34,24 @@ function Login() {
 
             if (response.ok) {
 
-                alert("Login successful!");
+                
 
                 console.log("Logged in user:", data.user);
 
                 // Save user information
                 localStorage.setItem("user", JSON.stringify(data.user));
-                localStorage.setItem("token", JSON.stringify(data.token));
+                localStorage.setItem("token", data.token);
 
                 // Go to home page
-                navigate("/");
+                if (data.user.role === "faculty") {
+        navigate("/faculty-dashboard");
+    } else {
+        navigate("/student-dashboard");
+    }
 
             } else {
 
-                alert(data.message);
+                setError(data.message || "Login failed");
 
             }
 
@@ -54,7 +59,7 @@ function Login() {
 
             console.error("Login error:", error);
 
-            alert("Cannot connect to backend.");
+            setError("Cannot connect to backend.");
 
         }
     };
@@ -114,6 +119,7 @@ function Login() {
 
 
                     {/* Login Form */}
+                    {error && <p className="error-message">{error}</p>}
                     <form
                         className="login-form"
                         onSubmit={handleLogin}
