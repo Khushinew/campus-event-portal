@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
 
+
 function Register() {
+   
 
     const navigate = useNavigate();
 
@@ -11,66 +13,47 @@ function Register() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [role, setRole] = useState("");
+    const [error, setError] = useState("");
 
     const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
 
-        e.preventDefault();
+    if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        return;
+    }
 
-        // Check password
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
-
-        // Check role
-        if (!role) {
-            alert("Please select Student or Faculty");
-            return;
-        }
-
-        try {
-
-            const response = await fetch(
-                "http://localhost:5000/api/register",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        password: password,
-                        role: role
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            if (response.ok) {
-
-                alert("Account created successfully!");
-
-                // Go to login page
-                navigate("/login");
-
-            } else {
-
-                alert(data.message);
-
+    try {
+        const response = await fetch(
+            "http://localhost:5000/api/register",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email.trim().toLowerCase(),
+                    password: password
+                })
             }
+        );
 
-        } catch (error) {
+        const data = await response.json();
 
-            console.error("Registration error:", error);
-
-            alert("Cannot connect to backend.");
-
+        if (response.ok) {
+            navigate("/login");
+        } else {
+            setError(data.message || "Registration failed.");
         }
-    };
+    } catch (error) {
+        console.error("Registration error:", error);
+        setError("Cannot connect to backend.");
+    }
+};
+            
+        
 
     return (
         <div className="register-page">
@@ -105,6 +88,12 @@ function Register() {
                     className="register-form"
                     onSubmit={handleRegister}
                 >
+                    {error && (
+        <p className="error-message" role="alert">
+            {error}
+        </p>
+    )}
+                
 
                     <h2>Register</h2>
 
@@ -155,149 +144,7 @@ function Register() {
                     />
 
 
-                    <h3>Select Account Type</h3>
-
-
-                    <div className="role-buttons">
-
-                        <button
-                            type="button"
-                            className={
-                                role === "student"
-                                    ? "selected"
-                                    : ""
-                            }
-                            onClick={() => setRole("student")}
-                        >
-                            🎓 Student
-                        </button>
-
-
-                        <button
-                            type="button"
-                            className={
-                                role === "faculty"
-                                    ? "selected"
-                                    : ""
-                            }
-                            onClick={() => setRole("faculty")}
-                        >
-                            👨‍🏫 Faculty
-                        </button>
-
-                    </div>
-
-
-                    {role === "student" && (
-
-                        <div className="extra-details">
-
-                            <select>
-                                <option>
-                                    Select Department
-                                </option>
-
-                                <option>
-                                    Computer Engineering
-                                </option>
-
-                                <option>
-                                    Information Technology
-                                </option>
-
-                                <option>
-                                    Artificial Intelligence
-                                </option>
-
-                                <option>
-                                    Electronics
-                                </option>
-
-                            </select>
-
-
-                            <select>
-
-                                <option>
-                                    Select Semester
-                                </option>
-
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
-                                <option>6</option>
-                                <option>7</option>
-                                <option>8</option>
-
-                            </select>
-
-                        </div>
-
-                    )}
-
-
-                    {role === "faculty" && (
-
-                        <div className="extra-details">
-
-                            <select>
-
-                                <option>
-                                    Select Department
-                                </option>
-
-                                <option>
-                                    Computer Engineering
-                                </option>
-
-                                <option>
-                                    Information Technology
-                                </option>
-
-                                <option>
-                                    Science
-                                </option>
-
-                            </select>
-
-
-                            <input
-                                type="text"
-                                placeholder="Faculty ID"
-                            />
-
-
-                            <select>
-
-                                <option>
-                                    Select Designation
-                                </option>
-
-                                <option>
-                                    Professor
-                                </option>
-
-                                <option>
-                                    Associate Professor
-                                </option>
-
-                                <option>
-                                    Assistant Professor
-                                </option>
-
-                                <option>
-                                    HOD
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    )}
-
-
+                    
                     <button
                         type="submit"
                         className="register-button"

@@ -5,7 +5,7 @@ const User = require("./models/User");
 const Event = require("./models/Event");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const facultyEmails = require("./config/facultyEmails");
+const CollegeUser = require("./models/CollegeUser");
 require("dotenv").config();
 
 const app = express();
@@ -71,69 +71,67 @@ app.get("/api/test", (req, res) => {
 
 app.post("/api/register", async (req, res) => {
     try {
-        const {
-            name,
-            email,
-            password,
-            department,
-            semester,
-            facultyId,
-            designation
-        } = req.body;
+        const { email, password } = req.body;
 
-        if (!name || !email || !password) {
-    return res.status(400).json({
-        message: "Please fill all required fields"
-    });
-}
-
-const normalizedEmail = email.trim().toLowerCase();
-
-const role = facultyEmails
-    .map(email => email.trim().toLowerCase())
-    .includes(normalizedEmail)
-        ? "faculty"
-        : "student";
-
-        const existingUser = await User.findOne({
-    email: normalizedEmail
-});
-
-        if (existingUser) {
+        if (!email || !password) {
             return res.status(400).json({
-                message: "User already exists"
+                message: "Please provide your university email and password."
             });
         }
 
+        const normalizedEmail = email.trim().toLowerCase();
+
+        // 1. Find the person in the college directory
+        const collegeUser = await CollegeUser.findOne({
+            email: normalizedEmail
+        });
+
+        if (!collegeUser) {
+            return res.status(403).json({
+                message: "This email is not present in the college directory."
+            });
+        }
+
+        // 2. Check whether they already have an account
+        const existingUser = await User.findOne({
+            email: normalizedEmail
+        });
+
+        if (existingUser) {
+            return res.status(409).json({
+                message: "An account already exists for this email."
+            });
+        }
+
+        // 3. Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // 4. Create the account using the directory record
         const newUser = new User({
-            name,
-            email,
+            name: collegeUser.name,
+            email: collegeUser.email,
             password: hashedPassword,
-            email: normalizedEmail,
-            department,
-            semester,
-            facultyId,
-            designation
+            role: collegeUser.role,
+            department: collegeUser.department,
+            semester: collegeUser.semester,
+            facultyId: collegeUser.facultyId,
+            designation: collegeUser.designation
         });
 
         await newUser.save();
 
         res.status(201).json({
-            message: "User registered successfully"
+            message: "User registered successfully."
         });
 
     } catch (error) {
         console.error("Registration error:", error);
 
         res.status(500).json({
-            message: "Registration failed",
-            error: error.message
+            message: "Registration failed."
         });
     }
 });
-
 // ===============================
 // LOGIN
 // ===============================
