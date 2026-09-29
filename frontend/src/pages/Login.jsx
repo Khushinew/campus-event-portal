@@ -13,28 +13,12 @@ function Login() {
 
                 <nav className="nav-links">
                     <Link to="/">Home</Link>
-<<<<<<< Updated upstream
                     <Link to="/events">Events</Link>
                     <Link to="/calendar">Calendar</Link>
                     <Link to="/login">Login</Link>
                     <Link to="/register" className="register-btn">
                         Register
                     </Link>
-=======
-
-                    <Link to="/events">
-                        Events
-                    </Link>
-
-                    <Link to="/calendar">
-                        Calendar
-                    </Link>
-
-                    <Link to="/login" className="login-nav-btn">
-                        Login
-                    </Link>
-
->>>>>>> Stashed changes
                 </nav>
             </header>
 
@@ -98,7 +82,6 @@ function Login() {
                         </button>
 
                     </form>
-<<<<<<< Updated upstream
 
 
                     {/* Register Link */}
@@ -107,8 +90,6 @@ function Login() {
                         <Link to="/register"> Create an Account</Link>
                     </p>
 
-=======
->>>>>>> Stashed changes
                 </div>
 
             </main>
