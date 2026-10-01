@@ -1,211 +1,568 @@
-.event-details-page {
-  min-height: 100vh;
-  background: #f5f7fb;
-  padding: 45px 60px;
-  color: #1f2937;
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+/* =========================================
+   EVENT DETAILS — CREATIVE NOTEBOOK STYLE
+   ========================================= */
+
+* {
+  box-sizing: border-box;
 }
 
-/* Header */
+.event-details-page {
+  min-height: 100vh;
+  padding: 48px 60px;
+
+  color: #30333d;
+  font-family: "DM Sans", sans-serif;
+
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  background:
+    radial-gradient(circle at 8% 14%, rgba(255, 220, 170, 0.42), transparent 24%),
+    radial-gradient(circle at 92% 18%, rgba(205, 220, 255, 0.48), transparent 25%),
+    radial-gradient(circle at 76% 90%, rgba(232, 210, 245, 0.4), transparent 25%),
+    #f4f0e8;
+}
+
+/* Notebook ruled background */
+.event-details-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0.28;
+  pointer-events: none;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgba(99, 120, 160, 0.14) 32px,
+      transparent 33px
+    );
+}
+
+/* Decorative dashed circle */
+.event-details-page::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  right: -110px;
+  bottom: -110px;
+  z-index: -1;
+
+  border: 2px dashed rgba(94, 83, 70, 0.14);
+  border-radius: 50%;
+
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+
+/* =========================================
+   HEADER
+   ========================================= */
 
 .event-details-header {
   max-width: 1100px;
-  margin: 0 auto 35px;
+  margin: 0 auto 38px;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 25px;
+
+  padding: 25px 30px;
+  position: relative;
+
+  background: rgba(255, 253, 247, 0.94);
+
+  border: 1px solid rgba(80, 75, 65, 0.13);
+  border-radius: 4px;
+
+  box-shadow:
+    0 12px 25px rgba(63, 56, 45, 0.09),
+    4px 5px 0 rgba(215, 205, 190, 0.45);
+
+  transform: rotate(-0.25deg);
+}
+
+/* Tape */
+.event-details-header::before {
+  content: "";
+  position: absolute;
+
+  width: 95px;
+  height: 27px;
+  top: -13px;
+  left: 50%;
+
+  transform: translateX(-50%) rotate(-2deg);
+
+  background: rgba(238, 215, 157, 0.72);
+
+  box-shadow: 0 2px 5px rgba(80, 70, 50, 0.08);
 }
 
 .event-details-header h1 {
   margin: 0;
-  font-size: 34px;
-  color: #111827;
+
+  font-family: "Playfair Display", serif;
+  font-size: 36px;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+
+  color: #252936;
+  position: relative;
+}
+
+/* Hand-drawn underline */
+.event-details-header h1::after {
+  content: "";
+  position: absolute;
+
+  left: 2px;
+  bottom: -8px;
+
+  width: 145px;
+  height: 7px;
+
+  border-bottom: 3px solid #8b9bb7;
+  border-radius: 50%;
+
+  transform: rotate(-2deg);
 }
 
 .event-details-header p {
-  margin: 8px 0 0;
-  color: #6b7280;
+  margin: 13px 0 0;
+
+  color: #77766f;
+  font-size: 14px;
+  line-height: 1.6;
 }
+
+
+/* =========================================
+   BACK BUTTON
+   ========================================= */
 
 .back-btn {
   text-decoration: none;
-  background: #111827;
-  color: white;
-  padding: 11px 18px;
-  border-radius: 9px;
-  font-weight: 600;
-  transition: 0.2s ease;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 11px 19px;
+
+  border-radius: 5px;
+
+  background: #303542;
+  color: #fffdf8;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  box-shadow: 3px 4px 0 rgba(48, 53, 66, 0.17);
+
+  transition: 0.25s ease;
 }
 
 .back-btn:hover {
-  background: #374151;
+  background: #4a5364;
+
+  transform: translate(-2px, -2px) rotate(-1deg);
+
+  box-shadow: 5px 6px 0 rgba(48, 53, 66, 0.15);
 }
 
-/* Main Container */
+
+/* =========================================
+   MAIN CONTAINER
+   ========================================= */
 
 .event-details-container {
   max-width: 1100px;
   margin: 0 auto;
+
   display: grid;
   grid-template-columns: 1.7fr 1fr;
-  gap: 25px;
+  gap: 30px;
+
   align-items: start;
 }
 
-/* Main Event Card */
+
+/* =========================================
+   MAIN EVENT CARD
+   ========================================= */
 
 .event-main-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
+  position: relative;
+
   padding: 32px;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgba(99, 120, 160, 0.12) 32px,
+      transparent 33px
+    ),
+    #fffdf7;
+
+  border: 1px solid rgba(80, 75, 65, 0.14);
+  border-radius: 4px;
+
+  box-shadow:
+    0 13px 27px rgba(70, 61, 49, 0.1),
+    5px 7px 0 rgba(215, 205, 190, 0.38);
+
+  transform: rotate(0.25deg);
+
+  overflow: hidden;
 }
+
+/* Paperclip */
+.event-main-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: -13px;
+  right: 30px;
+
+  width: 25px;
+  height: 66px;
+
+  border: 3px solid #9a9b9f;
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+
+  transform: rotate(8deg);
+
+  opacity: 0.62;
+}
+
+
+/* =========================================
+   EVENT TOP
+   ========================================= */
 
 .event-details-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   gap: 15px;
 }
 
 .event-category {
-  background: #f3f4f6;
-  color: #374151;
-  padding: 7px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+  display: inline-block;
+
+  padding: 7px 14px;
+
+  border-radius: 3px;
+
+  background: #f3dfb9;
+  color: #5f513b;
+
+  font-family: "Caveat", cursive;
+  font-size: 18px;
   font-weight: 600;
+
+  transform: rotate(-2deg);
+
+  box-shadow: 2px 3px 0 rgba(93, 76, 50, 0.1);
 }
 
 .event-date {
-  color: #6b7280;
-  font-size: 13px;
+  color: #77766f;
+
+  font-family: "Caveat", cursive;
+  font-size: 18px;
+  font-weight: 600;
+
+  transform: rotate(1deg);
 }
 
+
+/* =========================================
+   EVENT CONTENT
+   ========================================= */
+
 .event-main-card h2 {
-  margin: 25px 0 12px;
+  margin: 25px 0 13px;
+
+  font-family: "Playfair Display", serif;
   font-size: 32px;
-  color: #111827;
+  line-height: 1.2;
+
+  color: #292d38;
 }
 
 .event-description {
-  color: #6b7280;
-  line-height: 1.7;
+  color: #666761;
+
+  line-height: 1.75;
   font-size: 15px;
+
   margin-bottom: 30px;
 }
 
-/* Information Grid */
+
+/* =========================================
+   INFORMATION GRID
+   ========================================= */
 
 .event-info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+
   gap: 15px;
+
   padding-top: 25px;
-  border-top: 1px solid #e5e7eb;
+
+  border-top: 2px dashed rgba(95, 101, 115, 0.2);
 }
 
 .info-item {
-  background: #f9fafb;
-  border-radius: 10px;
+  position: relative;
+
+  background: rgba(239, 235, 226, 0.68);
+
+  border: 1px solid rgba(80, 75, 65, 0.08);
+  border-radius: 3px;
+
   padding: 15px;
+
+  box-shadow: 2px 3px 0 rgba(80, 75, 65, 0.06);
+
+  transition: 0.22s ease;
+}
+
+.info-item:hover {
+  transform: translateY(-3px) rotate(-0.4deg);
+
+  background: #f3eee3;
 }
 
 .info-label {
   display: block;
-  font-size: 12px;
-  color: #6b7280;
+
   margin-bottom: 6px;
+
+  font-family: "Caveat", cursive;
+  font-size: 17px;
+  font-weight: 600;
+
+  color: #77746c;
 }
 
 .info-item strong {
   display: block;
-  color: #111827;
+
+  color: #343741;
   font-size: 14px;
+  line-height: 1.4;
 }
 
-/* Registration Card */
+
+/* =========================================
+   REGISTRATION CARD
+   ========================================= */
 
 .event-register-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
+  position: relative;
+
   padding: 30px;
+
   text-align: center;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgba(99, 120, 160, 0.12) 32px,
+      transparent 33px
+    ),
+    #fffdf8;
+
+  border: 1px solid rgba(80, 75, 65, 0.14);
+  border-radius: 4px;
+
+  box-shadow:
+    0 13px 27px rgba(70, 61, 49, 0.1),
+    -5px 7px 0 rgba(215, 205, 190, 0.35);
+
+  transform: rotate(-0.45deg);
 }
 
+/* Tape */
+.event-register-card::before {
+  content: "";
+
+  position: absolute;
+
+  width: 90px;
+  height: 24px;
+
+  top: -12px;
+  right: 35px;
+
+  background: rgba(190, 211, 237, 0.72);
+
+  transform: rotate(4deg);
+
+  box-shadow: 0 2px 5px rgba(80, 70, 50, 0.08);
+}
+
+
+/* =========================================
+   REGISTER ICON
+   ========================================= */
+
 .register-icon {
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
+
   margin: 0 auto 18px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
-  border-radius: 14px;
-  font-size: 28px;
+
+  background: #e7e1d4;
+
+  border-radius: 4px;
+
+  font-size: 29px;
+
+  box-shadow:
+    3px 4px 0 rgba(80, 75, 65, 0.1);
+
+  transform: rotate(-3deg);
+
+  transition: 0.25s ease;
 }
+
+.event-register-card:hover .register-icon {
+  transform: rotate(2deg) translateY(-3px);
+}
+
+
+/* =========================================
+   REGISTER CONTENT
+   ========================================= */
 
 .event-register-card h2 {
   margin: 0 0 10px;
-  color: #111827;
-  font-size: 23px;
+
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+
+  color: #292d38;
 }
 
 .event-register-card p {
-  color: #6b7280;
+  color: #77766f;
+
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.65;
+
   margin: 0 0 25px;
 }
 
-/* Buttons */
+
+/* =========================================
+   BUTTONS
+   ========================================= */
 
 .register-event-btn,
 .view-events-btn {
   display: block;
+
   text-decoration: none;
+
   padding: 12px;
-  border-radius: 9px;
-  font-weight: 600;
-  transition: 0.2s ease;
+
+  border-radius: 5px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  transition: 0.25s ease;
 }
 
 .register-event-btn {
-  background: #111827;
-  color: white;
-  margin-bottom: 10px;
+  background: #343945;
+  color: #fffdf8;
+
+  margin-bottom: 11px;
+
+  box-shadow: 3px 4px 0 rgba(52, 57, 69, 0.15);
 }
 
 .register-event-btn:hover {
-  background: #374151;
-  transform: translateY(-1px);
+  background: #4d5668;
+
+  transform: translate(-2px, -2px) rotate(-0.5deg);
+
+  box-shadow: 5px 6px 0 rgba(52, 57, 69, 0.12);
 }
 
 .view-events-btn {
-  background: white;
-  color: #111827;
-  border: 1px solid #d1d5db;
+  background: #fffdf8;
+  color: #343945;
+
+  border: 1px solid #cbc8bf;
+
+  box-shadow: 2px 3px 0 rgba(80, 75, 65, 0.07);
 }
 
 .view-events-btn:hover {
-  background: #f3f4f6;
+  background: #f0ece3;
+
+  transform: translateY(-2px) rotate(0.5deg);
 }
 
-/* Tablet */
+
+/* =========================================
+   TABLET
+   ========================================= */
 
 @media (max-width: 850px) {
+
   .event-details-page {
     padding: 40px 35px;
   }
 
   .event-details-container {
     grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .event-main-card,
+  .event-register-card {
+    transform: none;
   }
 }
 
-/* Mobile */
+
+/* =========================================
+   MOBILE
+   ========================================= */
 
 @media (max-width: 600px) {
+
   .event-details-page {
     padding: 30px 20px;
   }
@@ -213,23 +570,168 @@
   .event-details-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
+
+    gap: 21px;
+
+    padding: 23px 22px;
   }
 
   .event-details-header h1 {
-    font-size: 28px;
+    font-size: 29px;
+  }
+
+  .event-details-header h1::after {
+    width: 115px;
+  }
+
+  .event-details-header p {
+    font-size: 13px;
+  }
+
+  .back-btn {
+    width: 100%;
   }
 
   .event-main-card,
   .event-register-card {
-    padding: 22px;
+    padding: 23px 21px;
   }
 
   .event-main-card h2 {
     font-size: 26px;
   }
 
+  .event-details-top {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .event-info-grid {
     grid-template-columns: 1fr;
   }
+
+  .event-register-card h2 {
+    font-size: 22px;
+  }
+}
+
+
+/* =========================================
+   EXTRA SMALL DEVICES
+   ========================================= */
+
+@media (max-width: 400px) {
+
+  .event-details-page {
+    padding: 24px 14px;
+  }
+
+  .event-details-header {
+    padding: 21px 18px;
+  }
+
+  .event-details-header h1 {
+    font-size: 25px;
+  }
+
+  .event-main-card,
+  .event-register-card {
+    padding: 21px 17px;
+  }
+
+  .event-category,
+  .event-date {
+    font-size: 16px;
+  }
+}
+
+
+/* =========================================
+   PAGE ANIMATION
+   ========================================= */
+
+@keyframes eventDetailsHeaderAppear {
+  from {
+    opacity: 0;
+    transform: translateY(18px) rotate(-1deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-0.25deg);
+  }
+}
+
+@keyframes eventMainAppear {
+  from {
+    opacity: 0;
+    transform: translateX(-22px) rotate(-1deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(0.25deg);
+  }
+}
+
+@keyframes eventRegisterAppear {
+  from {
+    opacity: 0;
+    transform: translateX(22px) rotate(1deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(-0.45deg);
+  }
+}
+
+.event-details-header {
+  animation: eventDetailsHeaderAppear 0.6s ease both;
+}
+
+.event-main-card {
+  animation: eventMainAppear 0.65s ease 0.08s both;
+}
+
+.event-register-card {
+  animation: eventRegisterAppear 0.65s ease 0.16s both;
+}
+
+
+/* =========================================
+   ACCESSIBILITY
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* =========================================
+   CUSTOM SCROLLBAR
+   ========================================= */
+
+.event-details-page::-webkit-scrollbar {
+  width: 9px;
+}
+
+.event-details-page::-webkit-scrollbar-track {
+  background: #eee9df;
+}
+
+.event-details-page::-webkit-scrollbar-thumb {
+  background: #aaa79f;
+  border-radius: 10px;
+}
+
+.event-details-page::-webkit-scrollbar-thumb:hover {
+  background: #85827b;
 }
