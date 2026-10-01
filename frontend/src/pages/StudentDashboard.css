@@ -1,200 +1,1153 @@
+/* =========================================================
+   STUDENT DASHBOARD — CREATIVE NOTEBOOK STYLE
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Caveat:wght@500;600;700&display=swap");
+
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+
+  font-family: "DM Sans", sans-serif;
+
+  color: #172033;
+
+  overflow-x: hidden;
+
+  background:
+    radial-gradient(
+      circle at 8% 12%,
+      rgba(255, 211, 117, 0.85),
+      transparent 23%
+    ),
+    radial-gradient(
+      circle at 94% 15%,
+      rgba(120, 176, 226, 0.65),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 85% 90%,
+      rgba(196, 153, 219, 0.55),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 18% 88%,
+      rgba(133, 190, 148, 0.38),
+      transparent 25%
+    ),
+    linear-gradient(
+      135deg,
+      #e8dfc9 0%,
+      #dfe7e7 45%,
+      #e2dce9 100%
+    );
+}
+
+button,
+a {
+  font-family: inherit;
+}
+
+
+/* =========================================================
+   BACKGROUND NOTEBOOK — LEFT
+   ========================================================= */
+
+body::before {
+  content: "";
+
+  position: fixed;
+
+  left: -75px;
+  top: 170px;
+
+  width: 330px;
+  height: 230px;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0 42px,
+      rgba(220, 75, 75, 0.22) 43px,
+      transparent 44px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      #fff9df 0px,
+      #fff9df 28px,
+      rgba(82, 132, 181, 0.18) 29px,
+      #fff9df 30px
+    );
+
+  border:
+    1px solid rgba(80, 70, 50, 0.1);
+
+  box-shadow:
+    15px 18px 35px rgba(45, 45, 45, 0.18);
+
+  transform:
+    rotate(-10deg);
+
+  opacity: 0.78;
+
+  filter: blur(0.7px);
+
+  pointer-events: none;
+
+  z-index: -2;
+
+  animation:
+    studentNotebookLeft 8s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   BACKGROUND NOTEBOOK — RIGHT
+   ========================================================= */
+
+body::after {
+  content: "";
+
+  position: fixed;
+
+  right: -70px;
+  bottom: 60px;
+
+  width: 320px;
+  height: 220px;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0 42px,
+      rgba(220, 75, 75, 0.18) 43px,
+      transparent 44px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      #f9f0ff 0px,
+      #f9f0ff 28px,
+      rgba(110, 130, 180, 0.18) 29px,
+      #f9f0ff 30px
+    );
+
+  border:
+    1px solid rgba(90, 70, 110, 0.12);
+
+  box-shadow:
+    -15px 18px 35px rgba(50, 45, 60, 0.18);
+
+  transform:
+    rotate(9deg);
+
+  opacity: 0.72;
+
+  filter: blur(0.8px);
+
+  pointer-events: none;
+
+  z-index: -2;
+
+  animation:
+    studentNotebookRight 10s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   STUDENT DASHBOARD
+   ========================================================= */
+
 .student-dashboard {
   min-height: 100vh;
-  background: #f5f7fb;
-  color: #1f2937;
+
+  position: relative;
+
+  isolation: isolate;
+
+  overflow: hidden;
+
+  background: transparent;
+
+  color: #172033;
 }
 
-/* Header */
+
+/* =========================================================
+   DECORATIVE PEN
+   ========================================================= */
+
+.student-dashboard::before {
+  content: "";
+
+  position: fixed;
+
+  left: 75px;
+  top: 420px;
+
+  width: 190px;
+  height: 18px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #1f3554 0%,
+      #285b91 55%,
+      #d8dde3 56%,
+      #d8dde3 72%,
+      #8a9199 73%
+    );
+
+  box-shadow:
+    0 8px 12px rgba(40, 50, 60, 0.15);
+
+  transform:
+    rotate(-30deg);
+
+  opacity: 0.5;
+
+  filter: blur(1px);
+
+  pointer-events: none;
+
+  z-index: -1;
+
+  animation:
+    studentPenMove 7s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   DECORATIVE BOOKS
+   ========================================================= */
+
+.student-dashboard::after {
+  content: "";
+
+  position: fixed;
+
+  right: 70px;
+  top: 160px;
+
+  width: 145px;
+  height: 110px;
+
+  background:
+    linear-gradient(#7e9dca, #7e9dca)
+    0 0 / 120px 28px no-repeat,
+
+    linear-gradient(#e4a86b, #e4a86b)
+    15px 30px / 120px 28px no-repeat,
+
+    linear-gradient(#83ad91, #83ad91)
+    2px 60px / 125px 28px no-repeat;
+
+  filter: blur(1px);
+
+  opacity: 0.55;
+
+  transform:
+    rotate(12deg);
+
+  pointer-events: none;
+
+  z-index: -1;
+
+  animation:
+    studentBooksMove 9s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .student-header {
-  background: #ffffff;
-  padding: 30px 60px;
+  min-height: 110px;
+
+  padding:
+    28px 7%;
+
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
-  border-bottom: 1px solid #e5e7eb;
+
+  position: relative;
+
+  z-index: 20;
+
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0.96),
+      rgba(255, 252, 244, 0.94)
+    );
+
+  backdrop-filter: blur(12px);
+
+  border-bottom:
+    1px solid rgba(50, 60, 70, 0.12);
+
+  box-shadow:
+    0 5px 20px rgba(40, 50, 60, 0.08);
+
+  animation:
+    studentHeaderAppear 0.6s ease both;
 }
+
+
+/* =========================================================
+   HEADER TITLE
+   ========================================================= */
 
 .student-header h1 {
   margin: 0;
-  font-size: 32px;
+
+  font-family:
+    "Playfair Display",
+    serif;
+
+  font-size: 38px;
+
   font-weight: 700;
+
+  letter-spacing: -1px;
+
   color: #111827;
 }
 
-.student-header p {
-  margin: 8px 0 0;
-  color: #6b7280;
-  font-size: 15px;
+.student-header h1::after {
+  content: "";
+
+  display: block;
+
+  width: 85px;
+
+  height: 7px;
+
+  margin-top: 5px;
+
+  border-bottom:
+    3px solid rgba(218, 155, 82, 0.55);
+
+  border-radius: 50%;
+
+  transform:
+    rotate(-2deg);
 }
+
+
+/* =========================================================
+   HEADER DESCRIPTION
+   ========================================================= */
+
+.student-header p {
+  margin:
+    9px 0 0;
+
+  color: #68778b;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   PROFILE BUTTON
+   ========================================================= */
 
 .profile-btn {
   text-decoration: none;
-  background: #111827;
+
+  background:
+    #172033;
+
   color: #ffffff;
-  padding: 12px 20px;
+
+  padding:
+    13px 21px;
+
   border-radius: 10px;
-  font-weight: 600;
-  transition: 0.2s ease;
+
+  font-weight: 700;
+
+  font-size: 14px;
+
+  box-shadow:
+    0 8px 18px rgba(30, 40, 55, 0.16);
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .profile-btn:hover {
-  background: #374151;
-  transform: translateY(-1px);
+  background:
+    #2867e6;
+
+  transform:
+    translateY(-3px);
+
+  box-shadow:
+    0 12px 25px rgba(40, 103, 230, 0.28);
 }
 
-/* Main Content */
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
 
 .student-content {
-  padding: 50px 60px;
-  max-width: 1250px;
-  margin: auto;
+  width: min(1250px, 90%);
+
+  padding:
+    60px 0 100px;
+
+  margin:
+    auto;
+
+  position: relative;
+
+  z-index: 5;
 }
 
+
+/* =========================================================
+   DASHBOARD TITLE
+   ========================================================= */
+
 .dashboard-title {
-  margin-bottom: 30px;
+  margin-bottom: 35px;
+
+  position: relative;
+
+  padding:
+    26px 32px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 42px,
+      rgba(211, 91, 91, 0.15) 43px,
+      rgba(211, 91, 91, 0.15) 44px,
+      transparent 45px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 253, 244, 0.9) 0,
+      rgba(255, 253, 244, 0.9) 30px,
+      rgba(90, 120, 145, 0.1) 31px,
+      rgba(255, 253, 244, 0.9) 32px
+    );
+
+  border:
+    1px solid rgba(60, 65, 65, 0.1);
+
+  box-shadow:
+    7px 9px 0 rgba(35, 40, 45, 0.06),
+    0 12px 25px rgba(40, 50, 60, 0.09);
+
+  transform:
+    rotate(-0.5deg);
 }
+
+
+/* small tape effect */
+
+.dashboard-title::before {
+  content: "";
+
+  position: absolute;
+
+  width: 90px;
+  height: 23px;
+
+  top: -11px;
+  left: 50%;
+
+  transform:
+    translateX(-50%)
+    rotate(-2deg);
+
+  background:
+    rgba(255, 231, 159, 0.65);
+
+  box-shadow:
+    0 2px 4px rgba(50, 50, 40, 0.08);
+
+  opacity: 0.9;
+}
+
 
 .dashboard-title h2 {
   margin: 0;
-  font-size: 28px;
+
+  position: relative;
+
+  z-index: 2;
+
+  font-family:
+    "Playfair Display",
+    serif;
+
+  font-size: 34px;
+
+  letter-spacing: -1px;
+
   color: #111827;
 }
 
-.dashboard-title p {
-  margin-top: 7px;
-  color: #6b7280;
+
+.dashboard-title h2::before {
+  content:
+    "STUDENT / DASHBOARD";
+
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 2.5px;
+
+  color: #8b95a4;
 }
 
-/* Cards */
+
+.dashboard-title p {
+  margin:
+    8px 0 0;
+
+  position: relative;
+
+  z-index: 2;
+
+  color: #68778b;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   STUDENT GRID
+   ========================================================= */
 
 .student-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 22px;
 }
+
+
+/* =========================================================
+   STUDENT CARD
+   ========================================================= */
 
 .student-card {
   position: relative;
-  min-height: 190px;
-  padding: 25px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
+
+  min-height: 205px;
+
+  padding:
+    26px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 36px,
+      rgba(211, 91, 91, 0.12) 37px,
+      rgba(211, 91, 91, 0.12) 38px,
+      transparent 39px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 253, 244, 0.96) 0,
+      rgba(255, 253, 244, 0.96) 27px,
+      rgba(90, 120, 145, 0.08) 28px,
+      rgba(255, 253, 244, 0.96) 29px
+    );
+
+  border:
+    1px solid rgba(60, 75, 95, 0.13);
+
+  border-radius: 3px;
+
   text-decoration: none;
+
   color: #1f2937;
+
   display: flex;
+
   flex-direction: column;
+
   justify-content: space-between;
+
   overflow: hidden;
+
+  box-shadow:
+    7px 9px 0 rgba(35, 40, 45, 0.06),
+    0 12px 25px rgba(40, 50, 60, 0.1);
+
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
+
+
+/* paper layer */
+
+.student-card::before {
+  content: "";
+
+  position: absolute;
+
+  width: 96%;
+  height: 95%;
+
+  left: 2%;
+  top: 3%;
+
+  background:
+    #e8e3d7;
+
+  border:
+    1px solid rgba(50, 55, 60, 0.06);
+
+  z-index: -1;
+
+  transform:
+    rotate(1.5deg);
+}
+
+
+/* top colored edge */
+
+.student-card:nth-child(1) {
+  border-top:
+    4px solid #5e8bd0;
+}
+
+.student-card:nth-child(2) {
+  border-top:
+    4px solid #e2a05d;
+}
+
+.student-card:nth-child(3) {
+  border-top:
+    4px solid #7cad88;
+}
+
+.student-card:nth-child(4) {
+  border-top:
+    4px solid #a38bca;
+}
+
+.student-card:nth-child(5) {
+  border-top:
+    4px solid #d27e7e;
+}
+
+.student-card:nth-child(6) {
+  border-top:
+    4px solid #6ba5a5;
+}
+
+
+/* =========================================================
+   CARD HOVER
+   ========================================================= */
 
 .student-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  border-color: #d1d5db;
+  transform:
+    translateY(-8px)
+    rotate(-0.7deg);
+
+  box-shadow:
+    10px 16px 32px rgba(40, 50, 60, 0.17);
 }
 
-/* Card Top */
+
+/* =========================================================
+   CARD TOP
+   ========================================================= */
 
 .card-top {
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
+
+  position: relative;
+
+  z-index: 2;
 }
+
+
+/* =========================================================
+   CARD ICON
+   ========================================================= */
 
 .card-icon {
-  width: 48px;
-  height: 48px;
+  width: 49px;
+
+  height: 49px;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
-  background: #f3f4f6;
+
+  background:
+    rgba(40, 103, 230, 0.09);
+
+  border:
+    1px solid rgba(40, 103, 230, 0.12);
+
   border-radius: 12px;
+
   font-size: 25px;
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
 }
+
+.student-card:hover .card-icon {
+  transform:
+    rotate(-6deg)
+    scale(1.05);
+
+  background:
+    rgba(40, 103, 230, 0.15);
+}
+
+
+/* =========================================================
+   CARD NUMBER
+   ========================================================= */
 
 .card-number {
-  font-size: 13px;
-  font-weight: 700;
-  color: #9ca3af;
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size: 20px;
+
+  font-weight: 600;
+
+  color: #8d96a3;
+
+  transform:
+    rotate(3deg);
 }
 
-/* Card Content */
+
+/* =========================================================
+   CARD CONTENT
+   ========================================================= */
 
 .card-content {
   margin-top: 20px;
-  padding-right: 30px;
+
+  padding-right: 35px;
+
+  position: relative;
+
+  z-index: 2;
 }
 
 .student-card h3 {
-  margin: 0 0 8px;
-  font-size: 20px;
+  margin:
+    0 0 8px;
+
+  font-family:
+    "Playfair Display",
+    serif;
+
+  font-size: 22px;
+
   color: #111827;
+
+  letter-spacing: -0.4px;
 }
 
 .student-card p {
   margin: 0;
-  color: #6b7280;
+
+  color: #69778a;
+
   line-height: 1.5;
-  font-size: 14px;
+
+  font-size: 13px;
 }
 
-/* Arrow */
+
+/* =========================================================
+   ARROW
+   ========================================================= */
 
 .arrow {
   position: absolute;
-  right: 25px;
-  bottom: 22px;
+
+  right: 23px;
+
+  bottom: 20px;
+
   font-size: 24px;
-  color: #6b7280;
-  transition: transform 0.2s ease;
+
+  color: #7b8796;
+
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease;
 }
 
 .student-card:hover .arrow {
-  transform: translateX(5px);
-  color: #111827;
+  transform:
+    translateX(7px)
+    rotate(-3deg);
+
+  color: #2867e6;
 }
 
-/* Tablet */
 
-@media (max-width: 950px) {
+/* =========================================================
+   STICKY NOTE
+   ========================================================= */
+
+.student-content::after {
+  content:
+    "PLAN IT.\A JOIN IT.\A ENJOY IT. ✦";
+
+  white-space: pre;
+
+  position: absolute;
+
+  right: -25px;
+
+  top: 55px;
+
+  width: 125px;
+
+  min-height: 105px;
+
+  padding: 15px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff0a9,
+      #ffe083
+    );
+
+  color: #5b4b1e;
+
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size: 19px;
+
+  line-height: 1.05;
+
+  box-shadow:
+    6px 10px 18px rgba(35, 40, 45, 0.14);
+
+  transform:
+    rotate(5deg);
+
+  z-index: 10;
+
+  animation:
+    studentStickyFloat 6s ease-in-out infinite;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes studentHeaderAppear {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes studentNotebookLeft {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(-10deg);
+  }
+
+  50% {
+    transform:
+      translateY(-22px)
+      rotate(-6deg);
+  }
+}
+
+@keyframes studentNotebookRight {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(9deg);
+  }
+
+  50% {
+    transform:
+      translateY(25px)
+      rotate(13deg);
+  }
+}
+
+@keyframes studentPenMove {
+  0%,
+  100% {
+    transform:
+      translate(0, 0)
+      rotate(-30deg);
+  }
+
+  50% {
+    transform:
+      translate(25px, -20px)
+      rotate(-24deg);
+  }
+}
+
+@keyframes studentBooksMove {
+  0%,
+  100% {
+    transform:
+      translate(0, 0)
+      rotate(12deg);
+  }
+
+  50% {
+    transform:
+      translate(-18px, 20px)
+      rotate(17deg);
+  }
+}
+
+@keyframes studentStickyFloat {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(5deg);
+  }
+
+  50% {
+    transform:
+      translateY(-15px)
+      rotate(8deg);
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
   .student-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, 1fr);
   }
 
   .student-header {
-    padding: 30px 35px;
+    padding:
+      28px 5%;
   }
 
   .student-content {
-    padding: 40px 35px;
+    width: 90%;
+  }
+
+  .student-content::after {
+    right: -10px;
   }
 }
 
-/* Mobile */
 
-@media (max-width: 600px) {
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  body::before {
+    left: -130px;
+
+    transform:
+      scale(0.75)
+      rotate(-10deg);
+  }
+
+  body::after {
+    right: -130px;
+
+    transform:
+      scale(0.75)
+      rotate(9deg);
+  }
+
   .student-header {
-    padding: 25px;
+    padding:
+      25px 22px;
+
     flex-direction: column;
+
     align-items: flex-start;
+
     gap: 20px;
   }
+
+  .student-header h1 {
+    font-size: 30px;
+  }
+
+  .student-header p {
+    font-size: 13px;
+  }
+
+  .profile-btn {
+    width: 100%;
+
+    text-align: center;
+  }
+
+  .student-content {
+    width: 92%;
+
+    padding:
+      40px 0 70px;
+  }
+
+  .dashboard-title {
+    padding:
+      25px 24px;
+  }
+
+  .dashboard-title h2 {
+    font-size: 29px;
+  }
+
+  .student-grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+  .student-card {
+    min-height: 190px;
+  }
+
+  .student-content::after {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 400px) {
 
   .student-header h1 {
     font-size: 27px;
   }
 
-  .student-content {
-    padding: 30px 20px;
+  .dashboard-title h2 {
+    font-size: 26px;
   }
 
-  .student-grid {
-    grid-template-columns: 1fr;
+  .student-card {
+    padding:
+      23px;
+  }
+
+  .student-card h3 {
+    font-size: 20px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.01ms !important;
   }
 }
