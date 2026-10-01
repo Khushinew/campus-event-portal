@@ -82,16 +82,8 @@ function Login() {
                         Events
                     </Link>
 
-                    <Link to="/calendar">
-                        Calendar
-                    </Link>
-
-                    <Link to="/login">
+                    <Link to="/login" className="register-btn">
                         Login
-                    </Link>
-
-                    <Link to="/register" className="register-btn">
-                        Register
                     </Link>
 
                 </nav>
@@ -184,19 +176,6 @@ function Login() {
                         </button>
 
                     </form>
-
-
-                    {/* Register Link */}
-                    <p className="register-text">
-
-                        Don't have an account?
-
-                        <Link to="/register">
-                            {" "}Create an Account
-                        </Link>
-
-                    </p>
-
                 </div>
 
             </main>

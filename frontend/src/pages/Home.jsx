@@ -14,10 +14,8 @@ function Home() {
                 <nav className="nav-links">
                     <Link to="/">Home</Link>
                     <Link to="/events">Events</Link>
-                    <Link to="/calendar">Calendar</Link>
-                    <Link to="/login">Login</Link>
-                    <Link to="/register" className="register-btn">
-                        Register
+                    <Link to="/login" className="register-btn">
+                        Login
                     </Link>
                 </nav>
             </header>
@@ -45,11 +43,11 @@ function Home() {
 
                     <div className="hero-buttons">
 
-                        <Link to="/login" className="primary-btn">
+                        <Link to="/events" className="primary-btn">
                             Explore Events
                         </Link>
 
-                        <Link to="/register" className="secondary-btn">
+                        <Link to="/login" className="secondary-btn">
                             Get Started
                         </Link>
 
