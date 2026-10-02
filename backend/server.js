@@ -12,7 +12,12 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+require('dotenv').config({ path: './.env' });
+require('dotenv').config();
 
+console.log('Loaded MONGO_URI:', process.env.MONGO_URI);
+
+mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/campus_event_db');
 // Middleware to verify JWT
 function verifyToken(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -140,7 +145,15 @@ app.post("/api/login", async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await User.findOne({ email });
+        const normalizedEmail = String(email || "").trim().toLowerCase();
+
+        if (!normalizedEmail || !password) {
+            return res.status(400).json({
+                message: "Please provide your university email and password."
+            });
+        }
+
+        const user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
             return res.status(404).json({

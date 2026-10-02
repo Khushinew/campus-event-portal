@@ -1,18 +1,33 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getCampusRole, getDashboardPath, getStoredUser } from "../auth";
 import "./Login.css";
 
 function Login() {
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
+    useEffect(() => {
+        const user = getStoredUser();
+        if (user) navigate(getDashboardPath(user.role), { replace: true });
+    }, [navigate]);
+
     const handleLogin = async (e) => {
         setError("");
         e.preventDefault();
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const emailRole = getCampusRole(normalizedEmail);
+
+        if (!emailRole) {
+            setError("Use your GSFC University student or faculty email address.");
+            return;
+        }
 
         try {
 
@@ -25,7 +40,7 @@ function Login() {
                 },
 
                 body: JSON.stringify({
-                    email: email,
+                    email: normalizedEmail,
                     password: password
                 })
             });
@@ -33,8 +48,10 @@ function Login() {
             const data = await response.json();
 
             if (response.ok) {
-
-                
+                if (data.user?.role !== emailRole) {
+                    setError("This email does not match the account role in the university directory.");
+                    return;
+                }
 
                 console.log("Logged in user:", data.user);
 
@@ -42,12 +59,20 @@ function Login() {
                 localStorage.setItem("user", JSON.stringify(data.user));
                 localStorage.setItem("token", data.token);
 
-                // Go to home page
-                if (data.user.role === "faculty") {
-        navigate("/faculty-dashboard");
-    } else {
-        navigate("/student-dashboard");
-    }
+                const returnLocation = location.state?.from;
+                const isPendingStudentRegistration =
+                    emailRole === "student" &&
+                    returnLocation?.pathname === "/student/register-event";
+
+                navigate(
+                    isPendingStudentRegistration
+                        ? returnLocation.pathname
+                        : getDashboardPath(emailRole),
+                    {
+                        replace: true,
+                        state: isPendingStudentRegistration ? returnLocation.state : undefined,
+                    }
+                );
 
             } else {
 

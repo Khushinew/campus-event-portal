@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"; 
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom"; 
 import "./App.css";
 import Home from "./pages/Home"; 
 import Login from "./pages/Login"; 
-import Register from "./pages/Register"; 
- 
+import FacultyDashboard from "./pages/FacultyDashboard";
+import { getDashboardPath, getStoredUser } from "./auth";
 import StudentDashboard from "./pages/StudentDashboard"; 
 import ViewEvents from "./pages/StudentEvents/ViewEvents"; 
 import RegisterEvent from "./pages/StudentEvents/RegisterEvent"; 
@@ -11,6 +11,29 @@ import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar"; 
 import EventDetails from "./pages/StudentEvents/EventDetails"; 
 import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent"; 
+
+function PublicEventsEntry() {
+  const user = getStoredUser();
+
+  return user
+    ? <Navigate to={getDashboardPath(user.role)} replace />
+    : <ViewEvents />;
+}
+
+function EventRegistrationRoute() {
+  const location = useLocation();
+  const user = getStoredUser();
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (user.role !== "student") {
+    return <Navigate to={getDashboardPath(user.role)} replace />;
+  }
+
+  return <RegisterEvent />;
+}
  
 function App() { 
   return ( 
@@ -22,9 +45,12 @@ function App() {
  
         {/* Login */} 
         <Route path="/login" element={<Login />} /> 
- 
-        {/* Registration */} 
-        <Route path="/register" element={<Register />} /> 
+
+        {/* Public event preview for guests */}
+        <Route path="/events" element={<PublicEventsEntry />} />
+
+        {/* Faculty Dashboard */}
+        <Route path="/faculty-dashboard" element={<FacultyDashboard />} />
  
         {/* Student Dashboard */} 
         <Route 
@@ -47,7 +73,7 @@ function App() {
         {/* Student Register Event */} 
         <Route 
           path="/student/register-event" 
-          element={<RegisterEvent />} 
+          element={<EventRegistrationRoute />} 
         /> 
  
         {/* Student Registered Events */} 
