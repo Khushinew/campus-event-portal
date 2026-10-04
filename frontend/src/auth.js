@@ -1,12 +1,12 @@
-const CAMPUS_DOMAIN = "gsfcuniversity.ac.in";
+const CAMPUS_DOMAIN = "campus.edu.in";
 
 export function getCampusRole(email) {
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const studentEmail = new RegExp(
-    `^\\d{2}(?:bba|bio|mba|bb|bc|bt)\\d+@${CAMPUS_DOMAIN.replaceAll(".", "\\.")}$`
+    `^\\d{2}(?:bba|mba|ace|bt|bio|dd)04(?:0\\d{2}|1\\d{2}|200)@${CAMPUS_DOMAIN.replaceAll(".", "\\.")}$`
   );
   const facultyEmail = new RegExp(
-    `^[a-z]+(?:\\.[a-z]+)+@${CAMPUS_DOMAIN.replaceAll(".", "\\.")}$`
+    `^[a-z]+\\.[a-z]+@${CAMPUS_DOMAIN.replaceAll(".", "\\.")}$`
   );
 
   if (studentEmail.test(normalizedEmail)) return "student";

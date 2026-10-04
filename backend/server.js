@@ -6,16 +6,13 @@ const Event = require("./models/Event");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const CollegeUser = require("./models/CollegeUser");
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-require('dotenv').config({ path: './.env' });
-require('dotenv').config();
-
-console.log('Loaded MONGO_URI:', process.env.MONGO_URI);
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/campus_event_db');
 // Middleware to verify JWT
@@ -51,6 +48,21 @@ function verifyToken(req, res, next) {
 }
 
 const PORT = 5000;
+const DEFAULT_INITIAL_PASSWORD = "Campus@123";
+const CAMPUS_DOMAIN = "campus.edu.in";
+
+function getCampusRole(email) {
+    const studentEmail = new RegExp(
+        `^\\d{2}(?:bba|mba|ace|bt|bio|dd)04(?:0\\d{2}|1\\d{2}|200)@${CAMPUS_DOMAIN.replaceAll(".", "\\.")}$`
+    );
+    const facultyEmail = new RegExp(
+        `^[a-z]+\\.[a-z]+@${CAMPUS_DOMAIN.replaceAll(".", "\\.")}$`
+    );
+
+    if (studentEmail.test(email)) return "student";
+    if (facultyEmail.test(email)) return "faculty";
+    return null;
+}
 
 // ===============================
 // HOME
@@ -71,73 +83,6 @@ app.get("/api/test", (req, res) => {
 });
 
 // ===============================
-// REGISTER
-// ===============================
-
-app.post("/api/register", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({
-                message: "Please provide your university email and password."
-            });
-        }
-
-        const normalizedEmail = email.trim().toLowerCase();
-
-        // 1. Find the person in the college directory
-        const collegeUser = await CollegeUser.findOne({
-            email: normalizedEmail
-        });
-
-        if (!collegeUser) {
-            return res.status(403).json({
-                message: "This email is not present in the college directory."
-            });
-        }
-
-        // 2. Check whether they already have an account
-        const existingUser = await User.findOne({
-            email: normalizedEmail
-        });
-
-        if (existingUser) {
-            return res.status(409).json({
-                message: "An account already exists for this email."
-            });
-        }
-
-        // 3. Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // 4. Create the account using the directory record
-        const newUser = new User({
-            name: collegeUser.name,
-            email: collegeUser.email,
-            password: hashedPassword,
-            role: collegeUser.role,
-            department: collegeUser.department,
-            semester: collegeUser.semester,
-            facultyId: collegeUser.facultyId,
-            designation: collegeUser.designation
-        });
-
-        await newUser.save();
-
-        res.status(201).json({
-            message: "User registered successfully."
-        });
-
-    } catch (error) {
-        console.error("Registration error:", error);
-
-        res.status(500).json({
-            message: "Registration failed."
-        });
-    }
-});
-// ===============================
 // LOGIN
 // ===============================
 
@@ -149,27 +94,79 @@ app.post("/api/login", async (req, res) => {
 
         if (!normalizedEmail || !password) {
             return res.status(400).json({
-                message: "Please provide your university email and password."
+                message: "Please provide your campus email and password."
             });
         }
 
-        const user = await User.findOne({ email: normalizedEmail });
+        const emailRole = getCampusRole(normalizedEmail);
+
+        if (!emailRole) {
+            return res.status(400).json({
+                message: "Use a valid faculty or student email ending in @campus.edu.in."
+            });
+        }
+
+        let user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
-            return res.status(404).json({
-                message: "User not found"
+            const collegeUser = await CollegeUser.findOne({
+                email: normalizedEmail
+            });
+
+            if (!collegeUser) {
+                return res.status(404).json({
+                    message: "User not found"
+                });
+            }
+
+            if (collegeUser.role !== emailRole) {
+                return res.status(403).json({
+                    message: "This email format does not match the role in the college directory."
+                });
+            }
+
+            if (password !== DEFAULT_INITIAL_PASSWORD) {
+                return res.status(401).json({
+                    message: "Invalid email or password"
+                });
+            }
+
+            user = new User({
+                name: collegeUser.name,
+                email: collegeUser.email,
+                password: await bcrypt.hash(DEFAULT_INITIAL_PASSWORD, 10),
+                role: collegeUser.role,
+                department: collegeUser.department,
+                semester: collegeUser.semester,
+                facultyId: collegeUser.facultyId,
+                designation: collegeUser.designation
+            });
+
+            try {
+                await user.save();
+            } catch (error) {
+                if (error.code !== 11000) throw error;
+
+                user = await User.findOne({ email: normalizedEmail });
+                if (!user) throw error;
+            }
+        }
+
+        if (user.role !== emailRole) {
+            return res.status(403).json({
+                message: "This email format does not match the account role."
             });
         }
 
-        const isPasswordCorrect = await bcrypt.compare(
-            password,
-            user.password
-        );
-
-        if (!isPasswordCorrect) {
+        if (password !== DEFAULT_INITIAL_PASSWORD) {
             return res.status(401).json({
-                message: "Invalid password"
+                message: "Invalid email or password"
             });
+        }
+
+        if (!user.password || !(await bcrypt.compare(DEFAULT_INITIAL_PASSWORD, user.password))) {
+            user.password = await bcrypt.hash(DEFAULT_INITIAL_PASSWORD, 10);
+            await user.save();
         }
 
         const token = jwt.sign(
@@ -185,8 +182,6 @@ app.post("/api/login", async (req, res) => {
 
         res.status(200).json({
             message: "Login successful",
-
-            message:"Login successful",
             token: token,
             user: {
                 id: user._id,
