@@ -706,6 +706,33 @@ body::after {
     0 0 0 3px rgba(40, 103, 230, 0.1);
 }
 
+.password-input-wrap {
+  position: relative;
+}
+
+.password-input-wrap input {
+  padding-right: 64px;
+}
+
+.password-visibility-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: #2867e6;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.password-visibility-btn:focus-visible {
+  outline: 2px solid #2867e6;
+  outline-offset: 2px;
+}
+
 
 /* =========================================================
    LOGIN OPTIONS

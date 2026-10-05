@@ -1,126 +1,198 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getDashboardPath, getStoredUser } from "../../auth";
+import businessImage from "../../assets/buisness.jpg";
+import debateImage from "../../assets/debate.jpg";
+import dotsImage from "../../assets/dots.jpg";
 import "./ViewEvents.css";
 
 function ViewEvents() {
+  const user = getStoredUser();
   const events = [
     {
-      id: 1,
-      title: "AI Workshop",
-      date: "15 October 2026",
-      time: "10:00 AM - 1:00 PM",
-      venue: "Innovation Lab",
-      category: "Technology",
-      description:
-        "Explore practical AI tools, prompt design, and responsible ways to use machine learning.",
-    },
-    {
-      id: 2,
-      title: "Excel Workshop",
-      date: "20 October 2026",
-      time: "11:00 AM - 2:00 PM",
-      venue: "Computer Lab 2",
-      category: "Workshop",
-      description:
-        "Build confidence with formulas, pivot tables, and clear data visualizations in Excel.",
-    },
-    {
-      id: 3,
-      title: "Business Workshop",
-      date: "25 October 2026",
-      time: "9:30 AM - 12:30 PM",
-      venue: "Seminar Hall",
+      id: "business",
+      title: "Business Analytics Workshop",
+      date: "18 October 2026",
+      time: "10:00 AM - 12:30 PM",
+      venue: "School of Business, Room 204",
+      guest: "Business faculty guest speaker",
+      capacity: 80,
+      charge: "Free",
+      attendanceRegistration: true,
       category: "Business",
+      image: businessImage,
+      imageAlt: "Business charts being reviewed during a workshop",
+      imageRatio: "4 / 3",
       description:
-        "Turn an early idea into a business plan with guidance on customers, costs, and pitching.",
+        "Learn to read business data, make confident decisions, and turn numbers into a clear story.",
+    },
+    {
+      id: "debate",
+      title: "Debate: Prepare to Raise Your Voice",
+      date: "22 October 2026",
+      time: "2:00 PM - 4:00 PM",
+      venue: "University Assembly Hall",
+      guest: "Debate society coach",
+      capacity: 120,
+      charge: "Free",
+      attendanceRegistration: true,
+      category: "Debate",
+      image: debateImage,
+      imageAlt: "Students gathered in a large debate assembly hall",
+      imageRatio: "16 / 10",
+      description:
+        "Shape a strong argument, listen with purpose, and speak up for the ideas you believe in.",
+    },
+    {
+      id: "dots",
+      title: "Dots: Build Your Own AI Agent",
+      date: "29 October 2026",
+      time: "11:00 AM - 1:30 PM",
+      venue: "Innovation Lab",
+      guest: "Campus AI workshop facilitator",
+      capacity: 40,
+      charge: "Free",
+      attendanceRegistration: true,
+      category: "AI & Technology",
+      image: dotsImage,
+      imageAlt: "Colorful Dots characters beneath the OpenAI wordmark",
+      imageRatio: "1 / 1",
+      description:
+        "Discover how to create a personal AI agent, shape its instructions, and put it to work on your ideas.",
     },
   ];
-  const [expandedEvent, setExpandedEvent] = useState(null);
+  const [activeInfo, setActiveInfo] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+
+  useEffect(() => {
+    if (!activeInfo) return undefined;
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setActiveInfo(null);
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [activeInfo]);
+
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch = `${event.title} ${event.category} ${event.description}`
+      .toLowerCase()
+      .includes(searchQuery.trim().toLowerCase());
+    const matchesCategory = categoryFilter === "All" || event.category === categoryFilter;
+
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div className="view-events-page">
-
-      {/* Header */}
+    <main className="view-events-page">
       <div className="events-header">
         <div>
-          <h1>Explore Campus Events</h1>
-          <p>Find a workshop that sparks your next idea.</p>
+          <p className="events-eyebrow">CAMPUS CALENDAR / AUTUMN 2026</p>
+          <h1>Find your next big idea.</h1>
+          <p>Workshops, conversations, and new perspectives, all on campus.</p>
         </div>
 
-        <Link to="/" className="back-btn">
-          Home
+        <Link to={user ? getDashboardPath(user.role) : "/"} className="back-btn">
+          {user ? "Dashboard" : "Home"}
         </Link>
       </div>
 
-      {/* Search and Filter */}
       <div className="events-toolbar">
         <input
           type="text"
           placeholder="Search events..."
           className="event-search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          aria-label="Search campus events"
         />
 
-        <select className="event-filter">
-          <option value="">All Categories</option>
-          <option value="Technology">Technology</option>
-          <option value="Workshop">Workshop</option>
-          <option value="Competition">Competition</option>
+        <select
+          className="event-filter"
+          value={categoryFilter}
+          onChange={(event) => setCategoryFilter(event.target.value)}
+          aria-label="Filter events by category"
+        >
+          <option value="All">All categories</option>
+          <option value="Business">Business</option>
+          <option value="Debate">Debate</option>
+          <option value="AI & Technology">AI &amp; Technology</option>
         </select>
       </div>
 
-      {/* Events */}
       <div className="events-grid">
-        {events.map((event) => (
-          <div className="view-event-card" key={event.id}>
-
-            <div className="event-card-top">
-              <span className="event-category">
-                {event.category}
-              </span>
-
-              <span className="event-date">
-                {event.date}
-              </span>
+        {filteredEvents.map((event) => (
+          <article
+            className="view-event-card"
+            key={event.id}
+            style={{ "--event-image-ratio": event.imageRatio }}
+          >
+            <div className="event-image-wrap">
+              <img src={event.image} alt={event.imageAlt} className="event-image" />
+              <span className="event-category">{event.category}</span>
             </div>
 
-            <h2>{event.title}</h2>
-
-            <p className="event-description">
-              {event.description}
-            </p>
-
-            <div className="event-info">
-              <p>🕐 {event.time}</p>
-              <p>📍 {event.venue}</p>
-            </div>
-
-            {expandedEvent === event.id && (
-              <div className="event-expanded-info">
-                <p><strong>Date:</strong> {event.date}</p>
-                <p><strong>Time:</strong> {event.time}</p>
-                <p><strong>Location:</strong> {event.venue}</p>
+            <div className="event-card-content">
+              <p className="event-date">{event.date}</p>
+              <h2>{event.title}</h2>
+              <p className="event-description">{event.description}</p>
+              <div className="event-actions">
+                <Link
+                  to="/student/register-event"
+                  state={{ event }}
+                  className="event-register-button"
+                >
+                  Register
+                </Link>
+                <button
+                  type="button"
+                  className="info-event-button"
+                  aria-expanded={activeInfo === event.id}
+                  aria-controls={`event-info-${event.id}`}
+                  onClick={() => setActiveInfo(activeInfo === event.id ? null : event.id)}
+                >
+                  Info
+                </button>
               </div>
-            )}
-
-            <div className="event-actions">
-              <Link to="/login" className="details-btn">
-                Register
-              </Link>
-              <button
-                type="button"
-                className="info-event-button"
-                aria-expanded={expandedEvent === event.id}
-                onClick={() => setExpandedEvent(expandedEvent === event.id ? null : event.id)}
-              >
-                {expandedEvent === event.id ? "Hide info" : "Info"}
-              </button>
             </div>
 
-          </div>
+            {activeInfo === event.id && (
+              <section
+                className="event-info-popover"
+                id={`event-info-${event.id}`}
+                role="dialog"
+                aria-label={`${event.title} information`}
+              >
+                <button
+                  type="button"
+                  className="event-info-close"
+                  onClick={() => setActiveInfo(null)}
+                  aria-label="Close event information"
+                >
+                  ×
+                </button>
+                <p className="event-info-kicker">EVENT DETAILS</p>
+                <h3>{event.title}</h3>
+                <dl className="event-info-list">
+                  <div><dt>Date &amp; time</dt><dd>{event.date}<br />{event.time}</dd></div>
+                  <div><dt>Venue</dt><dd>{event.venue}</dd></div>
+                  <div><dt>Guest</dt><dd>{event.guest}</dd></div>
+                  <div><dt>Total capacity</dt><dd>{event.capacity} people</dd></div>
+                  <div><dt>Charge</dt><dd>{event.charge || "Free"}</dd></div>
+                  <div><dt>Attendance registration</dt><dd>{event.attendanceRegistration ? "Yes" : "No"}</dd></div>
+                </dl>
+              </section>
+            )}
+          </article>
         ))}
       </div>
 
-    </div>
+      {filteredEvents.length === 0 && (
+        <p className="events-empty-state">No events match your search.</p>
+      )}
+    </main>
   );
 }
 
