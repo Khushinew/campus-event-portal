@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./ViewEvents.css";
 
@@ -5,35 +6,36 @@ function ViewEvents() {
   const events = [
     {
       id: 1,
-      title: "Tech Fest 2026",
+      title: "AI Workshop",
       date: "15 October 2026",
-      time: "10:00 AM - 4:00 PM",
-      venue: "Main Auditorium",
+      time: "10:00 AM - 1:00 PM",
+      venue: "Innovation Lab",
       category: "Technology",
       description:
-        "A campus technology event featuring workshops, competitions and technical sessions.",
+        "Explore practical AI tools, prompt design, and responsible ways to use machine learning.",
     },
     {
       id: 2,
-      title: "AI Workshop",
+      title: "Excel Workshop",
       date: "20 October 2026",
       time: "11:00 AM - 2:00 PM",
-      venue: "Seminar Hall",
+      venue: "Computer Lab 2",
       category: "Workshop",
       description:
-        "Learn the fundamentals of artificial intelligence through an interactive workshop.",
+        "Build confidence with formulas, pivot tables, and clear data visualizations in Excel.",
     },
     {
       id: 3,
-      title: "Inter-College Hackathon",
+      title: "Business Workshop",
       date: "25 October 2026",
-      time: "9:00 AM - 6:00 PM",
-      venue: "Computer Lab",
-      category: "Competition",
+      time: "9:30 AM - 12:30 PM",
+      venue: "Seminar Hall",
+      category: "Business",
       description:
-        "A coding competition where students work together to build innovative solutions.",
+        "Turn an early idea into a business plan with guidance on customers, costs, and pitching.",
     },
   ];
+  const [expandedEvent, setExpandedEvent] = useState(null);
 
   return (
     <div className="view-events-page">
@@ -41,12 +43,12 @@ function ViewEvents() {
       {/* Header */}
       <div className="events-header">
         <div>
-          <h1>Upcoming Events</h1>
-          <p>Discover events happening across the campus.</p>
+          <h1>Explore Campus Events</h1>
+          <p>Find a workshop that sparks your next idea.</p>
         </div>
 
-        <Link to="/student-dashboard" className="back-btn">
-          ← Dashboard
+        <Link to="/" className="back-btn">
+          Home
         </Link>
       </div>
 
@@ -92,12 +94,27 @@ function ViewEvents() {
               <p>📍 {event.venue}</p>
             </div>
 
-            <Link
-              to="/student/event-details"
-              className="details-btn"
-            >
-              View Details →
-            </Link>
+            {expandedEvent === event.id && (
+              <div className="event-expanded-info">
+                <p><strong>Date:</strong> {event.date}</p>
+                <p><strong>Time:</strong> {event.time}</p>
+                <p><strong>Location:</strong> {event.venue}</p>
+              </div>
+            )}
+
+            <div className="event-actions">
+              <Link to="/login" className="details-btn">
+                Register
+              </Link>
+              <button
+                type="button"
+                className="info-event-button"
+                aria-expanded={expandedEvent === event.id}
+                onClick={() => setExpandedEvent(expandedEvent === event.id ? null : event.id)}
+              >
+                {expandedEvent === event.id ? "Hide info" : "Info"}
+              </button>
+            </div>
 
           </div>
         ))}
