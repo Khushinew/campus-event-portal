@@ -3,7 +3,6 @@ import "./App.css";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 
 import StudentDashboard from "./pages/StudentDashboard";
 import ViewEvents from "./pages/StudentEvents/ViewEvents";
@@ -24,10 +23,7 @@ function App() {
         {/* Login */}
         <Route path="/login" element={<Login />} />
 
-        {/* Registration */}
-        <Route path="/register" element={<Register />} />
-
-        {/* Public event exploration */}
+        {/* Public Event Exploration */}
         <Route path="/events" element={<ViewEvents />} />
 
         {/* Student Dashboard */}
