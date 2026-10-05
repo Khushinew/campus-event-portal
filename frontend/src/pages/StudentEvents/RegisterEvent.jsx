@@ -1,8 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./RegisterEvent.css";
 
 function RegisterEvent() {
-  const event = {
+  const location = useLocation();
+  const selectedEvent = location.state?.event;
+  const event = selectedEvent || {
     title: "Tech Fest 2026",
     date: "15 October 2026",
     time: "10:00 AM - 4:00 PM",

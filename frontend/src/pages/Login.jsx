@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getCampusRole, getDashboardPath, getStoredUser } from "../auth";
 import "./Login.css";
 
 function Login() {
@@ -8,11 +9,25 @@ function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+
+    useEffect(() => {
+        const user = getStoredUser();
+        if (user) navigate(getDashboardPath(user.role), { replace: true });
+    }, [navigate]);
 
     const handleLogin = async (e) => {
         setError("");
         e.preventDefault();
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const emailRole = getCampusRole(normalizedEmail);
+
+        if (!emailRole) {
+            setError("Use a valid faculty or student email ending in @campus.edu.in.");
+            return;
+        }
 
         try {
 
@@ -25,7 +40,7 @@ function Login() {
                 },
 
                 body: JSON.stringify({
-                    email: email,
+                    email: normalizedEmail,
                     password: password
                 })
             });
@@ -33,8 +48,10 @@ function Login() {
             const data = await response.json();
 
             if (response.ok) {
-
-                
+                if (data.user?.role !== emailRole) {
+                    setError("This email does not match the account role in the university directory.");
+                    return;
+                }
 
                 console.log("Logged in user:", data.user);
 
@@ -42,12 +59,7 @@ function Login() {
                 localStorage.setItem("user", JSON.stringify(data.user));
                 localStorage.setItem("token", data.token);
 
-                // Go to home page
-                if (data.user.role === "faculty") {
-        navigate("/faculty-dashboard");
-    } else {
-        navigate("/student-dashboard");
-    }
+                navigate(getDashboardPath(emailRole), { replace: true });
 
             } else {
 
@@ -140,13 +152,25 @@ function Login() {
                                 Password
                             </label>
 
-                            <input
-                                type="password"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
+                            <div className="password-input-wrap">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    autoComplete="current-password"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    className="password-visibility-btn"
+                                    onClick={() => setShowPassword((visible) => !visible)}
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                    aria-pressed={showPassword}
+                                >
+                                    {showPassword ? "Hide" : "Show"}
+                                </button>
+                            </div>
 
                         </div>
 
