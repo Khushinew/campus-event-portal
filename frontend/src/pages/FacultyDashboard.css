@@ -1,8 +1,15 @@
 /* =========================================================
-   FACULTY DASHBOARD — CREATIVE NOTEBOOK / CAMPUSPHERE STYLE
+   CAMPUSPHERE — FACULTY DASHBOARD
+   CREATIVE NOTEBOOK / ACADEMIC DESK UI
+   JSX IS NOT CHANGED
    ========================================================= */
 
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Caveat:wght@500;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Caveat:wght@500;600;700&display=swap');
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
 
 * {
     box-sizing: border-box;
@@ -15,36 +22,8 @@ html {
 body {
     margin: 0;
     font-family: "DM Sans", sans-serif;
-    color: #172033;
-    overflow-x: hidden;
-
-    background:
-        radial-gradient(
-            circle at 8% 12%,
-            rgba(255, 211, 117, 0.85),
-            transparent 23%
-        ),
-        radial-gradient(
-            circle at 94% 15%,
-            rgba(120, 176, 226, 0.65),
-            transparent 25%
-        ),
-        radial-gradient(
-            circle at 85% 90%,
-            rgba(196, 153, 219, 0.55),
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 18% 88%,
-            rgba(133, 190, 148, 0.38),
-            transparent 25%
-        ),
-        linear-gradient(
-            135deg,
-            #e8dfc9 0%,
-            #dfe7e7 45%,
-            #e2dce9 100%
-        );
+    color: #171717;
+    background: #e8e5dc;
 }
 
 button,
@@ -54,243 +33,141 @@ textarea {
     font-family: inherit;
 }
 
-
-/* =========================================================
-   NOTEBOOK BACKGROUND — LEFT
-   ========================================================= */
-
-body::before {
-    content: "";
-
-    position: fixed;
-    left: -75px;
-    top: 160px;
-
-    width: 330px;
-    height: 230px;
-
-    border-radius: 14px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent 0 42px,
-            rgba(220, 75, 75, 0.22) 43px,
-            transparent 44px
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            #fff9df 0px,
-            #fff9df 28px,
-            rgba(82, 132, 181, 0.18) 29px,
-            #fff9df 30px
-        );
-
-    border: 1px solid rgba(80, 70, 50, 0.1);
-
-    box-shadow:
-        15px 18px 35px rgba(45, 45, 45, 0.18);
-
-    transform: rotate(-10deg);
-
-    opacity: 0.78;
-
-    filter: blur(0.7px);
-
-    pointer-events: none;
-
-    z-index: -2;
-
-    animation: facultyNotebookLeft 8s ease-in-out infinite;
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
 
 /* =========================================================
-   NOTEBOOK BACKGROUND — RIGHT
-   ========================================================= */
-
-body::after {
-    content: "";
-
-    position: fixed;
-    right: -70px;
-    bottom: 55px;
-
-    width: 320px;
-    height: 220px;
-
-    border-radius: 14px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent 0 42px,
-            rgba(220, 75, 75, 0.18) 43px,
-            transparent 44px
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            #f9f0ff 0px,
-            #f9f0ff 28px,
-            rgba(110, 130, 180, 0.18) 29px,
-            #f9f0ff 30px
-        );
-
-    border: 1px solid rgba(90, 70, 110, 0.12);
-
-    box-shadow:
-        -15px 18px 35px rgba(50, 45, 60, 0.18);
-
-    transform: rotate(9deg);
-
-    opacity: 0.72;
-
-    filter: blur(0.8px);
-
-    pointer-events: none;
-
-    z-index: -2;
-
-    animation: facultyNotebookRight 10s ease-in-out infinite;
-}
-
-
-/* =========================================================
-   FACULTY DASHBOARD
+   MAIN DASHBOARD
    ========================================================= */
 
 .faculty-dashboard {
     min-height: 100vh;
-
+    display: flex;
     position: relative;
+    overflow-x: hidden;
 
-    isolation: isolate;
+    background:
+        radial-gradient(
+            circle at 15% 20%,
+            rgba(255, 255, 255, 0.8),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 90% 80%,
+            rgba(210, 205, 194, 0.8),
+            transparent 28%
+        ),
+        #e8e5dc;
 
-    overflow: hidden;
-
-    background: transparent;
-
-    color: #172033;
+    color: #171717;
 }
 
 
 /* =========================================================
-   DECORATIVE PEN
+   NOTEBOOK PAPER BACKGROUND
    ========================================================= */
 
 .faculty-dashboard::before {
     content: "";
-
     position: fixed;
 
-    left: 70px;
-    top: 430px;
+    inset: 0;
 
-    width: 190px;
-    height: 18px;
-
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #1f3554 0%,
-            #285b91 55%,
-            #d8dde3 56%,
-            #d8dde3 72%,
-            #8a9199 73%
-        );
-
-    box-shadow:
-        0 8px 12px rgba(40, 50, 60, 0.15);
-
-    transform: rotate(-30deg);
+    pointer-events: none;
 
     opacity: 0.5;
 
-    filter: blur(1px);
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 31px,
+            rgba(70, 70, 70, 0.055) 32px
+        );
 
-    pointer-events: none;
-
-    z-index: -1;
-
-    animation: facultyPenMove 7s ease-in-out infinite;
+    z-index: 0;
 }
 
 
 /* =========================================================
-   DECORATIVE BOOKS
+   SIDEBAR
    ========================================================= */
 
-.faculty-dashboard::after {
-    content: "";
+.faculty-sidebar {
+    width: 265px;
+    min-height: 100vh;
 
     position: fixed;
+    left: 0;
+    top: 0;
 
-    right: 70px;
-    top: 155px;
+    display: flex;
+    flex-direction: column;
 
-    width: 145px;
-    height: 110px;
-
-    background:
-        linear-gradient(#7e9dca, #7e9dca)
-        0 0 / 120px 28px no-repeat,
-
-        linear-gradient(#e4a86b, #e4a86b)
-        15px 30px / 120px 28px no-repeat,
-
-        linear-gradient(#83ad91, #83ad91)
-        2px 60px / 125px 28px no-repeat;
-
-    filter: blur(1px);
-
-    opacity: 0.55;
-
-    transform: rotate(12deg);
-
-    pointer-events: none;
-
-    z-index: -1;
-
-    animation: facultyBooksMove 9s ease-in-out infinite;
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.dashboard-header {
-    min-height: 92px;
+    padding: 32px 22px;
 
     background:
         linear-gradient(
-            rgba(255, 255, 255, 0.97),
-            rgba(255, 252, 244, 0.94)
+            135deg,
+            #111111,
+            #171717 60%,
+            #0c0c0c
         );
 
-    backdrop-filter: blur(12px);
+    color: #ffffff;
 
-    display: flex;
+    border-right: 1px solid #303030;
 
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 0 7%;
-
-    position: relative;
-
-    z-index: 20;
-
-    border-bottom:
-        1px solid rgba(50, 60, 70, 0.12);
+    z-index: 50;
 
     box-shadow:
-        0 5px 20px rgba(40, 50, 60, 0.08);
+        8px 0 30px rgba(0, 0, 0, 0.16);
 
-    animation: facultyHeaderAppear 0.6s ease both;
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   SIDEBAR DECORATION
+   ========================================================= */
+
+.faculty-sidebar::before {
+    content: "";
+
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    top: -80px;
+    right: -100px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+.faculty-sidebar::after {
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    bottom: -80px;
+    left: -100px;
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    transform: rotate(25deg);
+
+    pointer-events: none;
 }
 
 
@@ -298,28 +175,244 @@ body::after {
    LOGO
    ========================================================= */
 
-.dashboard-logo {
-    font-family:
-        "Playfair Display",
-        serif;
+.faculty-logo {
+    font-family: "Playfair Display", serif;
 
-    font-size: 29px;
-
+    font-size: 28px;
     font-weight: 700;
 
-    color: #172033;
+    letter-spacing: -1px;
 
-    letter-spacing: -1.3px;
+    margin-bottom: 55px;
+
+    color: #f5f2e9;
+
+    position: relative;
+
+    z-index: 2;
 }
 
-.dashboard-logo::after {
+.faculty-logo::after {
     content: ".";
-    color: #2867e6;
+
+    color: #ffffff;
+
+    font-size: 32px;
 }
 
 
 /* =========================================================
-   FACULTY PROFILE
+   SIDEBAR NAVIGATION
+   ========================================================= */
+
+.faculty-nav {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    position: relative;
+
+    z-index: 2;
+}
+
+.faculty-nav a {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    min-height: 48px;
+
+    padding: 0 16px;
+
+    border-radius: 9px;
+
+    color: #aaa;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    letter-spacing: 0.2px;
+
+    transition:
+        color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+.faculty-nav a::before {
+    content: "";
+
+    width: 4px;
+    height: 4px;
+
+    margin-right: 12px;
+
+    border-radius: 50%;
+
+    background: #555;
+
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+.faculty-nav a:hover {
+    color: #ffffff;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    transform: translateX(4px);
+}
+
+.faculty-nav a:hover::before {
+    background: #ffffff;
+
+    transform: scale(1.8);
+}
+
+
+/* =========================================================
+   ACTIVE NAVIGATION
+   ========================================================= */
+
+.faculty-nav a.active {
+    color: #111111;
+
+    background: #f3efe4;
+
+    box-shadow:
+        4px 5px 0 rgba(255, 255, 255, 0.06);
+}
+
+.faculty-nav a.active::before {
+    background: #111111;
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+.logout-btn {
+    margin-top: auto;
+
+    width: 100%;
+
+    padding: 13px 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.13);
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: #aaa;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.logout-btn:hover {
+    background: #ffffff;
+
+    color: #111111;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   MAIN AREA
+   ========================================================= */
+
+.faculty-main {
+    width: calc(100% - 265px);
+
+    min-height: 100vh;
+
+    margin-left: 265px;
+
+    padding: 0 55px 70px;
+
+    position: relative;
+
+    z-index: 1;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.faculty-header {
+    min-height: 145px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    padding: 30px 0;
+
+    border-bottom: 1px solid rgba(30, 30, 30, 0.14);
+}
+
+
+/* =========================================================
+   HEADER TEXT
+   ========================================================= */
+
+.dashboard-label {
+    margin: 0 0 7px;
+
+    font-family: "Caveat", cursive;
+
+    font-size: 20px;
+
+    font-weight: 600;
+
+    color: #555;
+
+    letter-spacing: 0.5px;
+}
+
+.faculty-header h1 {
+    margin: 0;
+
+    font-family: "Playfair Display", serif;
+
+    font-size: clamp(32px, 4vw, 48px);
+
+    line-height: 1.05;
+
+    letter-spacing: -1.5px;
+
+    color: #151515;
+}
+
+.faculty-header > div:first-child > p:last-child {
+    margin: 10px 0 0;
+
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   PROFILE
    ========================================================= */
 
 .faculty-profile {
@@ -327,292 +420,75 @@ body::after {
 
     align-items: center;
 
-    gap: 25px;
-}
+    gap: 13px;
 
-.faculty-profile div {
-    display: flex;
+    padding: 9px 13px;
 
-    flex-direction: column;
+    background: rgba(255, 255, 255, 0.58);
 
-    align-items: flex-end;
-}
+    border: 1px solid rgba(30, 30, 30, 0.1);
 
-.faculty-profile div:first-child::before {
-    content: "FACULTY";
-
-    margin-bottom: 2px;
-
-    font-family:
-        "Courier New",
-        monospace;
-
-    font-size: 9px;
-
-    font-weight: 700;
-
-    letter-spacing: 2px;
-
-    color: #8a94a4;
-}
-
-.faculty-profile span {
-    font-family:
-        "Caveat",
-        cursive;
-
-    font-size: 18px;
-
-    color: #68778b;
-
-    margin-top: 2px;
-}
-
-.faculty-profile button {
-    border: none;
-
-    background: #172033;
-
-    color: white;
-
-    padding: 11px 19px;
-
-    border-radius: 9px;
-
-    cursor: pointer;
-
-    font-weight: 700;
+    border-radius: 12px;
 
     box-shadow:
-        0 7px 16px rgba(30, 40, 55, 0.16);
-
-    transition:
-        background 0.25s ease,
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
+        4px 5px 0 rgba(30, 30, 30, 0.04);
 }
 
-.faculty-profile button:hover {
-    background: #2867e6;
+.profile-circle {
+    width: 46px;
+    height: 46px;
 
-    transform: translateY(-3px);
-
-    box-shadow:
-        0 11px 23px rgba(40, 103, 230, 0.28);
-}
-
-
-/* =========================================================
-   MAIN
-   ========================================================= */
-
-.dashboard-main {
-    width: 88%;
-
-    max-width: 1300px;
-
-    margin: auto;
-
-    padding:
-        55px 0 90px;
-
-    position: relative;
-
-    z-index: 5;
-}
-
-
-/* =========================================================
-   WELCOME SECTION
-   ========================================================= */
-
-.welcome-section {
     display: flex;
-
-    justify-content: space-between;
 
     align-items: center;
-
-    margin-bottom: 35px;
-
-    padding:
-        30px 34px;
-
-    position: relative;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent 0,
-            transparent 42px,
-            rgba(211, 91, 91, 0.15) 43px,
-            rgba(211, 91, 91, 0.15) 44px,
-            transparent 45px
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            rgba(255, 253, 244, 0.93) 0,
-            rgba(255, 253, 244, 0.93) 30px,
-            rgba(90, 120, 145, 0.1) 31px,
-            rgba(255, 253, 244, 0.93) 32px
-        );
-
-    border:
-        1px solid rgba(60, 65, 65, 0.1);
-
-    box-shadow:
-        8px 10px 0 rgba(35, 40, 45, 0.06),
-        0 15px 30px rgba(40, 50, 60, 0.1);
-
-    transform: rotate(-0.4deg);
-}
-
-
-/* tape */
-
-.welcome-section::before {
-    content: "";
-
-    position: absolute;
-
-    width: 95px;
-    height: 23px;
-
-    top: -11px;
-    left: 50%;
-
-    transform:
-        translateX(-50%)
-        rotate(-2deg);
-
-    background:
-        rgba(255, 231, 159, 0.68);
-
-    box-shadow:
-        0 2px 4px rgba(50, 50, 40, 0.08);
-}
-
-
-/* =========================================================
-   DASHBOARD LABEL
-   ========================================================= */
-
-.dashboard-label {
-    font-family:
-        "Caveat",
-        cursive;
-
-    font-size: 21px;
-
-    font-weight: 700;
-
-    letter-spacing: 1px;
-
-    color: #2867e6;
-}
-
-
-/* =========================================================
-   WELCOME HEADING
-   ========================================================= */
-
-.welcome-section h1 {
-    font-family:
-        "Playfair Display",
-        serif;
-
-    font-size: 39px;
-
-    line-height: 1.1;
-
-    letter-spacing: -1px;
-
-    margin: 8px 0;
-
-    color: #111827;
-}
-
-.welcome-section h1::after {
-    content: "";
-
-    display: block;
-
-    width: 90px;
-
-    height: 7px;
-
-    border-bottom:
-        3px solid rgba(218, 155, 82, 0.58);
+    justify-content: center;
 
     border-radius: 50%;
 
-    transform: rotate(-2deg);
+    background: #171717;
+
+    color: #ffffff;
+
+    font-family: "Playfair Display", serif;
+
+    font-size: 19px;
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.16);
 }
 
-.welcome-section p {
-    margin:
-        9px 0 0;
+.faculty-profile strong {
+    display: block;
 
-    color: #68778b;
+    color: #222;
 
-    font-size: 14px;
+    font-size: 13px;
+}
+
+.faculty-profile span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #888;
+
+    font-size: 11px;
 }
 
 
 /* =========================================================
-   CREATE EVENT BUTTON
+   STATS AREA
    ========================================================= */
 
-.create-event-btn {
-    border: none;
-
-    background: #2867e6;
-
-    color: white;
-
-    padding:
-        14px 22px;
-
-    border-radius: 8px;
-
-    font-size: 15px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 9px 20px rgba(40, 103, 230, 0.25);
-
-    transition:
-        transform 0.25s ease,
-        background 0.25s ease,
-        box-shadow 0.25s ease;
-}
-
-.create-event-btn:hover {
-    background: #1e58ca;
-
-    transform: translateY(-3px);
-
-    box-shadow:
-        0 13px 27px rgba(40, 103, 230, 0.34);
-}
-
-
-/* =========================================================
-   STATS
-   ========================================================= */
-
-.stats-container {
+.faculty-stats {
     display: grid;
 
     grid-template-columns:
-        repeat(3, 1fr);
+        repeat(4, minmax(0, 1fr));
 
-    gap: 20px;
+    gap: 18px;
 
-    margin-bottom: 40px;
+    margin-top: 30px;
 }
 
 
@@ -621,804 +497,507 @@ body::after {
    ========================================================= */
 
 .stat-card {
-    min-height: 120px;
+    position: relative;
 
-    background:
-        linear-gradient(
-            90deg,
-            transparent 0,
-            transparent 35px,
-            rgba(211, 91, 91, 0.12) 36px,
-            rgba(211, 91, 91, 0.12) 37px,
-            transparent 38px
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            rgba(255, 253, 244, 0.96) 0,
-            rgba(255, 253, 244, 0.96) 27px,
-            rgba(90, 120, 145, 0.08) 28px,
-            rgba(255, 253, 244, 0.96) 29px
-        );
+    min-height: 150px;
 
     padding: 23px;
 
-    display: flex;
+    overflow: hidden;
 
-    align-items: center;
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            #f7f4eb 0,
+            #f7f4eb 28px,
+            #e6e1d5 29px,
+            #f7f4eb 30px
+        );
 
-    gap: 18px;
+    border: 1px solid #d5d0c4;
 
-    border:
-        1px solid rgba(60, 75, 95, 0.13);
-
-    border-radius: 3px;
-
-    position: relative;
+    border-radius: 4px;
 
     box-shadow:
-        6px 8px 0 rgba(35, 40, 45, 0.05),
-        0 10px 24px rgba(40, 50, 60, 0.09);
+        6px 7px 0 rgba(30, 30, 30, 0.06),
+        0 12px 25px rgba(30, 30, 30, 0.08);
 
     transition:
         transform 0.3s ease,
         box-shadow 0.3s ease;
 }
 
-.stat-card:nth-child(1) {
-    border-top: 4px solid #5e8bd0;
-}
 
-.stat-card:nth-child(2) {
-    border-top: 4px solid #e2a05d;
-}
+/* notebook red margin */
+.stat-card::before {
+    content: "";
 
-.stat-card:nth-child(3) {
-    border-top: 4px solid #7cad88;
+    position: absolute;
+
+    left: 35px;
+    top: 0;
+    bottom: 0;
+
+    width: 1px;
+
+    background: rgba(190, 80, 80, 0.2);
 }
 
 .stat-card:hover {
     transform:
         translateY(-6px)
-        rotate(-0.5deg);
+        rotate(-0.4deg);
 
     box-shadow:
-        9px 14px 30px rgba(40, 50, 60, 0.15);
+        9px 13px 28px rgba(30, 30, 30, 0.13);
 }
 
+.stat-card h3 {
+    margin: 0 0 12px;
 
-/* =========================================================
-   STAT ICON
-   ========================================================= */
+    font-size: 12px;
 
-.stat-icon {
-    width: 52px;
+    text-transform: uppercase;
 
-    height: 52px;
+    letter-spacing: 1.2px;
 
-    display: flex;
+    color: #777;
 
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 27px;
-
-    background:
-        rgba(40, 103, 230, 0.09);
-
-    border:
-        1px solid rgba(40, 103, 230, 0.12);
-
-    border-radius: 12px;
-}
-
-
-/* =========================================================
-   STAT NUMBER
-   ========================================================= */
-
-.stat-card h2 {
-    margin: 0;
-
-    font-family:
-        "Playfair Display",
-        serif;
-
-    font-size: 29px;
-
-    color: #111827;
+    font-weight: 700;
 }
 
 .stat-card p {
-    margin:
-        4px 0 0;
+    margin: 0;
 
-    color: #737e90;
+    font-family: "Playfair Display", serif;
 
-    font-size: 13px;
+    font-size: 38px;
+
+    line-height: 1;
+
+    color: #171717;
+}
+
+.stat-card span {
+    display: block;
+
+    margin-top: 12px;
+
+    color: #888;
+
+    font-size: 11px;
+}
+
+.department-value,
+.role-value {
+    font-family: "DM Sans", sans-serif !important;
+
+    font-size: 20px !important;
+
+    font-weight: 700;
+
+    line-height: 1.2 !important;
 }
 
 
 /* =========================================================
-   EVENT FORM
+   GENERAL SECTIONS
    ========================================================= */
 
-.event-form-section {
-    position: relative;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent 0,
-            transparent 42px,
-            rgba(211, 91, 91, 0.15) 43px,
-            rgba(211, 91, 91, 0.15) 44px,
-            transparent 45px
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            rgba(255, 253, 244, 0.98) 0,
-            rgba(255, 253, 244, 0.98) 30px,
-            rgba(90, 120, 145, 0.1) 31px,
-            rgba(255, 253, 244, 0.98) 32px
-        );
-
-    padding:
-        34px 35px;
-
-    border:
-        1px solid rgba(60, 65, 65, 0.12);
-
-    border-radius: 3px;
-
-    margin-bottom: 45px;
-
-    box-shadow:
-        8px 10px 0 rgba(35, 40, 45, 0.06),
-        0 16px 32px rgba(40, 50, 60, 0.1);
-}
-
-
-/* paperclip */
-
-.event-form-section::before {
-    content: "";
-
-    position: absolute;
-
-    width: 31px;
-
-    height: 75px;
-
-    right: 28px;
-
-    top: -22px;
-
-    border:
-        4px solid rgba(65, 72, 80, 0.5);
-
-    border-radius: 22px;
-
-    transform:
-        rotate(23deg);
+.dashboard-section {
+    margin-top: 45px;
 }
 
 
 /* =========================================================
-   FORM HEADING
+   SECTION HEADING
    ========================================================= */
 
-.event-form-section h2 {
-    margin:
-        0 0 25px;
+.section-heading {
+    display: flex;
 
-    font-family:
-        "Playfair Display",
-        serif;
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+
+    padding-bottom: 13px;
+
+    border-bottom: 1px solid rgba(30, 30, 30, 0.13);
+}
+
+.section-heading h2 {
+    margin: 0;
+
+    font-family: "Playfair Display", serif;
 
     font-size: 29px;
 
-    color: #111827;
+    color: #171717;
+
+    letter-spacing: -0.5px;
+}
+
+.section-heading > a {
+    font-size: 12px;
+
+    font-weight: 700;
+
+    color: #555;
+
+    border-bottom: 1px solid #555;
+
+    padding-bottom: 2px;
+
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.section-heading > a:hover {
+    color: #000;
+
+    border-color: #000;
 }
 
 
 /* =========================================================
-   FORM ROW
+   QUICK ACTION GRID
    ========================================================= */
 
-.form-row {
+.action-grid {
     display: grid;
 
     grid-template-columns:
-        repeat(3, 1fr);
+        repeat(3, minmax(0, 1fr));
 
     gap: 18px;
 }
 
 
 /* =========================================================
-   INPUT GROUP
+   ACTION CARD
    ========================================================= */
 
-.input-group {
-    display: flex;
+.action-card {
+    min-height: 150px;
 
-    flex-direction: column;
-
-    gap: 8px;
-
-    margin-bottom: 18px;
-}
-
-.input-group label {
-    font-family:
-        "Caveat",
-        cursive;
-
-    font-size: 18px;
-
-    font-weight: 600;
-
-    color: #37465b;
-}
-
-.input-group input,
-.input-group select,
-.input-group textarea {
-    border:
-        1px solid rgba(90, 105, 120, 0.25);
-
-    border-radius: 6px;
-
-    padding:
-        12px 13px;
-
-    font-size: 14px;
-
-    color: #172033;
-
-    background:
-        rgba(255, 255, 255, 0.72);
-
-    outline: none;
-
-    box-shadow:
-        inset 0 1px 3px rgba(50, 60, 70, 0.04);
-
-    transition:
-        border-color 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.25s ease;
-}
-
-.input-group input:focus,
-.input-group select:focus,
-.input-group textarea:focus {
-    border-color: #2867e6;
-
-    background:
-        rgba(255, 255, 255, 0.96);
-
-    box-shadow:
-        0 0 0 3px rgba(40, 103, 230, 0.1);
-}
-
-.input-group textarea {
-    min-height: 110px;
-
-    resize: vertical;
-}
-
-
-/* =========================================================
-   FORM BUTTONS
-   ========================================================= */
-
-.form-buttons {
-    display: flex;
-
-    justify-content: flex-end;
-
-    gap: 12px;
-
-    margin-top: 5px;
-}
-
-.cancel-btn,
-.submit-event-btn {
-    padding:
-        12px 20px;
-
-    border-radius: 7px;
-
-    cursor: pointer;
-
-    border: none;
-
-    font-weight: 700;
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.25s ease;
-}
-
-.cancel-btn {
-    background:
-        #e9edf2;
-
-    color: #374151;
-}
-
-.cancel-btn:hover {
-    background:
-        #dfe4eb;
-
-    transform:
-        translateY(-2px);
-}
-
-.submit-event-btn {
-    background:
-        #2867e6;
-
-    color: white;
-
-    box-shadow:
-        0 8px 18px rgba(40, 103, 230, 0.22);
-}
-
-.submit-event-btn:hover {
-    background:
-        #1e58ca;
-
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 12px 24px rgba(40, 103, 230, 0.3);
-}
-
-
-/* =========================================================
-   EVENTS SECTION
-   ========================================================= */
-
-.events-section {
-    margin-top: 35px;
-}
-
-.section-heading {
-    margin-bottom: 22px;
-}
-
-.section-heading h2 {
-    margin:
-        5px 0 0;
-
-    font-family:
-        "Playfair Display",
-        serif;
-
-    font-size: 31px;
-
-    color: #111827;
-}
-
-
-/* =========================================================
-   EVENTS GRID
-   ========================================================= */
-
-.events-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 22px;
-}
-
-
-/* =========================================================
-   EVENT CARD
-   ========================================================= */
-
-.event-card {
     position: relative;
 
-    background:
-        linear-gradient(
-            90deg,
-            transparent 0,
-            transparent 35px,
-            rgba(211, 91, 91, 0.12) 36px,
-            rgba(211, 91, 91, 0.12) 37px,
-            transparent 38px
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            rgba(255, 253, 244, 0.96) 0,
-            rgba(255, 253, 244, 0.96) 27px,
-            rgba(90, 120, 145, 0.08) 28px,
-            rgba(255, 253, 244, 0.96) 29px
-        );
+    display: flex;
 
-    border:
-        1px solid rgba(60, 75, 95, 0.13);
+    align-items: flex-start;
 
-    border-radius: 3px;
+    gap: 17px;
 
-    padding:
-        24px;
+    padding: 23px;
+
+    overflow: hidden;
+
+    background: #f8f5ec;
+
+    border: 1px solid #d8d2c5;
+
+    border-radius: 5px;
 
     box-shadow:
-        7px 9px 0 rgba(35, 40, 45, 0.05),
-        0 12px 25px rgba(40, 50, 60, 0.1);
+        5px 6px 0 rgba(25, 25, 25, 0.05);
 
     transition:
         transform 0.3s ease,
-        box-shadow 0.3s ease;
+        box-shadow 0.3s ease,
+        background 0.3s ease;
 }
 
-.event-card:nth-child(1) {
-    border-top: 4px solid #5e8bd0;
-}
+.action-card::after {
+    content: "↗";
 
-.event-card:nth-child(2) {
-    border-top: 4px solid #e2a05d;
-}
+    position: absolute;
 
-.event-card:nth-child(3) {
-    border-top: 4px solid #7cad88;
-}
+    right: 18px;
+    top: 14px;
 
-.event-card:nth-child(4) {
-    border-top: 4px solid #a38bca;
-}
+    font-size: 18px;
 
-.event-card:nth-child(5) {
-    border-top: 4px solid #d27e7e;
-}
-
-.event-card:nth-child(6) {
-    border-top: 4px solid #6ba5a5;
-}
-
-.event-card:hover {
-    transform:
-        translateY(-7px)
-        rotate(-0.5deg);
-
-    box-shadow:
-        10px 15px 30px rgba(40, 50, 60, 0.16);
-}
-
-
-/* =========================================================
-   EVENT CATEGORY
-   ========================================================= */
-
-.event-category {
-    display: inline-block;
-
-    background:
-        rgba(40, 103, 230, 0.09);
-
-    color:
-        #2867e6;
-
-    padding:
-        6px 11px;
-
-    border-radius: 20px;
-
-    font-family:
-        "Caveat",
-        cursive;
-
-    font-size: 17px;
-
-    font-weight: 600;
-}
-
-
-/* =========================================================
-   EVENT TITLE
-   ========================================================= */
-
-.event-card h3 {
-    margin:
-        15px 0 8px;
-
-    font-family:
-        "Playfair Display",
-        serif;
-
-    font-size: 21px;
-
-    color: #111827;
-}
-
-.event-description {
-    color: #6d7889;
-
-    line-height: 1.55;
-
-    font-size: 13px;
-}
-
-
-/* =========================================================
-   EVENT INFO
-   ========================================================= */
-
-.event-info {
-    border-top:
-        1px dashed rgba(100, 110, 125, 0.25);
-
-    margin-top: 18px;
-
-    padding-top: 12px;
-}
-
-.event-info p {
-    font-size: 13px;
-
-    color: #596579;
-
-    margin:
-        7px 0;
-}
-
-
-/* =========================================================
-   DELETE BUTTON
-   ========================================================= */
-
-.delete-event-btn {
-    width: 100%;
-
-    border:
-        1px solid rgba(90, 100, 110, 0.2);
-
-    background:
-        rgba(255, 255, 255, 0.65);
-
-    color:
-        #555e70;
-
-    padding:
-        10px;
-
-    border-radius: 7px;
-
-    cursor: pointer;
-
-    margin-top: 10px;
-
-    font-weight: 600;
+    color: #aaa;
 
     transition:
-        background 0.25s ease,
         color 0.25s ease,
         transform 0.25s ease;
 }
 
-.delete-event-btn:hover {
-    background:
-        #fff0ed;
-
-    color:
-        #c94b3e;
-
-    border-color:
-        rgba(201, 75, 62, 0.25);
+.action-card:hover {
+    background: #ffffff;
 
     transform:
-        translateY(-2px);
+        translateY(-6px)
+        rotate(-0.5deg);
+
+    box-shadow:
+        8px 12px 25px rgba(25, 25, 25, 0.12);
+}
+
+.action-card:hover::after {
+    color: #111;
+
+    transform:
+        translate(3px, -3px);
 }
 
 
 /* =========================================================
-   EMPTY EVENTS
+   ACTION ICON
    ========================================================= */
 
-.empty-events {
-    background:
-        linear-gradient(
-            90deg,
-            transparent 0,
-            transparent 42px,
-            rgba(211, 91, 91, 0.14) 43px,
-            rgba(211, 91, 91, 0.14) 44px,
-            transparent 45px
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            rgba(255, 253, 244, 0.96) 0,
-            rgba(255, 253, 244, 0.96) 30px,
-            rgba(90, 120, 145, 0.09) 31px,
-            rgba(255, 253, 244, 0.96) 32px
-        );
+.action-icon {
+    width: 48px;
+    height: 48px;
 
-    border:
-        1px dashed #aeb7c5;
+    flex-shrink: 0;
 
-    border-radius: 3px;
+    display: flex;
 
-    padding:
-        65px 20px;
+    align-items: center;
+    justify-content: center;
 
-    text-align: center;
+    background: #171717;
 
-    box-shadow:
-        7px 9px 0 rgba(35, 40, 45, 0.05),
-        0 12px 25px rgba(40, 50, 60, 0.08);
-}
-
-.empty-events div {
-    font-size: 42px;
-
-    margin-bottom: 8px;
-}
-
-.empty-events h3 {
-    margin:
-        0 0 5px;
-
-    font-family:
-        "Playfair Display",
-        serif;
-
-    font-size: 25px;
-
-    color: #111827;
-}
-
-.empty-events p {
-    color: #777f8e;
-
-    font-size: 14px;
-}
-
-.empty-events button {
-    border: none;
-
-    background:
-        #2867e6;
-
-    color: white;
-
-    padding:
-        12px 20px;
+    color: #ffffff;
 
     border-radius: 8px;
 
-    cursor: pointer;
-
-    font-weight: 700;
+    font-size: 21px;
 
     box-shadow:
-        0 8px 18px rgba(40, 103, 230, 0.22);
+        4px 5px 0 rgba(30, 30, 30, 0.13);
 
     transition:
-        transform 0.25s ease,
-        background 0.25s ease;
+        transform 0.3s ease;
 }
 
-.empty-events button:hover {
-    background:
-        #1e58ca;
-
+.action-card:hover .action-icon {
     transform:
-        translateY(-2px);
+        rotate(-7deg)
+        scale(1.05);
 }
 
 
 /* =========================================================
-   SCROLLBAR
+   ACTION TEXT
    ========================================================= */
 
-::-webkit-scrollbar {
-    width: 9px;
+.action-card h3 {
+    margin: 3px 0 7px;
+
+    font-family: "Playfair Display", serif;
+
+    font-size: 19px;
+
+    color: #171717;
 }
 
-::-webkit-scrollbar-track {
-    background:
-        rgba(230, 224, 210, 0.8);
+.action-card p {
+    margin: 0;
+
+    max-width: 210px;
+
+    color: #777;
+
+    font-size: 12px;
+
+    line-height: 1.6;
 }
 
-::-webkit-scrollbar-thumb {
+
+/* =========================================================
+   EMPTY / RECENT EVENTS
+   ========================================================= */
+
+.empty-events {
+    min-height: 230px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 40px 25px;
+
     background:
-        #91a3b8;
+        repeating-linear-gradient(
+            to bottom,
+            #f7f4eb 0,
+            #f7f4eb 29px,
+            #e6e1d5 30px,
+            #f7f4eb 31px
+        );
+
+    border: 1px solid #d4cec1;
+
+    border-radius: 4px;
+
+    box-shadow:
+        7px 8px 0 rgba(30, 30, 30, 0.05),
+        0 15px 30px rgba(30, 30, 30, 0.07);
+}
+
+
+/* red notebook line */
+.empty-events::before {
+    content: "";
+
+    position: absolute;
+
+    left: 55px;
+    top: 0;
+    bottom: 0;
+
+    width: 1px;
+
+    background: rgba(190, 80, 80, 0.2);
+}
+
+
+/* paperclip */
+.empty-events::after {
+    content: "";
+
+    position: absolute;
+
+    width: 24px;
+    height: 68px;
+
+    right: 35px;
+    top: -20px;
+
+    border: 3px solid #777;
 
     border-radius: 20px;
 
-    border:
-        2px solid rgba(230, 224, 210, 0.8);
+    transform: rotate(23deg);
+
+    opacity: 0.45;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background:
-        #2867e6;
+.empty-icon {
+    font-size: 38px;
+
+    margin-bottom: 10px;
+
+    filter: grayscale(1);
+}
+
+.empty-events h3 {
+    margin: 0 0 7px;
+
+    font-family: "Playfair Display", serif;
+
+    font-size: 25px;
+
+    color: #171717;
+}
+
+.empty-events p {
+    margin: 0 0 18px;
+
+    color: #777;
+
+    font-size: 13px;
 }
 
 
 /* =========================================================
-   ANIMATIONS
+   CREATE EVENT BUTTON
    ========================================================= */
 
-@keyframes facultyHeaderAppear {
-    from {
-        opacity: 0;
-        transform: translateY(-12px);
-    }
+.create-event-btn {
+    display: inline-flex;
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 20px;
+
+    background: #171717;
+
+    color: #ffffff;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.3px;
+
+    box-shadow:
+        4px 5px 0 rgba(0, 0, 0, 0.12);
+
+    transition:
+        transform 0.25s ease,
+        background 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
-@keyframes facultyNotebookLeft {
+.create-event-btn:hover {
+    background: #333;
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        6px 8px 0 rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.faculty-main > div {
+    font-family: "DM Sans", sans-serif;
+
+    padding: 50px;
+
+    text-align: center;
+
+    color: #555;
+}
+
+
+/* =========================================================
+   FLOATING PAPER EFFECT
+   ========================================================= */
+
+@keyframes paperFloat {
     0%,
     100% {
-        transform:
-            translateY(0)
-            rotate(-10deg);
+        transform: translateY(0) rotate(0deg);
     }
 
     50% {
-        transform:
-            translateY(-22px)
-            rotate(-6deg);
+        transform: translateY(-5px) rotate(0.4deg);
     }
 }
 
-@keyframes facultyNotebookRight {
-    0%,
-    100% {
-        transform:
-            translateY(0)
-            rotate(9deg);
-    }
-
-    50% {
-        transform:
-            translateY(25px)
-            rotate(13deg);
-    }
+.action-card:nth-child(2) {
+    animation: paperFloat 6s ease-in-out infinite;
 }
 
-@keyframes facultyPenMove {
-    0%,
-    100% {
-        transform:
-            translate(0, 0)
-            rotate(-30deg);
-    }
-
-    50% {
-        transform:
-            translate(25px, -20px)
-            rotate(-24deg);
-    }
-}
-
-@keyframes facultyBooksMove {
-    0%,
-    100% {
-        transform:
-            translate(0, 0)
-            rotate(12deg);
-    }
-
-    50% {
-        transform:
-            translate(-18px, 20px)
-            rotate(17deg);
-    }
+.action-card:nth-child(4) {
+    animation: paperFloat 7s ease-in-out infinite reverse;
 }
 
 
@@ -1426,28 +1005,27 @@ body::after {
    TABLET
    ========================================================= */
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
 
-    .dashboard-header {
-        padding:
-            0 5%;
+    .faculty-sidebar {
+        width: 230px;
     }
 
-    .dashboard-main {
-        width: 90%;
+    .faculty-main {
+        width: calc(100% - 230px);
+
+        margin-left: 230px;
+
+        padding-left: 35px;
+        padding-right: 35px;
     }
 
-    .stats-container {
-        grid-template-columns:
-            repeat(3, 1fr);
-    }
-
-    .events-grid {
+    .faculty-stats {
         grid-template-columns:
             repeat(2, 1fr);
     }
 
-    .form-row {
+    .action-grid {
         grid-template-columns:
             repeat(2, 1fr);
     }
@@ -1458,104 +1036,94 @@ body::after {
    MOBILE
    ========================================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 760px) {
 
-    body::before {
-        left: -130px;
-
-        transform:
-            scale(0.75)
-            rotate(-10deg);
+    .faculty-dashboard {
+        display: block;
     }
 
-    body::after {
-        right: -130px;
+    .faculty-sidebar {
+        position: relative;
 
-        transform:
-            scale(0.75)
-            rotate(9deg);
+        width: 100%;
+        min-height: auto;
+
+        padding: 18px 20px;
+
+        border-right: none;
+        border-bottom: 1px solid #333;
+
+        box-shadow:
+            0 5px 20px rgba(0, 0, 0, 0.12);
     }
 
-    .dashboard-header {
-        min-height: 80px;
+    .faculty-logo {
+        margin-bottom: 18px;
 
-        padding:
-            18px 22px;
-    }
-
-    .dashboard-logo {
         font-size: 24px;
     }
 
-    .faculty-profile {
-        gap: 10px;
+    .faculty-nav {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 6px;
     }
 
-    .faculty-profile div {
-        display: none;
+    .faculty-nav a {
+        min-height: 42px;
+
+        font-size: 11px;
+
+        padding: 0 10px;
     }
 
-    .faculty-profile button {
+    .logout-btn {
+        margin-top: 15px;
+    }
+
+    .faculty-main {
+        width: 100%;
+
+        margin-left: 0;
+
         padding:
-            10px 14px;
-
-        font-size: 13px;
+            0 20px 50px;
     }
 
-    .dashboard-main {
-        width: 92%;
-
-        padding:
-            40px 0 70px;
-    }
-
-    .welcome-section {
+    .faculty-header {
         flex-direction: column;
 
         align-items: flex-start;
 
-        gap: 20px;
-
         padding:
-            28px 24px;
+            30px 0 25px;
     }
 
-    .welcome-section h1 {
-        font-size: 31px;
-    }
-
-    .create-event-btn {
+    .faculty-profile {
         width: 100%;
     }
 
-    .stats-container {
+    .faculty-stats {
         grid-template-columns: 1fr;
 
-        gap: 16px;
+        gap: 14px;
     }
 
-    .event-form-section {
-        padding:
-            28px 23px;
-    }
-
-    .form-row {
+    .action-grid {
         grid-template-columns: 1fr;
+
+        gap: 14px;
     }
 
-    .form-buttons {
-        justify-content: stretch;
+    .section-heading {
+        align-items: flex-start;
 
         flex-direction: column;
-    }
 
-    .cancel-btn,
-    .submit-event-btn {
-        width: 100%;
-    }
-
-    .events-grid {
-        grid-template-columns: 1fr;
+        gap: 10px;
     }
 }
 
@@ -1564,23 +1132,33 @@ body::after {
    SMALL MOBILE
    ========================================================= */
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
 
-    .welcome-section h1 {
-        font-size: 28px;
+    .faculty-nav {
+        grid-template-columns: 1fr;
     }
 
-    .event-form-section h2 {
-        font-size: 25px;
+    .faculty-header h1 {
+        font-size: 34px;
     }
 
-    .section-heading h2 {
-        font-size: 27px;
+    .faculty-main {
+        padding-left: 15px;
+        padding-right: 15px;
     }
 
     .stat-card {
-        padding:
-            20px;
+        min-height: 135px;
+    }
+
+    .action-card {
+        min-height: 135px;
+
+        padding: 19px;
+    }
+
+    .section-heading h2 {
+        font-size: 25px;
     }
 }
 
@@ -1594,13 +1172,8 @@ body::after {
     *,
     *::before,
     *::after {
-        animation-duration:
-            0.01ms !important;
+        animation: none !important;
 
-        animation-iteration-count:
-            1 !important;
-
-        transition-duration:
-            0.01ms !important;
+        transition: none !important;
     }
 }
