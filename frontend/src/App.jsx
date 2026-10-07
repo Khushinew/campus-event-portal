@@ -4,7 +4,11 @@ import "./App.css";
 // Public pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+
+// Faculty pages
+import FacultyDashboard from "./pages/FacultyDashboard";
 import CreateEvent from "./pages/events/CreateEvent";
+import EditEvent from "./pages/events/EditEvent";
 
 // Student pages
 import StudentDashboard from "./pages/StudentDashboard";
@@ -14,9 +18,6 @@ import RegisterEvent from "./pages/StudentEvents/RegisterEvent";
 import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent";
-
-// Faculty pages
-import FacultyDashboard from "./pages/FacultyDashboard";
 
 function App() {
   return (
@@ -91,10 +92,17 @@ function App() {
           path="/faculty-dashboard"
           element={<FacultyDashboard />}
         />
-       <Route
+
+        <Route
           path="/faculty/create-event"
           element={<CreateEvent />}
-/>
+        />
+
+        {/* EDIT EVENTS PAGE */}
+        <Route
+          path="/faculty/edit-events"
+          element={<EditEvent />}
+        />
 
       </Routes>
     </BrowserRouter>
