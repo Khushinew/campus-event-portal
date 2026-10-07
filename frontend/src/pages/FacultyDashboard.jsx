@@ -8,6 +8,7 @@ function FacultyDashboard() {
   const [user, setUser] = useState(null);
   const [eventCount, setEventCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -26,7 +27,6 @@ function FacultyDashboard() {
 
     setUser(currentUser);
 
-    // Connection with backend
     fetch(`http://localhost:5000/api/events/faculty/${currentUser.id}`)
       .then((response) => response.json())
       .then((data) => {
@@ -49,61 +49,107 @@ function FacultyDashboard() {
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div className="faculty-loading">Loading...</div>;
   }
 
   return (
     <div className="faculty-dashboard">
 
-      {/* Sidebar */}
-      <aside className="faculty-sidebar">
+      {/* ================= MOBILE / SIDEBAR MENU BUTTON ================= */}
+      <button
+        className="sidebar-menu-btn"
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open sidebar"
+      >
+        ☰
+      </button>
 
-        <div className="faculty-logo">
-          Campusphere
+      {/* ================= OVERLAY ================= */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
+
+      {/* ================= SIDEBAR ================= */}
+      <aside
+        className={`faculty-sidebar ${
+          sidebarOpen ? "sidebar-open" : ""
+        }`}
+      >
+
+        {/* Logo + ONE close button */}
+        <div className="sidebar-top">
+
+          <div className="faculty-logo">
+            Campusphere<span>.</span>
+          </div>
+
+          <button
+            className="sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+          >
+            ×
+          </button>
+
         </div>
 
-        <nav className="faculty-nav">
+        {/* Faculty Profile */}
+        <div className="sidebar-profile">
 
-          <Link to="/faculty-dashboard" className="active">
-            Dashboard
+          <div className="sidebar-profile-circle">
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+
+          <div className="sidebar-profile-info">
+            <strong>{user.name}</strong>
+            <span>Faculty</span>
+            <small>
+              {user.department || "Department not set"}
+            </small>
+          </div>
+
+        </div>
+
+        {/* Sidebar Account Section */}
+        <div className="sidebar-account">
+
+          <p className="sidebar-section-label">
+            ACCOUNT
+          </p>
+
+          <Link
+            to="/faculty/account"
+            className="sidebar-account-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <span className="sidebar-link-icon">⚙</span>
+            <span>Manage Account</span>
           </Link>
 
-          <Link to="/faculty/create-event">
-            Create Event
-          </Link>
+          <button
+            className="sidebar-logout-btn"
+            onClick={handleLogout}
+          >
+            <span className="sidebar-link-icon">↪</span>
+            <span>Logout</span>
+          </button>
 
-          <Link to="/faculty/events">
-            My Events
-          </Link>
-
-          <Link to="/faculty/registrations">
-            Monitor Registrations
-          </Link>
-
-          <Link to="/faculty/students">
-            Student List
-          </Link>
-
-          <Link to="/faculty/account">
-            Manage Account
-          </Link>
-
-        </nav>
-
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+        </div>
 
       </aside>
 
 
-      {/* Main Content */}
+      {/* ================= MAIN CONTENT ================= */}
       <main className="faculty-main">
 
         {/* Header */}
         <header className="faculty-header">
 
-          <div>
+          <div className="faculty-header-content">
+
             <p className="dashboard-label">
               FACULTY PORTAL
             </p>
@@ -112,12 +158,14 @@ function FacultyDashboard() {
               Welcome, {user.name}
             </h1>
 
-            <p>
+            <p className="header-description">
               Manage your campus events and student activities.
             </p>
+
           </div>
 
           <div className="faculty-profile">
+
             <div className="profile-circle">
               {user.name.charAt(0).toUpperCase()}
             </div>
@@ -126,63 +174,82 @@ function FacultyDashboard() {
               <strong>{user.name}</strong>
               <span>Faculty</span>
             </div>
+
           </div>
 
         </header>
 
 
-        {/* Statistics */}
+        {/* ================= STATISTICS ================= */}
         <section className="faculty-stats">
 
-          <div className="stat-card">
-            <h3>My Events</h3>
+          <div className="stat-card stat-yellow">
+
+            <h3>MY EVENTS</h3>
 
             <p>
               {loading ? "..." : eventCount}
             </p>
 
-            <span>Events created by you</span>
+            <span>
+              Events created by you
+            </span>
+
           </div>
 
 
-          <div className="stat-card">
-            <h3>Registrations</h3>
+          <div className="stat-card stat-blue">
+
+            <h3>REGISTRATIONS</h3>
 
             <p>0</p>
 
-            <span>Student registrations</span>
+            <span>
+              Student registrations
+            </span>
+
           </div>
 
 
-          <div className="stat-card">
-            <h3>Department</h3>
+          <div className="stat-card stat-green">
+
+            <h3>DEPARTMENT</h3>
 
             <p className="department-value">
               {user.department || "Not Set"}
             </p>
 
-            <span>Your department</span>
+            <span>
+              Your department
+            </span>
+
           </div>
 
 
-          <div className="stat-card">
-            <h3>Role</h3>
+          <div className="stat-card stat-purple">
+
+            <h3>ROLE</h3>
 
             <p className="role-value">
               Faculty
             </p>
 
-            <span>Campusphere account</span>
+            <span>
+              Campusphere account
+            </span>
+
           </div>
 
         </section>
 
 
-        {/* Quick Actions */}
+        {/* ================= QUICK ACTIONS ================= */}
         <section className="dashboard-section">
 
           <div className="section-heading">
+
             <div>
+
               <p className="dashboard-label">
                 QUICK ACTIONS
               </p>
@@ -190,7 +257,9 @@ function FacultyDashboard() {
               <h2>
                 Manage Campus Activities
               </h2>
+
             </div>
+
           </div>
 
 
@@ -199,80 +268,135 @@ function FacultyDashboard() {
             {/* Create Event */}
             <Link
               to="/faculty/create-event"
-              className="action-card"
+              className="action-card action-yellow"
             >
-              <div className="action-icon">＋</div>
+
+              <div className="action-icon">
+                ＋
+              </div>
 
               <div>
-                <h3>Create Event</h3>
+                <h3>
+                  Create Event
+                </h3>
+
                 <p>
                   Create a new campus event.
                 </p>
               </div>
+
+              <span className="action-arrow">
+                ↗
+              </span>
+
             </Link>
 
 
-            {/* View Created Events */}
+            {/* My Events */}
             <Link
               to="/faculty/events"
-              className="action-card"
+              className="action-card action-blue"
             >
-              <div className="action-icon">▣</div>
+
+              <div className="action-icon">
+                ▣
+              </div>
 
               <div>
-                <h3>My Events</h3>
+                <h3>
+                  My Events
+                </h3>
+
                 <p>
                   View events created by you.
                 </p>
               </div>
+
+              <span className="action-arrow">
+                ↗
+              </span>
+
             </Link>
 
 
             {/* Monitor Registrations */}
             <Link
               to="/faculty/registrations"
-              className="action-card"
+              className="action-card action-green"
             >
-              <div className="action-icon">✓</div>
+
+              <div className="action-icon">
+                ✓
+              </div>
 
               <div>
-                <h3>Monitor Registrations</h3>
+                <h3>
+                  Monitor Registrations
+                </h3>
+
                 <p>
                   View student registrations.
                 </p>
               </div>
+
+              <span className="action-arrow">
+                ↗
+              </span>
+
             </Link>
 
 
             {/* Student List */}
             <Link
               to="/faculty/students"
-              className="action-card"
+              className="action-card action-purple"
             >
-              <div className="action-icon">♙</div>
+
+              <div className="action-icon">
+                ♙
+              </div>
 
               <div>
-                <h3>Student List</h3>
+                <h3>
+                  Student List
+                </h3>
+
                 <p>
                   View registered students.
                 </p>
               </div>
+
+              <span className="action-arrow">
+                ↗
+              </span>
+
             </Link>
 
 
             {/* Manage Account */}
             <Link
               to="/faculty/account"
-              className="action-card"
+              className="action-card action-yellow"
             >
-              <div className="action-icon">⚙</div>
+
+              <div className="action-icon">
+                ⚙
+              </div>
 
               <div>
-                <h3>Manage Account</h3>
+                <h3>
+                  Manage Account
+                </h3>
+
                 <p>
                   Update your faculty profile.
                 </p>
               </div>
+
+              <span className="action-arrow">
+                ↗
+              </span>
+
             </Link>
 
           </div>
@@ -280,11 +404,13 @@ function FacultyDashboard() {
         </section>
 
 
-        {/* Recent Activity */}
+        {/* ================= RECENT ACTIVITY ================= */}
         <section className="dashboard-section">
 
           <div className="section-heading">
+
             <div>
+
               <p className="dashboard-label">
                 ACTIVITY
               </p>
@@ -292,19 +418,29 @@ function FacultyDashboard() {
               <h2>
                 Recent Events
               </h2>
+
             </div>
 
-            <Link to="/faculty/events">
-              View All
+            <Link
+              to="/faculty/events"
+              className="view-all-link"
+            >
+              View All ↗
             </Link>
+
           </div>
 
 
           <div className="empty-events">
 
             {loading ? (
-              <p>Loading events...</p>
+
+              <p>
+                Loading events...
+              </p>
+
             ) : eventCount === 0 ? (
+
               <>
                 <div className="empty-icon">
                   📅
@@ -325,10 +461,13 @@ function FacultyDashboard() {
                   Create Event
                 </Link>
               </>
+
             ) : (
+
               <p>
                 You have created {eventCount} event(s).
               </p>
+
             )}
 
           </div>
