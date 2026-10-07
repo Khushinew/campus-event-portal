@@ -1,0 +1,919 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;
+}
+
+
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
+.create-event-page {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  padding: 55px 7% 80px;
+
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(250, 210, 120, 0.38),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 18%,
+      rgba(145, 195, 230, 0.30),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 80% 90%,
+      rgba(210, 180, 220, 0.22),
+      transparent 30%
+    ),
+    #f4f0e6;
+
+  color: #172033;
+
+  isolation: isolate;
+}
+
+
+/* notebook horizontal lines */
+
+.create-event-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 37px,
+      rgba(120, 130, 145, 0.10) 38px,
+      transparent 39px
+    );
+
+  pointer-events: none;
+}
+
+
+/* red notebook margin */
+
+.create-event-page::after {
+  content: "";
+  position: absolute;
+
+  top: 0;
+  left: 7%;
+
+  width: 1px;
+  height: 100%;
+
+  background: rgba(205, 100, 100, 0.10);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   DECORATIVE NOTES
+========================================================= */
+
+.create-note {
+  position: absolute;
+  z-index: -1;
+
+  width: 230px;
+  height: 150px;
+
+  border-radius: 12px;
+
+  box-shadow:
+    12px 15px 25px rgba(40, 40, 40, 0.12);
+
+  opacity: 0.72;
+}
+
+
+/* left note */
+
+.note-left {
+  top: 145px;
+  left: -85px;
+
+  transform: rotate(-9deg);
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #fff9df 0,
+      #fff9df 29px,
+      rgba(90, 130, 170, 0.15) 30px,
+      #fff9df 31px
+    );
+}
+
+
+/* right note */
+
+.note-right {
+  right: -95px;
+  bottom: 100px;
+
+  transform: rotate(9deg);
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #f7ecff 0,
+      #f7ecff 29px,
+      rgba(120, 100, 160, 0.14) 30px,
+      #f7ecff 31px
+    );
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.create-event-main {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.create-event-header {
+  position: relative;
+
+  padding: 38px 46px 34px;
+
+  background: rgba(255, 253, 247, 0.94);
+
+  border: 1px solid rgba(80, 80, 80, 0.10);
+
+  box-shadow:
+    8px 10px 0 rgba(70, 70, 70, 0.06),
+    0 15px 35px rgba(50, 50, 50, 0.08);
+
+  margin-bottom: 34px;
+}
+
+
+/* tape */
+
+.create-event-header::before {
+  content: "";
+
+  position: absolute;
+
+  top: -12px;
+  left: 44px;
+
+  width: 105px;
+  height: 25px;
+
+  background: rgba(225, 194, 132, 0.65);
+
+  transform: rotate(-2deg);
+
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.05);
+}
+
+
+/* small corner */
+
+.create-event-header::after {
+  content: "✦";
+
+  position: absolute;
+
+  right: 28px;
+  top: 25px;
+
+  font-size: 28px;
+
+  color: #d5a62a;
+
+  opacity: 0.65;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.create-back-btn {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 9px 17px;
+
+  margin-bottom: 27px;
+
+  border-radius: 7px;
+
+  background: #1b2335;
+  color: #fffdf7;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  box-shadow:
+    4px 5px 0 rgba(0, 0, 0, 0.14);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.create-back-btn:hover {
+  transform: translateY(-2px) rotate(-1deg);
+
+  box-shadow:
+    6px 7px 0 rgba(0, 0, 0, 0.14);
+}
+
+
+/* =========================================================
+   HEADER TEXT
+========================================================= */
+
+.create-event-label {
+  font-family: "Caveat", cursive;
+
+  font-size: 20px;
+  font-weight: 600;
+
+  color: #65758b;
+
+  margin-bottom: 5px;
+}
+
+.create-event-header h1 {
+  font-family: "Playfair Display", serif;
+
+  font-size: clamp(38px, 5vw, 58px);
+
+  line-height: 1.1;
+
+  color: #172033;
+
+  margin-bottom: 13px;
+
+  position: relative;
+}
+
+
+/* hand drawn underline */
+
+.create-event-header h1::after {
+  content: "";
+
+  display: block;
+
+  width: 135px;
+  height: 6px;
+
+  margin-top: 7px;
+
+  background: #e8bd4b;
+
+  border-radius: 50%;
+
+  transform: rotate(-1deg);
+}
+
+.create-event-subtitle {
+  color: #718096;
+
+  font-size: 15px;
+
+  max-width: 600px;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   FORM CARD
+========================================================= */
+
+.create-event-card {
+  position: relative;
+
+  max-width: 900px;
+
+  margin: 0 auto;
+
+  padding: 44px 52px 48px;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #fffdf7 0,
+      #fffdf7 34px,
+      rgba(115, 135, 155, 0.14) 35px,
+      #fffdf7 36px
+    );
+
+  border: 1px solid #ddd7c9;
+
+  border-radius: 7px;
+
+  box-shadow:
+    9px 11px 0 rgba(75, 75, 75, 0.08),
+    0 18px 35px rgba(60, 60, 60, 0.10);
+
+  transform: rotate(-0.25deg);
+}
+
+
+/* notebook red margin */
+
+.create-event-card::before {
+  content: "";
+
+  position: absolute;
+
+  left: 70px;
+  top: 0;
+  bottom: 0;
+
+  width: 1px;
+
+  background: rgba(214, 110, 110, 0.18);
+
+  pointer-events: none;
+}
+
+
+/* paperclip */
+
+.form-paperclip {
+  position: absolute;
+
+  right: 28px;
+  top: -18px;
+
+  width: 26px;
+  height: 65px;
+
+  border: 3px solid #7d8790;
+
+  border-bottom: 0;
+
+  border-radius: 18px 18px 0 0;
+
+  transform: rotate(7deg);
+
+  opacity: 0.75;
+}
+
+
+/* =========================================================
+   FORM TITLE
+========================================================= */
+
+.form-title-area {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+
+  margin-bottom: 35px;
+
+  padding-left: 12px;
+}
+
+.form-icon {
+  width: 58px;
+  height: 58px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: #f5d36d;
+
+  color: #202b3d;
+
+  font-size: 31px;
+  font-weight: 400;
+
+  box-shadow:
+    5px 6px 0 rgba(75, 75, 75, 0.12);
+
+  transform: rotate(-2deg);
+}
+
+.form-label {
+  font-family: "Caveat", cursive;
+
+  color: #778497;
+
+  font-size: 20px;
+  font-weight: 600;
+
+  margin-bottom: 2px;
+}
+
+.form-title-area h2 {
+  font-family: "Playfair Display", serif;
+
+  color: #1b2435;
+
+  font-size: 29px;
+
+  margin-bottom: 3px;
+}
+
+.form-title-area p:last-child {
+  color: #7d8792;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+form {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.form-group {
+  margin-bottom: 25px;
+
+  padding-left: 12px;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-family: "Caveat", cursive;
+
+  font-size: 21px;
+  font-weight: 600;
+
+  color: #394456;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+
+  padding: 13px 15px;
+
+  border: 1px solid #d8d3c8;
+
+  border-radius: 6px;
+
+  background: rgba(255, 255, 252, 0.90);
+
+  color: #222c3d;
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 14px;
+
+  outline: none;
+
+  box-shadow:
+    3px 4px 0 rgba(80, 80, 80, 0.05);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.form-group textarea {
+  min-height: 130px;
+
+  resize: vertical;
+
+  line-height: 1.6;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #a1a5a8;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #d7ad38;
+
+  box-shadow:
+    0 0 0 3px rgba(226, 187, 66, 0.16),
+    4px 5px 0 rgba(80, 80, 80, 0.06);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   TWO COLUMN ROW
+========================================================= */
+
+.form-row {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 24px;
+}
+
+
+/* =========================================================
+   CAPACITY
+========================================================= */
+
+.capacity-group {
+  max-width: 50%;
+}
+
+
+/* =========================================================
+   FORM ACTIONS
+========================================================= */
+
+.form-actions {
+  display: flex;
+
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 14px;
+
+  margin-top: 35px;
+
+  padding-top: 25px;
+
+  border-top: 1px dashed rgba(100, 100, 100, 0.25);
+}
+
+
+/* cancel */
+
+.cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 110px;
+
+  padding: 12px 20px;
+
+  border: 1px solid #cfc9bd;
+
+  border-radius: 7px;
+
+  background: #f6f2e8;
+
+  color: #596373;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #ebe5d8;
+
+  transform: translateY(-2px);
+}
+
+
+/* save */
+
+.save-event-btn {
+  min-width: 165px;
+
+  padding: 13px 23px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #1b2335;
+
+  color: white;
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    5px 6px 0 rgba(0, 0, 0, 0.14);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.save-event-btn:hover:not(:disabled) {
+  background: #27334a;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    7px 8px 0 rgba(0, 0, 0, 0.14);
+}
+
+.save-event-btn:active:not(:disabled) {
+  transform: translateY(1px);
+
+  box-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.14);
+}
+
+.save-event-btn:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+  .create-event-page {
+    padding: 40px 25px 60px;
+  }
+
+  .create-event-header {
+    padding: 32px 30px;
+  }
+
+  .create-event-card {
+    padding: 38px 35px 40px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .capacity-group {
+    max-width: 100%;
+  }
+
+  .create-event-card::before {
+    left: 48px;
+  }
+
+  .form-title-area {
+    padding-left: 5px;
+  }
+
+  .form-group {
+    padding-left: 5px;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .create-event-page {
+    padding: 30px 15px 50px;
+  }
+
+  .create-event-page::after {
+    display: none;
+  }
+
+  .create-note {
+    opacity: 0.4;
+  }
+
+  .create-event-header {
+    padding: 28px 22px;
+
+    margin-bottom: 25px;
+  }
+
+  .create-event-header h1 {
+    font-size: 36px;
+  }
+
+  .create-event-subtitle {
+    font-size: 14px;
+  }
+
+  .create-event-card {
+    padding: 30px 20px 30px;
+
+    transform: none;
+  }
+
+  .create-event-card::before {
+    left: 35px;
+  }
+
+  .form-title-area {
+    gap: 13px;
+  }
+
+  .form-icon {
+    width: 48px;
+    height: 48px;
+
+    font-size: 25px;
+  }
+
+  .form-title-area h2 {
+    font-size: 23px;
+  }
+
+  .form-title-area p:last-child {
+    font-size: 12px;
+  }
+
+  .form-group {
+    padding-left: 0;
+  }
+
+  .form-group label {
+    font-size: 19px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+
+  .cancel-btn,
+  .save-event-btn {
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 400px) {
+
+  .create-event-header {
+    padding: 25px 18px;
+  }
+
+  .create-event-header h1 {
+    font-size: 31px;
+  }
+
+  .create-event-card {
+    padding: 27px 16px;
+  }
+
+  .form-title-area {
+    align-items: flex-start;
+  }
+
+  .form-label {
+    font-size: 18px;
+  }
+
+  .form-title-area h2 {
+    font-size: 21px;
+  }
+
+  .create-back-btn {
+    font-size: 12px;
+  }
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+.create-event-header {
+  animation: createHeaderAppear 0.55s ease both;
+}
+
+.create-event-card {
+  animation: createCardAppear 0.65s ease 0.1s both;
+}
+
+@keyframes createHeaderAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes createCardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(25px) rotate(-0.25deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-0.25deg);
+  }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #eee9de;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9da4a7;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #707982;
+}
