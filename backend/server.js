@@ -1,3 +1,12 @@
+const dns = require("dns");
+
+// Use Google Public DNS
+dns.setServers([
+  "8.8.8.8",
+  "8.8.4.4"
+]);
+
+console.log("Using Google DNS:", dns.getServers());
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
