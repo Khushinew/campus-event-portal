@@ -4,6 +4,7 @@ import "./App.css";
 // Public pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import CreateEvent from "./pages/events/CreateEvent";
 
 // Student pages
 import StudentDashboard from "./pages/StudentDashboard";
@@ -90,6 +91,10 @@ function App() {
           path="/faculty-dashboard"
           element={<FacultyDashboard />}
         />
+       <Route
+          path="/faculty/create-event"
+          element={<CreateEvent />}
+/>
 
       </Routes>
     </BrowserRouter>
