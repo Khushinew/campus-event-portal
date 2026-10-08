@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import FacultySidebar from "./FacultySidebar";
 import "./EditEvent.css";
 
 function EditEvent() {
@@ -43,7 +43,16 @@ function EditEvent() {
       return;
     }
 
-    const currentUser = JSON.parse(savedUser);
+    let currentUser;
+
+    try {
+      currentUser = JSON.parse(savedUser);
+    } catch (error) {
+      console.error("Invalid user data:", error);
+      localStorage.removeItem("user");
+      navigate("/login");
+      return;
+    }
 
     if (currentUser.role !== "faculty") {
       navigate("/");
@@ -167,11 +176,9 @@ function EditEvent() {
         `http://localhost:5000/api/events/${id}`,
         {
           method: "PUT",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify(formData),
         }
       );
@@ -204,11 +211,14 @@ function EditEvent() {
     return (
       <div className="edit-event-page">
 
+        {/* FACULTY SIDEBAR */}
+        <FacultySidebar />
+
+        {/* Decorative Notes */}
         <div className="edit-note edit-note-left"></div>
         <div className="edit-note edit-note-right"></div>
 
         <div className="edit-loading">
-
           <div className="loading-icon">
             ✎
           </div>
@@ -220,7 +230,6 @@ function EditEvent() {
           <p>
             Please wait while we fetch the event details.
           </p>
-
         </div>
 
       </div>
@@ -228,17 +237,22 @@ function EditEvent() {
   }
 
   /* =====================================================
-     PAGE
+     MAIN PAGE
   ===================================================== */
 
   return (
     <div className="edit-event-page">
 
+      {/* =================================================
+          FACULTY SIDEBAR
+      ================================================= */}
+
+      <FacultySidebar />
+
       {/* Decorative Notes */}
 
       <div className="edit-note edit-note-left"></div>
       <div className="edit-note edit-note-right"></div>
-
 
       {/* =================================================
           EDIT EVENT HEADER
@@ -270,13 +284,11 @@ function EditEvent() {
 
       </header>
 
-
       {/* =================================================
           MAIN CONTENT
       ================================================= */}
 
       <main className="edit-event-container">
-
 
         {/* =================================================
             ERROR / SUCCESS
@@ -293,7 +305,6 @@ function EditEvent() {
             ✓ {success}
           </div>
         )}
-
 
         {/* =================================================
             VERIFICATION CARD
@@ -319,13 +330,11 @@ function EditEvent() {
 
           </div>
 
-
           <p className="verification-description">
             Enter the event name, category and original date
             exactly as they were created. You can edit the
             remaining details after verification.
           </p>
-
 
           <form
             className="verification-form"
@@ -353,7 +362,6 @@ function EditEvent() {
 
             </div>
 
-
             {/* CATEGORY */}
 
             <div className="form-group">
@@ -375,7 +383,6 @@ function EditEvent() {
 
             </div>
 
-
             {/* DATE */}
 
             <div className="form-group">
@@ -396,7 +403,6 @@ function EditEvent() {
 
             </div>
 
-
             <button
               type="submit"
               className="verify-btn"
@@ -408,7 +414,6 @@ function EditEvent() {
 
           </form>
 
-
           {verificationError && (
             <div className="verification-error">
 
@@ -418,7 +423,6 @@ function EditEvent() {
 
             </div>
           )}
-
 
           {verified && (
             <div className="verification-success">
@@ -432,7 +436,6 @@ function EditEvent() {
           )}
 
         </section>
-
 
         {/* =================================================
             EDIT FORM
@@ -463,7 +466,6 @@ function EditEvent() {
             </div>
           )}
 
-
           {/* FORM HEADER */}
 
           <div className="edit-details-title">
@@ -485,7 +487,6 @@ function EditEvent() {
             </div>
 
           </div>
-
 
           <form
             className="edit-event-form"
@@ -512,7 +513,6 @@ function EditEvent() {
 
             </div>
 
-
             {/* CATEGORY */}
 
             <div className="form-group">
@@ -532,7 +532,6 @@ function EditEvent() {
               </small>
 
             </div>
-
 
             {/* DATE */}
 
@@ -554,7 +553,6 @@ function EditEvent() {
 
             </div>
 
-
             {/* TIME */}
 
             <div className="form-group">
@@ -574,7 +572,6 @@ function EditEvent() {
               />
 
             </div>
-
 
             {/* VENUE */}
 
@@ -596,7 +593,6 @@ function EditEvent() {
               />
 
             </div>
-
 
             {/* MAX STUDENTS */}
 
@@ -620,7 +616,6 @@ function EditEvent() {
 
             </div>
 
-
             {/* DESCRIPTION */}
 
             <div className="form-group full-width">
@@ -642,7 +637,6 @@ function EditEvent() {
 
             </div>
 
-
             {/* BUTTONS */}
 
             <div className="form-actions">
@@ -656,7 +650,6 @@ function EditEvent() {
               >
                 Cancel
               </button>
-
 
               <button
                 type="submit"
