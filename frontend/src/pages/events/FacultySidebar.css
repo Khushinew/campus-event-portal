@@ -1,0 +1,472 @@
+/* =========================================================
+   FACULTY MENU BUTTON
+========================================================= */
+
+.faculty-menu-btn {
+    position: fixed;
+
+    top: 20px;
+    left: 20px;
+
+    width: 62px;
+    height: 62px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #fffdf7;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    cursor: pointer;
+
+    z-index: 3000;
+
+    box-shadow:
+        6px 7px 0 rgba(55, 55, 55, 0.12),
+        0 8px 20px rgba(55, 55, 55, 0.08);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.faculty-menu-btn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        7px 9px 0 rgba(55, 55, 55, 0.12),
+        0 10px 25px rgba(55, 55, 55, 0.10);
+}
+
+
+.faculty-menu-btn span {
+    display: block;
+
+    width: 25px;
+    height: 3px;
+
+    background: #182236;
+
+    border-radius: 5px;
+}
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.faculty-sidebar-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(23, 32, 51, 0.28);
+
+    backdrop-filter: blur(2px);
+
+    z-index: 4000;
+
+    animation: sidebarOverlayIn 0.2s ease;
+}
+
+
+@keyframes sidebarOverlayIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.faculty-sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 330px;
+    height: 100vh;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 31px,
+            rgba(100, 130, 160, 0.11) 32px,
+            transparent 33px
+        ),
+        #fffdf7;
+
+    border-right: 1px solid rgba(70, 70, 70, 0.10);
+
+    box-shadow:
+        10px 0 30px rgba(30, 30, 30, 0.12);
+
+    z-index: 5000;
+
+    transform: translateX(-105%);
+
+    transition:
+        transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow-y: auto;
+}
+
+
+/* OPEN */
+
+.faculty-sidebar.sidebar-open {
+    transform: translateX(0);
+}
+
+
+/* Notebook red margin */
+
+.faculty-sidebar::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+
+    left: 52px;
+
+    width: 2px;
+
+    background: rgba(224, 110, 110, 0.14);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.sidebar-header {
+    position: relative;
+
+    padding: 32px 24px 22px 72px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    border-bottom: 1px solid rgba(80, 80, 80, 0.08);
+}
+
+
+.sidebar-label {
+    margin: 0 0 2px;
+
+    font-family: "Caveat", cursive;
+
+    font-size: 19px;
+
+    font-style: italic;
+
+    color: #7890aa;
+}
+
+
+.sidebar-header h2 {
+    margin: 0;
+
+    font-family: "Playfair Display", serif;
+
+    font-size: 25px;
+
+    color: #182236;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.sidebar-close-btn {
+    width: 36px;
+    height: 36px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #182236;
+
+    color: white;
+
+    font-size: 25px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s ease;
+}
+
+
+.sidebar-close-btn:hover {
+    transform: rotate(90deg);
+
+    background: #29364d;
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.sidebar-profile {
+    margin: 25px 20px 20px 72px;
+
+    padding: 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    background: #f8f1d7;
+
+    border: 1px solid rgba(70, 70, 70, 0.08);
+
+    border-radius: 8px;
+
+    box-shadow:
+        4px 5px 0 rgba(55, 55, 55, 0.06);
+}
+
+
+.sidebar-profile-circle {
+    width: 45px;
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #f4d05b;
+
+    border-radius: 50%;
+
+    font-family: "Playfair Display", serif;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    color: #182236;
+}
+
+
+.sidebar-profile strong {
+    display: block;
+
+    color: #182236;
+
+    font-size: 14px;
+
+    margin-bottom: 3px;
+}
+
+
+.sidebar-profile span {
+    display: block;
+
+    color: #7890aa;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.sidebar-nav {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    padding: 10px 20px 20px 72px;
+}
+
+
+.sidebar-link {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 13px 14px;
+
+    text-decoration: none;
+
+    color: #39465a;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.sidebar-link:hover {
+    background: #f8f1d7;
+
+    color: #182236;
+
+    transform: translateX(3px);
+}
+
+
+.sidebar-icon {
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    padding: 20px 20px 30px 72px;
+
+    border-top: 1px solid rgba(80, 80, 80, 0.08);
+}
+
+
+.sidebar-logout {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 13px 14px;
+
+    border: none;
+
+    background: transparent;
+
+    border-radius: 7px;
+
+    color: #b3534c;
+
+    font-family: "DM Sans", sans-serif;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition: 0.2s ease;
+}
+
+
+.sidebar-logout:hover {
+    background: #fde8e6;
+
+    transform: translateX(3px);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .faculty-menu-btn {
+        width: 55px;
+        height: 55px;
+
+        top: 14px;
+        left: 14px;
+    }
+
+    .faculty-menu-btn span {
+        width: 23px;
+    }
+
+    .faculty-sidebar {
+        width: 290px;
+    }
+
+    .sidebar-header {
+        padding-left: 65px;
+    }
+
+    .sidebar-profile {
+        margin-left: 65px;
+    }
+
+    .sidebar-nav {
+        padding-left: 65px;
+    }
+
+    .sidebar-bottom {
+        padding-left: 65px;
+    }
+
+}

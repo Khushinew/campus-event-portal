@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./MyEvent.css";
+import FacultySidebar from "./FacultySidebar";
 
 function MyEvents() {
   const navigate = useNavigate();
@@ -16,46 +17,85 @@ function MyEvents() {
       return;
     }
 
-    const currentUser = JSON.parse(savedUser);
+    let currentUser;
+
+    try {
+      currentUser = JSON.parse(savedUser);
+    } catch (error) {
+      console.error("Invalid user data:", error);
+      localStorage.removeItem("user");
+      navigate("/login");
+      return;
+    }
 
     if (currentUser.role !== "faculty") {
       navigate("/");
       return;
     }
 
-    fetch(`http://localhost:5000/api/events/faculty/${currentUser.id}`)
-      .then((response) => response.json())
+    fetch(
+      `http://localhost:5000/api/events/faculty/${currentUser.id}`
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to load events");
+        }
+
+        return response.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setEvents(data);
+        } else {
+          setEvents([]);
         }
       })
       .catch((error) => {
         console.error("Error loading events:", error);
+        setEvents([]);
       })
       .finally(() => {
         setLoading(false);
       });
   }, [navigate]);
 
+  /* ================= LOADING ================= */
+
   if (loading) {
     return (
       <div className="my-events-page">
-        <div className="events-loading">
-          Loading your events...
-        </div>
+
+        <FacultySidebar />
+
+        <main className="my-events-main">
+
+          <div className="events-loading">
+            Loading your events...
+          </div>
+
+        </main>
+
       </div>
     );
   }
 
+  /* ================= PAGE ================= */
+
   return (
     <div className="my-events-page">
 
+      {/* Faculty Sidebar */}
+      <FacultySidebar />
+
+
       <main className="my-events-main">
+
+        {/* ================= HEADER ================= */}
 
         <header className="my-events-header">
 
           <div>
+
             <p className="events-label">
               FACULTY PORTAL
             </p>
@@ -67,7 +107,9 @@ function MyEvents() {
             <p>
               View and manage the events created by you.
             </p>
+
           </div>
+
 
           <Link
             to="/faculty-dashboard"
@@ -78,6 +120,8 @@ function MyEvents() {
 
         </header>
 
+
+        {/* ================= NO EVENTS ================= */}
 
         {events.length === 0 ? (
 
@@ -110,79 +154,114 @@ function MyEvents() {
 
         ) : (
 
+          /* ================= EVENTS ================= */
+
           <section className="events-grid">
 
-            {events.map((event, index) => (
+            {events.map((event, index) => {
 
-              <article
-                className="my-event-card"
-                key={event.id || event._id || index}
-              >
+              const eventId =
+                event.id || event._id;
 
-                <div className="event-card-top">
+              return (
+                <article
+                  className="my-event-card"
+                  key={eventId || index}
+                >
 
-                  <span className="event-tag">
-                    {event.category || "Campus Event"}
-                  </span>
+                  {/* TOP */}
 
-                  <span className="event-date">
-                    {event.date || "Date not set"}
-                  </span>
+                  <div className="event-card-top">
 
-                </div>
+                    <span className="event-tag">
+                      {event.category || "Campus Event"}
+                    </span>
 
+                    <span className="event-date">
+                      {event.date || "Date not set"}
+                    </span>
 
-                <h2>
-                  {event.title || event.name || "Untitled Event"}
-                </h2>
-
-
-                <p className="event-description">
-                  {event.description ||
-                    "No description available for this event."}
-                </p>
-
-
-                <div className="event-details">
-
-                  <div>
-                    <span>VENUE</span>
-                    <strong>
-                      {event.venue || "Not specified"}
-                    </strong>
                   </div>
 
-                  <div>
-                    <span>TIME</span>
-                    <strong>
-                      {event.time || "Not specified"}
-                    </strong>
+
+                  {/* TITLE */}
+
+                  <h2>
+                    {event.title ||
+                      event.name ||
+                      "Untitled Event"}
+                  </h2>
+
+
+                  {/* DESCRIPTION */}
+
+                  <p className="event-description">
+
+                    {event.description ||
+                      "No description available for this event."}
+
+                  </p>
+
+
+                  {/* DETAILS */}
+
+                  <div className="event-details">
+
+                    <div>
+
+                      <span>
+                        VENUE
+                      </span>
+
+                      <strong>
+                        {event.venue ||
+                          event.location ||
+                          "Not specified"}
+                      </strong>
+
+                    </div>
+
+
+                    <div>
+
+                      <span>
+                        TIME
+                      </span>
+
+                      <strong>
+                        {event.time ||
+                          "Not specified"}
+                      </strong>
+
+                    </div>
+
                   </div>
 
-                </div>
+
+                  {/* ACTIONS */}
+
+                  <div className="event-actions">
+
+                    <Link
+                      to={`/faculty/events/${eventId}`}
+                      className="view-event-btn"
+                    >
+                      View
+                    </Link>
 
 
-                <div className="event-actions">
+                    <Link
+                      to={`/faculty/events/edit/${eventId}`}
+                      className="edit-event-btn"
+                    >
+                      Edit Event
+                    </Link>
 
-                  <Link
-                    to={`/faculty/events/${event.id || event._id}`}
-                    className="view-event-btn"
-                  >
-                    View
-                  </Link>
+                  </div>
 
-                  <Link
-                    to={`/faculty/events/edit/${event.id || event._id}`}
-                    className="edit-event-btn"
-                  >
-                    Edit Event
-                  </Link>
-
-                </div>
-
-              </article>
-
-            ))}
+                </article>
+              );
+            })}
 
           </section>
 

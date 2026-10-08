@@ -10,6 +10,8 @@ import FacultyDashboard from "./pages/FacultyDashboard";
 import CreateEvent from "./pages/events/CreateEvent";
 import EditEvent from "./pages/events/EditEvent";
 import MyEvents from "./pages/events/MyEvents";
+import MonitorRegistrations from "./pages/events/MonitorRegistrations";
+
 
 // Student pages
 import StudentDashboard from "./pages/StudentDashboard";
@@ -108,6 +110,12 @@ function App() {
   path="/faculty/events"
   element={<MyEvents />}
 />
+<Route
+  path="/faculty/registrations"
+  element={<MonitorRegistrations />}
+/>
+
+
 
       </Routes>
     </BrowserRouter>
