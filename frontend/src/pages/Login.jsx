@@ -1,221 +1,287 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  getCampusRole,
-  getDashboardPath,
-  getStoredUser,
-} from "../auth";
+
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getDashboardPath, getStoredUser } from "../auth";
 import "./Login.css";
 
 function Login() {
-  const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  useEffect(() => {
-    const user = getStoredUser();
+    const [email, setEmail] =
+        useState("");
 
-    if (user) {
-      navigate(getDashboardPath(user.role), { replace: true });
-    }
-  }, [navigate]);
+    const [password, setPassword] =
+        useState("");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+    const [showPassword, setShowPassword] =
+        useState(false);
 
-    const normalizedEmail = email.trim().toLowerCase();
-    const emailRole = getCampusRole(normalizedEmail);
+    const [error, setError] =
+        useState("");
 
-    if (!emailRole) {
-      setError(
-        "Use a valid faculty or student email ending in @campus.edu.in."
-      );
-      setLoading(false);
-      return;
-    }
+    
 
-    try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: normalizedEmail,
-          password: password,
-        }),
-      });
+        
 
-      const data = await response.json();
+    const handleLogin = async (e) => {
 
-      if (response.ok) {
-        if (!data.user) {
-          setError("Login successful, but user information was not received.");
-          setLoading(false);
-          return;
+        e.preventDefault();
+
+        setError("");
+
+        const normalizedEmail =
+            email.trim().toLowerCase();
+
+        try {
+
+            const response =
+                await fetch(
+                    "http://localhost:5000/api/login",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            email: normalizedEmail,
+                            password: password
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                setError(
+                    data.message ||
+                    "Login failed."
+                );
+
+                return;
+            }
+
+            // --------------------------------
+            // First login
+            // --------------------------------
+
+            if (data.firstLogin) {
+
+                navigate(
+                    "/change-password",
+                    {
+                        state: {
+                            email:
+                                normalizedEmail
+                        }
+                    }
+                );
+
+                return;
+            }
+
+            // --------------------------------
+            // Normal login
+            // --------------------------------
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(data.user)
+            );
+
+            localStorage.setItem(
+                "token",
+                data.token
+            );
+
+            navigate(
+                getDashboardPath(
+                    data.user.role
+                ),
+                {
+                    replace: true
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Login error:",
+                error
+            );
+
+            setError(
+                "Cannot connect to backend."
+            );
         }
+    };
 
-        if (data.user.role !== emailRole) {
-          setError(
-            "This email does not match the account role in the university directory."
-          );
-          setLoading(false);
-          return;
-        }
+    return (
 
-        console.log("Logged in user:", data.user);
+        <div className="login-page">
 
-        localStorage.setItem("user", JSON.stringify(data.user));
+            <header className="header">
 
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
+                <div className="logo">
+                    Campusphere
+                </div>
 
-        navigate(getDashboardPath(emailRole), {
-          replace: true,
-        });
-      } else {
-        setError(data.message || "Login failed.");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Cannot connect to backend.");
-    } finally {
-      setLoading(false);
-    }
-  };
+                <nav className="nav-links">
 
-  return (
-    <div className="login-page">
+                    <Link to="/">
+                        Home
+                    </Link>
 
-      {/* Header */}
-      <header className="header">
-        <div className="logo">Campusphere</div>
+                    <Link to="/events">
+                        Events
+                    </Link>
 
-        <nav className="nav-links">
-          <Link to="/">Home</Link>
-          <Link to="/events">Events</Link>
-          <Link to="/login" className="register-btn">
-            Login
-          </Link>
-        </nav>
-      </header>
+                    <Link
+                        to="/login"
+                        className="register-btn"
+                    >
+                        Login
+                    </Link>
 
-      {/* Login Section */}
-      <main className="login-section">
-        <div className="login-box">
+                </nav>
 
-          <p className="login-label">
-            WELCOME BACK
-          </p>
+            </header>
 
-          <h1>
-            Login to <span>Campusphere</span>
-          </h1>
+            <main className="login-section">
 
-          <p className="login-description">
-            Login to discover events, manage your schedule,
-            and stay connected with your campus.
-          </p>
+                <div className="login-box">
 
-          {/* Error */}
-          {error && (
-            <p className="error-message">
-              {error}
-            </p>
-          )}
+                    <p className="login-label">
+                        WELCOME BACK
+                    </p>
 
-          {/* Login Form */}
-          <form
-            className="login-form"
-            onSubmit={handleLogin}
-          >
+                    <h1>
+                        Login to{" "}
+                        <span>
+                            Campusphere
+                        </span>
+                    </h1>
 
-            {/* Email */}
-            <div className="form-group">
-              <label htmlFor="email">
-                Email Address
-              </label>
+                    <p className="login-description">
+                        Login to discover events,
+                        manage your schedule,
+                        and stay connected
+                        with your campus.
+                    </p>
 
-              <input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+                    {error && (
+                        <p className="error-message">
+                            {error}
+                        </p>
+                    )}
 
-            {/* Password */}
-            <div className="form-group">
-              <label htmlFor="password">
-                Password
-              </label>
+                    <form
+                        className="login-form"
+                        onSubmit={handleLogin}
+                    >
 
-              <div className="password-input-wrap">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                />
+                        <div className="form-group">
 
-                <button
-                  type="button"
-                  className="password-visibility-btn"
-                  onClick={() =>
-                    setShowPassword((visible) => !visible)
-                  }
-                  aria-label={
-                    showPassword
-                      ? "Hide password"
-                      : "Show password"
-                  }
-                  aria-pressed={showPassword}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </div>
+                            <label>
+                                Email Address
+                            </label>
 
-            {/* Options */}
-            <div className="login-options">
+                            <input
+                                type="email"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={(e) =>
+                                    setEmail(
+                                        e.target.value
+                                    )
+                                }
+                                required
+                            />
 
-              <label className="remember">
-                <input type="checkbox" />
-                Remember me
-              </label>
+                        </div>
 
-              <a href="#forgot-password">
-                Forgot Password?
-              </a>
+                        <div className="form-group">
 
-            </div>
+                            <label>
+                                Password
+                            </label>
 
-            {/* Login Button */}
-            <button
-              type="submit"
-              className="login-btn"
-              disabled={loading}
-            >
-              {loading ? "Logging in..." : "Login"}
-            </button>
+                            <div className="password-input-wrap">
 
-          </form>
+                                <input
+                                    type={
+                                        showPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChange={(e) =>
+                                        setPassword(
+                                            e.target.value
+                                        )
+                                    }
+                                    autoComplete="current-password"
+                                    required
+                                />
+
+                                <button
+                                    type="button"
+                                    className="password-visibility-btn"
+                                    onClick={() =>
+                                        setShowPassword(
+                                            (visible) =>
+                                                !visible
+                                        )
+                                    }
+                                >
+                                    {showPassword
+                                        ? "Hide"
+                                        : "Show"}
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <div className="login-options">
+
+                            <label className="remember">
+
+                                <input
+                                    type="checkbox"
+                                />
+
+                                Remember me
+
+                            </label>
+
+                            <a href="#">
+                                Forgot Password?
+                            </a>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="login-btn"
+                        >
+                            Login
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </main>
+
         </div>
-      </main>
-    </div>
-  );
+    );
 }
 
 export default Login;

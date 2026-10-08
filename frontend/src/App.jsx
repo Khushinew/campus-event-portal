@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
+import ChangePassword from "./pages/ChangePassword";
 
 // Public pages
 import Home from "./pages/Home";
@@ -33,6 +34,7 @@ function App() {
           element={<Home />}
         />
 
+
         <Route
           path="/login"
           element={<Login />}
@@ -42,6 +44,12 @@ function App() {
           path="/events"
           element={<ViewEvents />}
         />
+        <Route
+    path="/change-password"
+    element={<ChangePassword />}
+/>
+
+        
 
 
         {/* =========================
