@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import FacultyDashboard from "./pages/FacultyDashboard";
 import CreateEvent from "./pages/events/CreateEvent";
 import EditEvent from "./pages/events/EditEvent";
+import MyEvents from "./pages/events/MyEvents";
 
 // Student pages
 import StudentDashboard from "./pages/StudentDashboard";
@@ -111,6 +112,10 @@ function App() {
           path="/faculty/edit-events"
           element={<EditEvent />}
         />
+        <Route
+  path="/faculty/events"
+  element={<MyEvents />}
+/>
 
       </Routes>
     </BrowserRouter>
