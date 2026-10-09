@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import OtpVerification from "./pages/OtpVerification";
+import ResetPassword from "./pages/ResetPassword";
 import CreateEvent from "./pages/events/CreateEvent";
 
 // Student pages
@@ -45,6 +46,8 @@ function App() {
 />
 
 <Route path="/verify-otp" element={<OtpVerification />} />
+
+<Route path="/reset-password" element={<ResetPassword />} />
 
         <Route
           path="/events"
