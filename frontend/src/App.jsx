@@ -1,15 +1,32 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
+import ChangePassword from "./pages/ChangePassword";
 
+// =========================
 // Public pages
+// =========================
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import OtpVerification from "./pages/OtpVerification";
 import ResetPassword from "./pages/ResetPassword";
-import CreateEvent from "./pages/events/CreateEvent";
 
+// =========================
+// Faculty pages
+// =========================
+import FacultyDashboard from "./pages/FacultyDashboard";
+
+import CreateEvent from "./pages/events/CreateEvent";
+import EditEvent from "./pages/events/EditEvent";
+import MyEvents from "./pages/events/MyEvents";
+import MonitorRegistrations from "./pages/events/MonitorRegistrations";
+
+import ManageAccount from "./pages/events/ManageAccount";
+import MyProfile from "./pages/events/MyProfile";
+
+// =========================
 // Student pages
+// =========================
 import StudentDashboard from "./pages/StudentDashboard";
 import ViewEvents from "./pages/StudentEvents/ViewEvents";
 import EventDetails from "./pages/StudentEvents/EventDetails";
@@ -18,12 +35,11 @@ import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent";
 
-// Faculty pages
-import FacultyDashboard from "./pages/FacultyDashboard";
 
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
         {/* =========================
@@ -34,6 +50,7 @@ function App() {
           path="/"
           element={<Home />}
         />
+
 
         <Route
           path="/login"
@@ -53,6 +70,12 @@ function App() {
           path="/events"
           element={<ViewEvents />}
         />
+        <Route
+    path="/change-password"
+    element={<ChangePassword />}
+/>
+
+        
 
 
         {/* =========================
@@ -99,16 +122,50 @@ function App() {
             FACULTY ROUTES
         ========================= */}
 
+        {/* Faculty Dashboard */}
         <Route
           path="/faculty-dashboard"
           element={<FacultyDashboard />}
         />
-       <Route
+
+        {/* Create Event */}
+        <Route
           path="/faculty/create-event"
           element={<CreateEvent />}
-/>
+        />
+
+        {/* My Events */}
+        <Route
+          path="/faculty/events"
+          element={<MyEvents />}
+        />
+
+        {/* Edit Event */}
+        <Route
+          path="/faculty/edit-events"
+          element={<EditEvent />}
+        />
+
+        {/* Monitor Registrations */}
+        <Route
+          path="/faculty/registrations"
+          element={<MonitorRegistrations />}
+        />
+
+        {/* Manage Account */}
+        <Route
+          path="/faculty/account"
+          element={<ManageAccount />}
+        />
+
+        {/* My Profile */}
+        <Route
+          path="/faculty/profile"
+          element={<MyProfile />}
+        />
 
       </Routes>
+
     </BrowserRouter>
   );
 }

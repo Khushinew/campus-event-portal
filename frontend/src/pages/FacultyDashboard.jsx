@@ -18,7 +18,16 @@ function FacultyDashboard() {
       return;
     }
 
-    const currentUser = JSON.parse(savedUser);
+    let currentUser;
+
+    try {
+      currentUser = JSON.parse(savedUser);
+    } catch (error) {
+      console.error("Invalid user data:", error);
+      localStorage.removeItem("user");
+      navigate("/login");
+      return;
+    }
 
     if (currentUser.role !== "faculty") {
       navigate("/");
@@ -27,8 +36,16 @@ function FacultyDashboard() {
 
     setUser(currentUser);
 
-    fetch(`http://localhost:5000/api/events/faculty/${currentUser.id}`)
-      .then((response) => response.json())
+    fetch(
+      `http://localhost:5000/api/events/faculty/${currentUser.id}`
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unable to load events");
+        }
+
+        return response.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setEventCount(data.length);
@@ -49,92 +66,165 @@ function FacultyDashboard() {
   };
 
   if (!user) {
-    return <div className="faculty-loading">Loading...</div>;
+    return (
+      <div className="faculty-loading">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div className="faculty-dashboard">
 
-      {/* ================= MOBILE / SIDEBAR MENU BUTTON ================= */}
+      {/* ==================================================
+          MENU BUTTON
+      ================================================== */}
+
       <button
-        className="sidebar-menu-btn"
+        className="faculty-menu-btn"
         onClick={() => setSidebarOpen(true)}
-        aria-label="Open sidebar"
+        aria-label="Open menu"
       >
-        ☰
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
 
-      {/* ================= OVERLAY ================= */}
+
+      {/* ==================================================
+          OVERLAY
+      ================================================== */}
+
       {sidebarOpen && (
         <div
-          className="sidebar-overlay"
+          className="faculty-sidebar-overlay"
           onClick={() => setSidebarOpen(false)}
         ></div>
       )}
 
-      {/* ================= SIDEBAR ================= */}
+
+      {/* ==================================================
+          SIDEBAR
+      ================================================== */}
+
       <aside
         className={`faculty-sidebar ${
           sidebarOpen ? "sidebar-open" : ""
         }`}
       >
 
-        {/* Logo + ONE close button */}
-        <div className="sidebar-top">
+        <div className="sidebar-header">
 
-          <div className="faculty-logo">
-            Campusphere<span>.</span>
+          <div>
+            <p className="sidebar-label">
+              FACULTY PORTAL
+            </p>
+
+            <h2>
+              Campusphere
+            </h2>
           </div>
 
           <button
             className="sidebar-close-btn"
             onClick={() => setSidebarOpen(false)}
-            aria-label="Close sidebar"
+            aria-label="Close menu"
           >
             ×
           </button>
 
         </div>
 
+
         {/* Faculty Profile */}
+
         <div className="sidebar-profile">
 
           <div className="sidebar-profile-circle">
-            {user.name.charAt(0).toUpperCase()}
+            {user.name
+              ? user.name.charAt(0).toUpperCase()
+              : "F"}
           </div>
 
-          <div className="sidebar-profile-info">
-            <strong>{user.name}</strong>
-            <span>Faculty</span>
-            <small>
-              {user.department || "Department not set"}
-            </small>
+          <div>
+            <strong>
+              {user.name}
+            </strong>
+
+            <span>
+              Faculty
+            </span>
           </div>
 
         </div>
 
-        {/* Sidebar Account Section */}
-        <div className="sidebar-account">
 
-          <p className="sidebar-section-label">
-            ACCOUNT
-          </p>
+        {/* Sidebar Navigation */}
+
+        <nav className="sidebar-nav">
+
+          <Link
+            to="/faculty-dashboard"
+            onClick={() => setSidebarOpen(false)}
+            className="sidebar-link"
+          >
+            <span className="sidebar-icon">
+              ⌂
+            </span>
+
+            <span>
+              Dashboard
+            </span>
+          </Link>
+
 
           <Link
             to="/faculty/account"
-            className="sidebar-account-link"
             onClick={() => setSidebarOpen(false)}
+            className="sidebar-link"
           >
-            <span className="sidebar-link-icon">⚙</span>
-            <span>Manage Account</span>
+            <span className="sidebar-icon">
+              ⚙
+            </span>
+
+            <span>
+              Manage Account
+            </span>
           </Link>
 
+
+          <Link
+            to="/faculty/profile"
+            onClick={() => setSidebarOpen(false)}
+            className="sidebar-link"
+          >
+            <span className="sidebar-icon">
+              ♙
+            </span>
+
+            <span>
+              My Profile
+            </span>
+          </Link>
+
+        </nav>
+
+
+        {/* Sidebar Bottom */}
+
+        <div className="sidebar-bottom">
+
           <button
-            className="sidebar-logout-btn"
+            className="sidebar-logout"
             onClick={handleLogout}
           >
-            <span className="sidebar-link-icon">↪</span>
-            <span>Logout</span>
+            <span className="sidebar-icon">
+              ↪
+            </span>
+
+            <span>
+              Logout
+            </span>
           </button>
 
         </div>
@@ -142,10 +232,14 @@ function FacultyDashboard() {
       </aside>
 
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* ==================================================
+          MAIN CONTENT
+      ================================================== */}
+
       <main className="faculty-main">
 
-        {/* Header */}
+        {/* HEADER */}
+
         <header className="faculty-header">
 
           <div className="faculty-header-content">
@@ -164,15 +258,25 @@ function FacultyDashboard() {
 
           </div>
 
+
           <div className="faculty-profile">
 
             <div className="profile-circle">
-              {user.name.charAt(0).toUpperCase()}
+              {user.name
+                ? user.name.charAt(0).toUpperCase()
+                : "F"}
             </div>
 
-            <div>
-              <strong>{user.name}</strong>
-              <span>Faculty</span>
+            <div className="profile-info">
+
+              <strong>
+                {user.name}
+              </strong>
+
+              <span>
+                Faculty
+              </span>
+
             </div>
 
           </div>
@@ -180,12 +284,17 @@ function FacultyDashboard() {
         </header>
 
 
-        {/* ================= STATISTICS ================= */}
+        {/* ==================================================
+            STATISTICS
+        ================================================== */}
+
         <section className="faculty-stats">
 
           <div className="stat-card stat-yellow">
 
-            <h3>MY EVENTS</h3>
+            <h3>
+              MY EVENTS
+            </h3>
 
             <p>
               {loading ? "..." : eventCount}
@@ -200,9 +309,13 @@ function FacultyDashboard() {
 
           <div className="stat-card stat-blue">
 
-            <h3>REGISTRATIONS</h3>
+            <h3>
+              REGISTRATIONS
+            </h3>
 
-            <p>0</p>
+            <p>
+              0
+            </p>
 
             <span>
               Student registrations
@@ -213,7 +326,9 @@ function FacultyDashboard() {
 
           <div className="stat-card stat-green">
 
-            <h3>DEPARTMENT</h3>
+            <h3>
+              DEPARTMENT
+            </h3>
 
             <p className="department-value">
               {user.department || "Not Set"}
@@ -228,7 +343,9 @@ function FacultyDashboard() {
 
           <div className="stat-card stat-purple">
 
-            <h3>ROLE</h3>
+            <h3>
+              ROLE
+            </h3>
 
             <p className="role-value">
               Faculty
@@ -243,7 +360,10 @@ function FacultyDashboard() {
         </section>
 
 
-        {/* ================= QUICK ACTIONS ================= */}
+        {/* ==================================================
+            QUICK ACTIONS
+        ================================================== */}
+
         <section className="dashboard-section">
 
           <div className="section-heading">
@@ -265,17 +385,19 @@ function FacultyDashboard() {
 
           <div className="action-grid">
 
-            {/* Create Event */}
+            {/* CREATE EVENT */}
+
             <Link
               to="/faculty/create-event"
               className="action-card action-yellow"
             >
 
               <div className="action-icon">
-                ＋
+                +
               </div>
 
-              <div>
+              <div className="action-content">
+
                 <h3>
                   Create Event
                 </h3>
@@ -283,6 +405,7 @@ function FacultyDashboard() {
                 <p>
                   Create a new campus event.
                 </p>
+
               </div>
 
               <span className="action-arrow">
@@ -292,7 +415,8 @@ function FacultyDashboard() {
             </Link>
 
 
-            {/* My Events */}
+            {/* MY EVENTS */}
+
             <Link
               to="/faculty/events"
               className="action-card action-blue"
@@ -302,7 +426,8 @@ function FacultyDashboard() {
                 ▣
               </div>
 
-              <div>
+              <div className="action-content">
+
                 <h3>
                   My Events
                 </h3>
@@ -310,6 +435,7 @@ function FacultyDashboard() {
                 <p>
                   View events created by you.
                 </p>
+
               </div>
 
               <span className="action-arrow">
@@ -319,7 +445,38 @@ function FacultyDashboard() {
             </Link>
 
 
-            {/* Monitor Registrations */}
+            {/* EDIT EVENTS */}
+
+            <Link
+              to="/faculty/edit-events"
+              className="action-card action-orange"
+            >
+
+              <div className="action-icon">
+                ✎
+              </div>
+
+              <div className="action-content">
+
+                <h3>
+                  Edit Events
+                </h3>
+
+                <p>
+                  Modify event date, time, venue and details.
+                </p>
+
+              </div>
+
+              <span className="action-arrow">
+                ↗
+              </span>
+
+            </Link>
+
+
+            {/* MONITOR REGISTRATIONS */}
+
             <Link
               to="/faculty/registrations"
               className="action-card action-green"
@@ -329,7 +486,8 @@ function FacultyDashboard() {
                 ✓
               </div>
 
-              <div>
+              <div className="action-content">
+
                 <h3>
                   Monitor Registrations
                 </h3>
@@ -337,60 +495,7 @@ function FacultyDashboard() {
                 <p>
                   View student registrations.
                 </p>
-              </div>
 
-              <span className="action-arrow">
-                ↗
-              </span>
-
-            </Link>
-
-
-            {/* Student List */}
-            <Link
-              to="/faculty/students"
-              className="action-card action-purple"
-            >
-
-              <div className="action-icon">
-                ♙
-              </div>
-
-              <div>
-                <h3>
-                  Student List
-                </h3>
-
-                <p>
-                  View registered students.
-                </p>
-              </div>
-
-              <span className="action-arrow">
-                ↗
-              </span>
-
-            </Link>
-
-
-            {/* Manage Account */}
-            <Link
-              to="/faculty/account"
-              className="action-card action-yellow"
-            >
-
-              <div className="action-icon">
-                ⚙
-              </div>
-
-              <div>
-                <h3>
-                  Manage Account
-                </h3>
-
-                <p>
-                  Update your faculty profile.
-                </p>
               </div>
 
               <span className="action-arrow">
@@ -404,7 +509,10 @@ function FacultyDashboard() {
         </section>
 
 
-        {/* ================= RECENT ACTIVITY ================= */}
+        {/* ==================================================
+            RECENT EVENTS
+        ================================================== */}
+
         <section className="dashboard-section">
 
           <div className="section-heading">
@@ -442,6 +550,7 @@ function FacultyDashboard() {
             ) : eventCount === 0 ? (
 
               <>
+
                 <div className="empty-icon">
                   📅
                 </div>
@@ -460,6 +569,7 @@ function FacultyDashboard() {
                 >
                   Create Event
                 </Link>
+
               </>
 
             ) : (

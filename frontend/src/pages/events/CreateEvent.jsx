@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./CreateEvent.css";
-
+import FacultySidebar from "./FacultySidebar";
 
 function CreateEvent() {
   const navigate = useNavigate();
-
 
   const [formData, setFormData] = useState({
     title: "",
@@ -17,9 +16,7 @@ function CreateEvent() {
     capacity: "",
   });
 
-
   const [loading, setLoading] = useState(false);
-
 
   const handleChange = (e) => {
     setFormData({
@@ -28,25 +25,19 @@ function CreateEvent() {
     });
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     const savedUser = localStorage.getItem("user");
-
 
     if (!savedUser) {
       navigate("/login");
       return;
     }
 
-
     const user = JSON.parse(savedUser);
 
-
     setLoading(true);
-
 
     try {
       const response = await fetch(
@@ -64,10 +55,8 @@ function CreateEvent() {
         }
       );
 
-
       if (response.ok) {
         alert("Event created successfully!");
-
 
         setFormData({
           title: "",
@@ -78,7 +67,6 @@ function CreateEvent() {
           category: "",
           capacity: "",
         });
-
 
         navigate("/faculty/events");
       } else {
@@ -92,86 +80,96 @@ function CreateEvent() {
     }
   };
 
-
   return (
     <div className="create-event-page">
 
+      {/* =================================================
+          FACULTY SIDEBAR
+      ================================================= */}
+
+      <FacultySidebar />
 
       {/* Decorative notebook elements */}
+
       <div className="create-note note-left"></div>
       <div className="create-note note-right"></div>
 
-
       <main className="create-event-main">
 
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
-        {/* Header */}
         <header className="create-event-header">
 
-
           <div>
-            <Link to="/faculty-dashboard" className="create-back-btn">
+
+            <Link
+              to="/faculty-dashboard"
+              className="create-back-btn"
+            >
               ← Back to Dashboard
             </Link>
-
 
             <p className="create-event-label">
               FACULTY PORTAL
             </p>
 
-
-            <h1>Create Campus Event</h1>
-
+            <h1>
+              Create Campus Event
+            </h1>
 
             <p className="create-event-subtitle">
               Add a new event for students and manage your campus activities.
             </p>
-          </div>
 
+          </div>
 
         </header>
 
+        {/* =================================================
+            FORM
+        ================================================= */}
 
-        {/* Form */}
         <section className="create-event-card">
-
 
           <div className="form-paperclip"></div>
 
-
           <div className="form-title-area">
+
             <div className="form-icon">
               +
             </div>
 
-
             <div>
+
               <p className="form-label">
                 NEW EVENT
               </p>
-
 
               <h2>
                 Event Information
               </h2>
 
-
               <p>
                 Fill in the details below to create your campus event.
               </p>
-            </div>
-          </div>
 
+            </div>
+
+          </div>
 
           <form onSubmit={handleSubmit}>
 
+            {/* =================================================
+                EVENT NAME
+            ================================================= */}
 
-            {/* Event Name */}
             <div className="form-group">
+
               <label>
                 Event Name
               </label>
-
 
               <input
                 type="text"
@@ -181,15 +179,18 @@ function CreateEvent() {
                 onChange={handleChange}
                 required
               />
+
             </div>
 
+            {/* =================================================
+                DESCRIPTION
+            ================================================= */}
 
-            {/* Description */}
             <div className="form-group">
+
               <label>
                 Description
               </label>
-
 
               <textarea
                 name="description"
@@ -199,18 +200,20 @@ function CreateEvent() {
                 rows="5"
                 required
               ></textarea>
+
             </div>
 
+            {/* =================================================
+                DATE + TIME
+            ================================================= */}
 
-            {/* Row */}
             <div className="form-row">
 
-
               <div className="form-group">
+
                 <label>
                   Date
                 </label>
-
 
                 <input
                   type="date"
@@ -219,14 +222,14 @@ function CreateEvent() {
                   onChange={handleChange}
                   required
                 />
+
               </div>
 
-
               <div className="form-group">
+
                 <label>
                   Time
                 </label>
-
 
                 <input
                   type="time"
@@ -235,21 +238,22 @@ function CreateEvent() {
                   onChange={handleChange}
                   required
                 />
-              </div>
 
+              </div>
 
             </div>
 
+            {/* =================================================
+                VENUE + CATEGORY
+            ================================================= */}
 
-            {/* Row */}
             <div className="form-row">
 
-
               <div className="form-group">
+
                 <label>
                   Venue
                 </label>
-
 
                 <input
                   type="text"
@@ -259,14 +263,14 @@ function CreateEvent() {
                   onChange={handleChange}
                   required
                 />
+
               </div>
 
-
               <div className="form-group">
+
                 <label>
                   Category
                 </label>
-
 
                 <select
                   name="category"
@@ -274,52 +278,50 @@ function CreateEvent() {
                   onChange={handleChange}
                   required
                 >
+
                   <option value="">
                     Select category
                   </option>
-
 
                   <option value="Technical">
                     Technical
                   </option>
 
-
                   <option value="Cultural">
                     Cultural
                   </option>
-
 
                   <option value="Sports">
                     Sports
                   </option>
 
-
                   <option value="Workshop">
                     Workshop
                   </option>
-
 
                   <option value="Seminar">
                     Seminar
                   </option>
 
-
                   <option value="Other">
                     Other
                   </option>
-                </select>
-              </div>
 
+                </select>
+
+              </div>
 
             </div>
 
+            {/* =================================================
+                CAPACITY
+            ================================================= */}
 
-            {/* Capacity */}
             <div className="form-group capacity-group">
+
               <label>
                 Maximum Participants
               </label>
-
 
               <input
                 type="number"
@@ -330,12 +332,14 @@ function CreateEvent() {
                 onChange={handleChange}
                 required
               />
+
             </div>
 
+            {/* =================================================
+                BUTTONS
+            ================================================= */}
 
-            {/* Buttons */}
             <div className="form-actions">
-
 
               <Link
                 to="/faculty-dashboard"
@@ -344,32 +348,26 @@ function CreateEvent() {
                 Cancel
               </Link>
 
-
               <button
                 type="submit"
                 className="save-event-btn"
                 disabled={loading}
               >
-                {loading ? "Creating..." : "Create Event →"}
+                {loading
+                  ? "Creating..."
+                  : "Create Event →"}
               </button>
-
 
             </div>
 
-
           </form>
-
 
         </section>
 
-
       </main>
-
 
     </div>
   );
 }
 
-
 export default CreateEvent;
-
