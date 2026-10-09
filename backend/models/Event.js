@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema(
@@ -5,6 +6,7 @@ const eventSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
 
     description: {
@@ -30,6 +32,12 @@ const eventSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
+    },
+
+    capacity: {
+      type: Number,
+      min: 1,
+      default: 100,
     },
 
     organizer: {
