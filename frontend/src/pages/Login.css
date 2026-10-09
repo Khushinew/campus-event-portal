@@ -1242,3 +1242,23 @@ body::after {
       0.01ms !important;
   }
 }
+
+.login-section {
+    display: flex !important;
+    min-height: 80vh !important;
+    align-items: center !important;
+    justify-content: center !important;
+    outline: 3px solid red !important;
+}
+
+.login-box {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 450px !important;
+    min-height: 300px !important;
+    background: white !important;
+    color: black !important;
+    position: relative !important;
+    z-index: 9999 !important;
+}

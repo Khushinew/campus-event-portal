@@ -1,12 +1,13 @@
 
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { getDashboardPath, getStoredUser } from "../auth";
+import { getDashboardPath } from "../auth";
 import "./Login.css";
 
 function Login() {
 
     const navigate = useNavigate();
-    const location = useLocation();
+    
 
     const [email, setEmail] =
         useState("");
