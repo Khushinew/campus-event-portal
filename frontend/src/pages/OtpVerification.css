@@ -1,0 +1,156 @@
+
+.otp-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 15% 20%, #e6eee5 0, transparent 30%),
+    radial-gradient(circle at 85% 80%, #e9e4d9 0, transparent 30%),
+    #f4f1e8;
+}
+
+.otp-box {
+  width: 100%;
+  max-width: 540px;
+  padding: 55px 50px;
+  box-sizing: border-box;
+  text-align: center;
+  background: #e8e2d4;
+  border: 1px solid #d2cbbb;
+  box-shadow: 12px 12px 0 rgba(70, 65, 50, 0.08);
+}
+
+.otp-label {
+  margin: 0 0 22px;
+  color: #2868ed;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.otp-box h1 {
+  margin: 0 0 22px;
+  color: #171b29;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 5vw, 46px);
+  font-weight: 600;
+}
+
+.otp-description {
+  margin: 0 auto 18px;
+  max-width: 430px;
+  color: #718099;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.otp-email {
+  margin: 0 0 28px;
+  color: #2868ed;
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.otp-form-group {
+  margin-top: 28px;
+  text-align: left;
+}
+
+.otp-form-group label {
+  display: block;
+  margin: 0 0 12px;
+  color: #39312d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 600;
+  text-align: center;
+}
+
+.otp-form-group input {
+  width: 100%;
+  padding: 17px 16px;
+  box-sizing: border-box;
+  border: 1px solid #e2b83f;
+  border-radius: 8px;
+  outline: none;
+  background: #fffefa;
+  color: #252525;
+  font-size: 18px;
+  letter-spacing: 5px;
+  text-align: center;
+  box-shadow: 0 0 0 3px rgba(226, 184, 63, 0.12);
+}
+
+.otp-form-group input:focus {
+  border-color: #2868ed;
+  box-shadow: 0 0 0 3px rgba(40, 104, 237, 0.12);
+}
+
+.otp-box form button {
+  width: 100%;
+  margin-top: 30px;
+  padding: 18px;
+  border: none;
+  border-radius: 9px;
+  background: #2868ed;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(40, 104, 237, 0.2);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.otp-box form button:hover:not(:disabled) {
+  background: #1855d1;
+  transform: translateY(-1px);
+}
+
+.otp-box form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.otp-error {
+  margin: 18px 0;
+  color: #b42318;
+  font-size: 14px;
+}
+
+.otp-back {
+  margin-top: 32px;
+  color: #718099;
+  font-size: 15px;
+}
+
+.otp-back a {
+  color: #2868ed;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.otp-back a:hover {
+  text-decoration: underline;
+}
+
+.otp-note {
+  margin: 24px 0 0;
+  color: #77766f;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 520px) {
+  .otp-box {
+    padding: 40px 24px;
+  }
+
+  .otp-description {
+    font-size: 16px;
+  }
+}
