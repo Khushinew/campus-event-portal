@@ -4,6 +4,7 @@ import "./App.css";
 // Public pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
 import CreateEvent from "./pages/events/CreateEvent";
 
 // Student pages
@@ -36,6 +37,11 @@ function App() {
           path="/login"
           element={<Login />}
         />
+
+        <Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
 
         <Route
           path="/events"
