@@ -1,19 +1,28 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 
+// =========================
 // Public pages
+// =========================
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 
+// =========================
 // Faculty pages
+// =========================
 import FacultyDashboard from "./pages/FacultyDashboard";
+
 import CreateEvent from "./pages/events/CreateEvent";
 import EditEvent from "./pages/events/EditEvent";
 import MyEvents from "./pages/events/MyEvents";
 import MonitorRegistrations from "./pages/events/MonitorRegistrations";
 
+import ManageAccount from "./pages/events/ManageAccount";
+import MyProfile from "./pages/events/MyProfile";
 
+// =========================
 // Student pages
+// =========================
 import StudentDashboard from "./pages/StudentDashboard";
 import ViewEvents from "./pages/StudentEvents/ViewEvents";
 import EventDetails from "./pages/StudentEvents/EventDetails";
@@ -22,9 +31,11 @@ import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent";
 
+
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
         {/* =========================
@@ -91,33 +102,50 @@ function App() {
             FACULTY ROUTES
         ========================= */}
 
+        {/* Faculty Dashboard */}
         <Route
           path="/faculty-dashboard"
           element={<FacultyDashboard />}
         />
 
+        {/* Create Event */}
         <Route
           path="/faculty/create-event"
           element={<CreateEvent />}
         />
 
-        {/* EDIT EVENTS PAGE */}
+        {/* My Events */}
+        <Route
+          path="/faculty/events"
+          element={<MyEvents />}
+        />
+
+        {/* Edit Event */}
         <Route
           path="/faculty/edit-events"
           element={<EditEvent />}
         />
+
+        {/* Monitor Registrations */}
         <Route
-  path="/faculty/events"
-  element={<MyEvents />}
-/>
-<Route
-  path="/faculty/registrations"
-  element={<MonitorRegistrations />}
-/>
+          path="/faculty/registrations"
+          element={<MonitorRegistrations />}
+        />
 
+        {/* Manage Account */}
+        <Route
+          path="/faculty/account"
+          element={<ManageAccount />}
+        />
 
+        {/* My Profile */}
+        <Route
+          path="/faculty/profile"
+          element={<MyProfile />}
+        />
 
       </Routes>
+
     </BrowserRouter>
   );
 }
