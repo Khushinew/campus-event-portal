@@ -1,30 +1,30 @@
-const CAMPUS_DOMAIN = "campus.edu.in";
-
-export function getCampusRole(email) {
-  const normalizedEmail = String(email || "").trim().toLowerCase();
-  const studentEmail = new RegExp(
-    `^\\d{2}(?:bba|mba|ace|bt|bio|dd)04(?:0\\d{2}|1\\d{2}|200)@${CAMPUS_DOMAIN.replaceAll(".", "\\.")}$`
-  );
-  const facultyEmail = new RegExp(
-    `^[a-z]+\\.[a-z]+@${CAMPUS_DOMAIN.replaceAll(".", "\\.")}$`
-  );
-
-  if (studentEmail.test(normalizedEmail)) return "student";
-  if (facultyEmail.test(normalizedEmail)) return "faculty";
-  return null;
-}
-
 export function getStoredUser() {
-  if (!localStorage.getItem("token")) return null;
 
-  try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    return user && ["student", "faculty"].includes(user.role) ? user : null;
-  } catch {
-    return null;
-  }
+    if (!localStorage.getItem("token")) {
+        return null;
+    }
+
+    try {
+
+        const user =
+            JSON.parse(
+                localStorage.getItem("user")
+            );
+
+        return user &&
+            ["student", "faculty"].includes(user.role)
+            ? user
+            : null;
+
+    } catch {
+
+        return null;
+    }
 }
 
 export function getDashboardPath(role) {
-  return role === "faculty" ? "/faculty-dashboard" : "/student-dashboard";
+
+    return role === "faculty"
+        ? "/faculty-dashboard"
+        : "/student-dashboard";
 }
