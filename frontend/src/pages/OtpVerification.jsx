@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./OtpVerification.css";
+import Footer from "../components/Footer";
 
 function OtpVerification() {
   const navigate = useNavigate();
@@ -87,6 +88,7 @@ function OtpVerification() {
           the backend is connected.
         </p>
       </div>
+      <Footer />
     </div>
   );
 }

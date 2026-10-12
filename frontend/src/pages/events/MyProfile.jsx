@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FacultySidebar from "../events/FacultySidebar";
 import "./MyProfile.css";
+import Footer from "../../components/Footer";
 
 function MyProfile() {
   const navigate = useNavigate();
@@ -201,6 +202,7 @@ function MyProfile() {
         </section>
 
       </main>
+      <Footer />
 
     </div>
   );

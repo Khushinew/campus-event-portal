@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./FacultySidebar.css";
+import Footer from "../../components/Footer";
 
 function FacultySidebar() {
   const navigate = useNavigate();
@@ -189,6 +190,7 @@ function FacultySidebar() {
           </button>
 
         </div>
+        <Footer />
 
       </aside>
     </>

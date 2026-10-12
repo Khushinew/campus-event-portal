@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "./RegisteredEvents.css";
-
+import Footer from "../../components/Footer";
 function RegisteredEvents() {
   const registeredEvents = [
     {
@@ -99,6 +99,7 @@ function RegisteredEvents() {
         )}
 
       </div>
+      <Footer />
 
     </div>
   );

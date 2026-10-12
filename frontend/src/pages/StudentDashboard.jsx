@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom";
 import "./StudentDashboard.css";
 import StudentSidebar from "./StudentEvents/StudentSidebar";
+import Footer from "../components/Footer";
 
 function StudentDashboard() {
   return (
@@ -136,7 +137,7 @@ function StudentDashboard() {
 
         </div>
       </main>
-
+    <Footer />
     </div>
   );
 }

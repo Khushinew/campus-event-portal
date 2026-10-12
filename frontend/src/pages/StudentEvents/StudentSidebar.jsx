@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./StudentSidebar.css";
+import Footer from "../../components/Footer";
 
 function StudentSidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -115,6 +116,7 @@ function StudentSidebar() {
             <span>Logout</span>
           </button>
         </div>
+        <Footer />
       </aside>
     </>
   );

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./ChangePassword.css";
+import Footer from "../components/Footer";
 
 function ChangePassword() {
 
@@ -191,8 +192,10 @@ function ChangePassword() {
                 </form>
 
             </div>
-
+            <Footer />
         </div>
+        
+        
     );
 }
 

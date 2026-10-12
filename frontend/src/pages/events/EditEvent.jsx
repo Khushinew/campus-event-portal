@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import FacultySidebar from "./FacultySidebar";
 import "./EditEvent.css";
+import Footer from "../../components/Footer";
 
 function EditEvent() {
   const { id } = useParams();
@@ -676,6 +677,7 @@ function EditEvent() {
         </section>
 
       </main>
+      <Footer />
 
     </div>
   );

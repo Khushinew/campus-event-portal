@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import "./EventDetails.css";
+import Footer from "../../components/Footer";
 
 function EventDetails() {
   const event = {
@@ -116,6 +117,7 @@ function EventDetails() {
         </div>
 
       </div>
+      <Footer />
 
     </div>
   );

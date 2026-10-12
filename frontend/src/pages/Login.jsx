@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getDashboardPath } from "../auth";
 import "./Login.css";
+import Footer from "../components/Footer";
 
 function Login() {
   const navigate = useNavigate();
@@ -173,6 +174,7 @@ function Login() {
           </form>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

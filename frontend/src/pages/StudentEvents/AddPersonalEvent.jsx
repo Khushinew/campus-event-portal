@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./AddPersonalEvent.css";
+import Footer from "../../components/Footer";
 
 function AddPersonalEvent() {
   const navigate = useNavigate();
@@ -290,6 +291,7 @@ function AddPersonalEvent() {
         </div>
 
       </div>
+      <Footer />
 
     </div>
   );

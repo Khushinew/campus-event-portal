@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import "./RegisterEvent.css";
+import Footer from "../../components/Footer";
 
 function RegisterEvent() {
   const location = useLocation();
@@ -135,7 +136,7 @@ function RegisterEvent() {
         </div>
 
       </div>
-
+      <Footer />
     </div>
   );
 }

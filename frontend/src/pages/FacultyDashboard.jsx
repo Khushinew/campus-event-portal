@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./FacultyDashboard.css";
+import Footer from "../components/Footer";
 
 function FacultyDashboard() {
   const navigate = useNavigate();
@@ -585,7 +586,7 @@ function FacultyDashboard() {
         </section>
 
       </main>
-
+    <Footer />
     </div>
   );
 }

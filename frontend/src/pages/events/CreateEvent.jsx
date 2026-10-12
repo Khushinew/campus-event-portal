@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./CreateEvent.css";
 import FacultySidebar from "./FacultySidebar";
+import Footer from "../../components/Footer";
 
 function CreateEvent() {
   const navigate = useNavigate();
@@ -365,6 +366,7 @@ function CreateEvent() {
         </section>
 
       </main>
+      <Footer />
 
     </div>
   );

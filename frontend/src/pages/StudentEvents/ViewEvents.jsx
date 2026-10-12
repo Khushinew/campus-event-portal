@@ -5,6 +5,7 @@ import businessImage from "../../assets/buisness.jpg";
 import debateImage from "../../assets/debate.jpg";
 import dotsImage from "../../assets/dots.jpg";
 import "./ViewEvents.css";
+import Footer from "../../components/Footer";
 
 function ViewEvents() {
   const user = getStoredUser();
@@ -192,6 +193,7 @@ function ViewEvents() {
       {filteredEvents.length === 0 && (
         <p className="events-empty-state">No events match your search.</p>
       )}
+      <Footer />
     </main>
   );
 }

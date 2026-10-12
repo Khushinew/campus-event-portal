@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./MonitorRegistrations.css";
 import FacultySidebar from "../events/FacultySidebar";
+import Footer from "../../components/Footer";
 
 function MonitorRegistrations() {
   const navigate = useNavigate();
@@ -648,6 +649,7 @@ function MonitorRegistrations() {
         )}
 
       </main>
+      <Footer />
 
     </div>
   );

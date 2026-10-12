@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import "./StudentProfile.css";
+import Footer from "../../components/Footer";
 
 function StudentProfile() {
   const [user] = useState(() => {
@@ -90,6 +91,7 @@ function StudentProfile() {
           </p>
         </section>
       </main>
+      <Footer />
     </div>
   );
 }

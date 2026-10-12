@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./ForgotPassword.css";
+import Footer from "../components/Footer";
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ function ForgotPassword() {
           Remember your password? <Link to="/login">Back to Login</Link>
         </p>
       </div>
+      <Footer />
     </div>
   );
 }

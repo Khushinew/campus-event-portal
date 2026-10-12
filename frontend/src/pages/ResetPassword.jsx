@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./ResetPassword.css";
+import Footer from "../components/Footer";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -112,6 +113,7 @@ function ResetPassword() {
           Remember your password? <Link to="/login">Back to Login</Link>
         </p>
       </div>
+      <Footer />
     </div>
   );
 }

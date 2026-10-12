@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./PersonalCalendar.css";
+import Footer from "../../components/Footer";
 
 function PersonalCalendar() {
   const [personalEvents, setPersonalEvents] = useState([]);
@@ -230,7 +231,7 @@ function PersonalCalendar() {
         </div>
 
       </div>
-
+    <Footer />
     </div>
   );
 }

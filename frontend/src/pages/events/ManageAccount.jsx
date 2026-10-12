@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FacultySidebar from "../events/FacultySidebar";
 import "./ManageAccount.css";
+import Footer from "../../components/Footer";
 
 function ManageAccount() {
   const navigate = useNavigate();
@@ -250,6 +251,7 @@ function ManageAccount() {
         </section>
 
       </main>
+      <Footer />
     </div>
   );
 }
