@@ -1,11 +1,16 @@
 import {Link} from "react-router-dom";
 import "./StudentDashboard.css";
+import StudentSidebar from "./StudentEvents/StudentSidebar";
 
 function StudentDashboard() {
   return (
     <div className="student-dashboard">
 
+      {/* Student Sidebar */}
+      <StudentSidebar />
+
       {/* Header */}
+      
       <header className="student-header">
         <div>
           <h1>Student Dashboard</h1>
