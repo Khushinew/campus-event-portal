@@ -4,61 +4,58 @@ import { Link, useNavigate } from "react-router-dom";
 import "./StudentSidebar.css";
 
 function StudentSidebar() {
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  let user = null;
+  let user = {};
 
   try {
-    const savedUser = localStorage.getItem("user");
-    user = savedUser ? JSON.parse(savedUser) : null;
-  } catch (error) {
-    console.error("Invalid user data");
+    user = JSON.parse(localStorage.getItem("user")) || {};
+  } catch {
+    user = {};
   }
 
-  const closeSidebar = () => setSidebarOpen(false);
+  const name = user.name || user.fullName || "Student";
+  const email = user.email || "";
+  const initial = name.charAt(0).toUpperCase();
+
+  const closeSidebar = () => setIsOpen(false);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    setSidebarOpen(false);
-    navigate("/login");
+    closeSidebar();
+    navigate("/login", { replace: true });
   };
-
-  const menuItems = [
-    { label: "Dashboard", path: "/student-dashboard", icon: "⌂" },
-    { label: "View Campus Events", path: "/student/events", icon: "✦" },
-    { label: "Registered Events", path: "/student/registered-events", icon: "✓" },
-    { label: "Personal Calendar", path: "/student/calendar", icon: "▦" },
-    { label: "Add Personal Event", path: "/student/add-event", icon: "+" },
-    { label: "My Profile", path: "/student/profile", icon: "♙" },
-  ];
 
   return (
     <>
+      {/* Hamburger button */}
       <button
+        type="button"
         className="student-menu-btn"
-        onClick={() => setSidebarOpen(true)}
+        onClick={() => setIsOpen(true)}
         aria-label="Open student menu"
-        aria-expanded={sidebarOpen}
       >
-        <span />
-        <span />
-        <span />
+        ☰
       </button>
 
-      {sidebarOpen && (
+      {/* Background overlay */}
+      {isOpen && (
         <div
           className="student-sidebar-overlay"
           onClick={closeSidebar}
         />
       )}
 
+      {/* Sidebar panel */}
       <aside
         className={`student-sidebar ${
-          sidebarOpen ? "student-sidebar-open" : ""
+          isOpen ? "student-sidebar-open" : ""
         }`}
+        aria-hidden={!isOpen}
       >
+        {/* Header */}
         <div className="student-sidebar-header">
           <div>
             <p className="student-sidebar-label">STUDENT PORTAL</p>
@@ -66,44 +63,51 @@ function StudentSidebar() {
           </div>
 
           <button
+            type="button"
             className="student-sidebar-close"
             onClick={closeSidebar}
-            aria-label="Close menu"
+            aria-label="Close student menu"
           >
             ×
           </button>
         </div>
 
-        {user && (
-          <div className="student-sidebar-profile">
-            <div className="student-profile-circle">
-              {user.name ? user.name.charAt(0).toUpperCase() : "S"}
-            </div>
+        {/* Student information */}
+        <div className="student-sidebar-profile">
+          <div className="student-sidebar-avatar">{initial}</div>
 
-            <div className="student-profile-info">
-              <strong>{user.name || "Student"}</strong>
-              <span>Student</span>
-              {user.email && <small>{user.email}</small>}
-            </div>
+          <div className="student-sidebar-user-info">
+            <h3>{name}</h3>
+            <p>Student</p>
+            {email && <small>{email}</small>}
           </div>
-        )}
+        </div>
 
+        {/* Only two navigation options */}
         <nav className="student-sidebar-nav">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className="student-sidebar-link"
-              onClick={closeSidebar}
-            >
-              <span className="student-sidebar-icon">{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          ))}
+          <Link
+            to="/student-dashboard"
+            className="student-sidebar-link"
+            onClick={closeSidebar}
+          >
+            <span className="student-sidebar-icon">⌂</span>
+            <span>Dashboard</span>
+          </Link>
+
+          <Link
+            to="/student/profile"
+            className="student-sidebar-link"
+            onClick={closeSidebar}
+          >
+            <span className="student-sidebar-icon">♙</span>
+            <span>My Profile</span>
+          </Link>
         </nav>
 
-        <div className="student-sidebar-bottom">
+        {/* Logout at the bottom */}
+        <div className="student-sidebar-footer">
           <button
+            type="button"
             className="student-sidebar-logout"
             onClick={handleLogout}
           >

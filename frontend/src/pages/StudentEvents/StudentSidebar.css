@@ -1,296 +1,276 @@
 
+/* Main hamburger button */
 .student-menu-btn {
   position: fixed;
-  top: 20px;
+  top: 42px;
   left: 20px;
-  width: 62px;
-  height: 62px;
-  border: none;
-  border-radius: 12px;
-  background: #fffdf7;
+  z-index: 3000;
+  width: 58px;
+  height: 58px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  border: none;
+  border-radius: 16px;
+  background: #fffdf7;
+  color: #192238;
+  font-size: 25px;
   cursor: pointer;
-  z-index: 3000;
-  box-shadow: 6px 7px 0 rgba(55, 55, 55, 0.12),
-    0 8px 20px rgba(55, 55, 55, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.1);
 }
 
 .student-menu-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 7px 9px 0 rgba(55, 55, 55, 0.12),
-    0 10px 25px rgba(55, 55, 55, 0.1);
+  background: #faf1d5;
 }
 
-.student-menu-btn span {
-  display: block;
-  width: 25px;
-  height: 3px;
-  background: #182236;
-  border-radius: 5px;
-}
-
+/* Background overlay */
 .student-sidebar-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(23, 32, 51, 0.28);
-  backdrop-filter: blur(2px);
   z-index: 4000;
-  animation: studentOverlayIn 0.2s ease;
+  background: rgba(25, 34, 56, 0.3);
+  backdrop-filter: blur(4px);
 }
 
-@keyframes studentOverlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
+/* Sidebar panel */
 .student-sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 330px;
+  z-index: 5000;
+  width: 375px;
   max-width: 88vw;
   height: 100vh;
   height: 100dvh;
-  box-sizing: border-box;
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 31px,
-      rgba(100, 130, 160, 0.11) 32px,
-      transparent 33px
-    ),
-    #fffdf7;
-  border-right: 1px solid rgba(70, 70, 70, 0.1);
-  box-shadow: 10px 0 30px rgba(30, 30, 30, 0.12);
-  z-index: 5000;
-  transform: translateX(-105%);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   overflow-y: auto;
+  box-sizing: border-box;
+  background-color: #fffdf7;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 39px,
+    #e9e5dc 40px,
+    transparent 41px
+  );
+  border-right: 1px solid #e7e2d8;
+  transform: translateX(-105%);
+  transition: transform 0.3s ease;
+  visibility: hidden;
 }
 
 .student-sidebar.student-sidebar-open {
   transform: translateX(0);
+  visibility: visible;
 }
 
-.student-sidebar::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 52px;
-  width: 2px;
-  background: rgba(224, 110, 110, 0.14);
-  pointer-events: none;
-}
-
+/* Sidebar heading */
 .student-sidebar-header {
   position: relative;
-  padding: 32px 24px 22px 72px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  border-bottom: 1px solid rgba(80, 80, 80, 0.08);
+  gap: 12px;
+  min-height: 125px;
+  padding: 24px 16px 20px 52px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #eee8de;
 }
 
 .student-sidebar-label {
-  margin: 0 0 2px;
-  font-family: "Caveat", cursive;
-  font-size: 19px;
+  margin: 0 0 7px;
+  color: #7893b5;
+  font-size: 15px;
   font-style: italic;
-  color: #7890aa;
+  letter-spacing: 1px;
+  text-align: center;
 }
 
 .student-sidebar-header h2 {
   margin: 0;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: 25px;
-  color: #182236;
+  color: #192238;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
+/* Close button */
 .student-sidebar-close {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 50%;
-  background: #182236;
-  color: white;
-  font-size: 25px;
-  line-height: 1;
+  background: #192238;
+  color: #fff;
+  font-size: 26px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .student-sidebar-close:hover {
-  transform: rotate(90deg);
-  background: #29364d;
+  background: #34415a;
 }
 
+/* Student profile card */
 .student-sidebar-profile {
-  position: relative;
-  margin: 25px 20px 20px 72px;
-  padding: 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: #f8f1d7;
-  border: 1px solid rgba(70, 70, 70, 0.08);
-  border-radius: 8px;
-  box-shadow: 4px 5px 0 rgba(55, 55, 55, 0.06);
-  min-width: 0;
+  gap: 15px;
+  margin: 28px 24px 26px;
+  padding: 20px;
+  min-height: 110px;
+  box-sizing: border-box;
+  border: 1px solid #eee3bf;
+  border-radius: 12px;
+  background: #faf1d5;
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.05);
 }
 
-.student-profile-circle {
-  width: 45px;
-  height: 45px;
-  flex-shrink: 0;
+.student-sidebar-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f4d05b;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #182236;
+  background: #f6d25a;
+  color: #192238;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
 }
 
-.student-profile-info {
+.student-sidebar-user-info {
+  flex: 1;
   min-width: 0;
 }
 
-.student-profile-info strong,
-.student-profile-info span,
-.student-profile-info small {
-  display: block;
+.student-sidebar-user-info h3 {
+  margin: 0 0 6px;
+  color: #192238;
+  font-size: 17px;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
-.student-profile-info strong {
-  color: #182236;
+.student-sidebar-user-info p {
+  margin: 0;
+  color: #7893b5;
   font-size: 14px;
-  margin-bottom: 3px;
 }
 
-.student-profile-info span {
-  color: #7890aa;
-  font-size: 12px;
-}
-
-.student-profile-info small {
-  margin-top: 4px;
-  color: #718099;
+.student-sidebar-user-info small {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
   font-size: 11px;
+  overflow-wrap: anywhere;
 }
 
+/* Navigation links */
 .student-sidebar-nav {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  padding: 10px 20px 20px 72px;
+  width: 100%;
 }
 
 .student-sidebar-link {
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 13px 14px;
-  text-decoration: none;
-  color: #39465a;
-  border-radius: 7px;
-  font-size: 14px;
+  gap: 20px;
+  min-height: 62px;
+  padding: 0 28px 0 76px;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(225, 220, 210, 0.6);
+  color: #40506a;
+  font-size: 16px;
   font-weight: 600;
-  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  text-decoration: none;
+  transition: background 0.2s ease;
 }
 
 .student-sidebar-link:hover {
-  background: #f8f1d7;
-  color: #182236;
-  transform: translateX(3px);
+  background: rgba(246, 210, 90, 0.2);
+  color: #192238;
 }
 
 .student-sidebar-icon {
-  width: 25px;
-  height: 25px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 20px;
   flex-shrink: 0;
-  font-size: 18px;
+  font-size: 20px;
 }
 
-.student-sidebar-bottom {
-  position: relative;
+/* Logout stays at the bottom */
+.student-sidebar-footer {
+  width: 100%;
   margin-top: auto;
-  padding: 20px 20px 30px 72px;
-  border-top: 1px solid rgba(80, 80, 80, 0.08);
+  padding: 18px 24px 24px;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(225, 220, 210, 0.6);
 }
 
 .student-sidebar-logout {
-  width: 100%;
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 13px 14px;
+  gap: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
   border: none;
   background: transparent;
-  border-radius: 7px;
-  color: #b3534c;
-  font-family: "DM Sans", sans-serif;
-  font-size: 14px;
+  color: #c94f48;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 700;
-  cursor: pointer;
   text-align: left;
-  transition: background 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
 }
 
 .student-sidebar-logout:hover {
-  background: #fde8e6;
-  transform: translateX(3px);
+  background: rgba(201, 79, 72, 0.08);
+  border-radius: 8px;
 }
 
-@media (max-width: 600px) {
+/* Mobile layout */
+@media (max-width: 480px) {
   .student-menu-btn {
-    width: 55px;
-    height: 55px;
-    top: 14px;
+    top: 20px;
     left: 14px;
-  }
-
-  .student-menu-btn span {
-    width: 23px;
+    width: 48px;
+    height: 48px;
   }
 
   .student-sidebar {
-    width: 290px;
+    width: 330px;
+    max-width: 88vw;
   }
 
   .student-sidebar-header {
-    padding-left: 65px;
+    min-height: 110px;
+    padding: 20px 16px 18px 24px;
+  }
+
+  .student-sidebar-header h2 {
+    font-size: 26px;
   }
 
   .student-sidebar-profile {
-    margin-left: 65px;
+    margin: 22px 16px;
+    padding: 16px;
   }
 
-  .student-sidebar-nav {
-    padding-left: 65px;
+  .student-sidebar-link {
+    padding-left: 42px;
   }
 
-  .student-sidebar-bottom {
-    padding-left: 65px;
+  .student-sidebar-footer {
+    padding-right: 16px;
+    padding-left: 16px;
   }
 }
