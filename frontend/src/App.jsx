@@ -34,8 +34,7 @@ import RegisterEvent from "./pages/StudentEvents/RegisterEvent";
 import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent";
-
-
+import StudentProfile from "./pages/StudentEvents/StudentProfile";
 function App() {
   return (
     <BrowserRouter>
@@ -117,7 +116,7 @@ function App() {
           element={<AddPersonalEvent />}
         />
 
-
+<Route path="/student/profile" element={<StudentProfile />} />
         {/* =========================
             FACULTY ROUTES
         ========================= */}
