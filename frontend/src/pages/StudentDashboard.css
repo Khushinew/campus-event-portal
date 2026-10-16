@@ -562,10 +562,21 @@ body::after {
 .student-grid {
   display: grid;
 
-  grid-template-columns:
-    repeat(3, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 
   gap: 22px;
+}
+
+.student-grid > .student-card {
+  grid-column: span 2;
+}
+
+.student-grid > .student-card:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+.student-grid > .student-card:nth-child(5) {
+  grid-column: 4 / span 2;
 }
 
 
@@ -1009,8 +1020,13 @@ body::after {
 @media (max-width: 1050px) {
 
   .student-grid {
-    grid-template-columns:
-      repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .student-grid > .student-card,
+  .student-grid > .student-card:nth-child(4),
+  .student-grid > .student-card:nth-child(5) {
+    grid-column: auto;
   }
 
   .student-header {
