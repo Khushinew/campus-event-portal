@@ -173,6 +173,7 @@ app.post("/api/login", async (req, res) => {
         password: await bcrypt.hash(DEFAULT_INITIAL_PASSWORD, 10),
         role: collegeUser.role,
         department: collegeUser.department || "",
+        studentId: collegeUser.studentId || "",
         semester: collegeUser.semester || "",
         facultyId: collegeUser.facultyId || "",
         designation: collegeUser.designation || "",
@@ -195,6 +196,17 @@ app.post("/api/login", async (req, res) => {
       return res.status(403).json({
         message: "This email format does not match the account role.",
       });
+    }
+
+    if (user.role === "student" && !user.studentId) {
+      const collegeUser = await CollegeUser.findOne({
+        email: normalizedEmail,
+      });
+
+      if (collegeUser?.studentId) {
+        user.studentId = collegeUser.studentId;
+        await user.save();
+      }
     }
 
     // Preserve the existing initial-password login behavior.
@@ -233,6 +245,7 @@ app.post("/api/login", async (req, res) => {
         email: user.email,
         role: user.role,
         department: user.department,
+        studentId: user.studentId,
         semester: user.semester,
         facultyId: user.facultyId,
         designation: user.designation,
@@ -570,11 +583,7 @@ app.get(
         });
       }
 
-      const event = await Event.findById(req.params.eventId)
-        .populate(
-          "registrations",
-          "name email department semester facultyId"
-        );
+      const event = await Event.findById(req.params.eventId);
 
       if (!event) {
         return res.status(404).json({
@@ -632,8 +641,29 @@ app.post(
         });
       }
 
+      const department =
+        typeof req.body.department === "string"
+          ? req.body.department.trim()
+          : "";
+
+      if (!department || department.length > 120) {
+        return res.status(400).json({
+          message: "Please enter a department (up to 120 characters).",
+        });
+      }
+
+      const normalizedEmail = String(student.email || "").trim().toLowerCase();
+      const campusStudentId =
+        String(student.studentId || "").trim() ||
+        normalizedEmail.split("@")[0];
       const alreadyRegistered = event.registrations.some(
-        (studentId) => String(studentId) === String(student._id)
+        (registration) =>
+          String(registration?.studentUserId || registration) ===
+            String(student._id) ||
+          (registration?.studentId &&
+            String(registration.studentId) === campusStudentId) ||
+          (registration?.studentEmail &&
+            String(registration.studentEmail).toLowerCase() === normalizedEmail)
       );
 
       if (alreadyRegistered) {
@@ -651,12 +681,20 @@ app.post(
         });
       }
 
-      event.registrations.push(student._id);
+      event.registrations.push({
+        studentUserId: String(student._id),
+        studentId: campusStudentId,
+        studentName: student.name,
+        studentEmail: normalizedEmail,
+        department,
+        registeredAt: new Date(),
+      });
       await event.save();
 
       res.status(201).json({
         message: "Registration successful",
         eventId: event._id,
+        registration: event.registrations[event.registrations.length - 1],
       });
     } catch (error) {
       console.error("Student registration error:", error);
@@ -680,7 +718,10 @@ app.get(
   async (req, res) => {
     try {
       const events = await Event.find({
-        registrations: req.user.userId,
+        $or: [
+          { "registrations.studentUserId": req.user.userId },
+          { registrations: new mongoose.Types.ObjectId(req.user.userId) },
+        ],
       })
         .populate("organizer", "name email department")
         .sort({ date: 1 });
@@ -788,6 +829,52 @@ app.put("/api/profile", verifyToken, async (req, res) => {
 // START SERVER AFTER MONGODB CONNECTS
 // =====================================
 
+const homepageEvents = [
+  {
+    title: "Business Analytics Workshop",
+    description:
+      "Learn to read business data, make confident decisions, and turn numbers into a clear story.",
+    date: "2026-10-18",
+    time: "10:00 AM - 12:30 PM",
+    venue: "School of Business, Room 204",
+    category: "Business",
+    capacity: 80,
+    organizerName: "Campusphere Events",
+  },
+  {
+    title: "Debate: Prepare to Raise Your Voice",
+    description:
+      "Shape a strong argument, listen with purpose, and speak up for the ideas you believe in.",
+    date: "2026-10-22",
+    time: "2:00 PM - 4:00 PM",
+    venue: "University Assembly Hall",
+    category: "Debate",
+    capacity: 120,
+    organizerName: "Campusphere Events",
+  },
+  {
+    title: "Dots: Build Your Own AI Agent",
+    description:
+      "Discover how to create a personal AI agent, shape its instructions, and put it to work on your ideas.",
+    date: "2026-10-29",
+    time: "11:00 AM - 1:30 PM",
+    venue: "Innovation Lab",
+    category: "AI & Technology",
+    capacity: 40,
+    organizerName: "Campusphere Events",
+  },
+];
+
+async function ensureHomepageEvents() {
+  for (const event of homepageEvents) {
+    await Event.updateOne(
+      { title: event.title, category: event.category },
+      { $setOnInsert: event },
+      { upsert: true }
+    );
+  }
+}
+
 async function startServer() {
   try {
     if (!process.env.MONGO_URI) {
@@ -801,6 +888,8 @@ async function startServer() {
     await mongoose.connect(process.env.MONGO_URI);
 
     console.log("MongoDB connected successfully");
+    await ensureHomepageEvents();
+    console.log("Homepage events are available in MongoDB");
 
     app.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}`);

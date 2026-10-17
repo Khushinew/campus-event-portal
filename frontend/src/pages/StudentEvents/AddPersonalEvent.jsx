@@ -1,10 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { getStoredUser } from "../../auth";
 import "./AddPersonalEvent.css";
 import Footer from "../../components/Footer";
 
 function AddPersonalEvent() {
   const navigate = useNavigate();
+  const user = getStoredUser();
 
   const [eventTitle, setEventTitle] = useState("");
   const [day, setDay] = useState("");
@@ -54,13 +56,13 @@ function AddPersonalEvent() {
       type: "Personal Event",
     };
 
-    const existingEvents =
-      JSON.parse(localStorage.getItem("campusPersonalEvents")) || [];
+    const storageKey = `campusPersonalEvents:${user?.id || user?.email}`;
+    const existingEvents = JSON.parse(localStorage.getItem(storageKey) || "[]");
 
     const updatedEvents = [...existingEvents, newEvent];
 
     localStorage.setItem(
-      "campusPersonalEvents",
+      storageKey,
       JSON.stringify(updatedEvents)
     );
 

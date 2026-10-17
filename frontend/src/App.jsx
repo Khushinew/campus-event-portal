@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import ChangePassword from "./pages/ChangePassword";
+import RequireStudent from "./components/RequireStudent";
 
 // =========================
 // Public pages
@@ -29,7 +30,6 @@ import MyProfile from "./pages/events/MyProfile";
 // =========================
 import StudentDashboard from "./pages/StudentDashboard";
 import ViewEvents from "./pages/StudentEvents/ViewEvents";
-import EventDetails from "./pages/StudentEvents/EventDetails";
 import RegisterEvent from "./pages/StudentEvents/RegisterEvent";
 import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
@@ -81,42 +81,39 @@ function App() {
             STUDENT ROUTES
         ========================= */}
 
-        <Route
-          path="/student-dashboard"
-          element={<StudentDashboard />}
-        />
+        <Route element={<RequireStudent />}>
+          <Route
+            path="/student-dashboard"
+            element={<StudentDashboard />}
+          />
 
-        <Route
-          path="/student/events"
-          element={<ViewEvents />}
-        />
+          <Route
+            path="/student/events"
+            element={<ViewEvents />}
+          />
 
-        <Route
-          path="/student/event-details"
-          element={<EventDetails />}
-        />
+          <Route
+            path="/student/register-event"
+            element={<RegisterEvent />}
+          />
 
-        <Route
-          path="/student/register-event"
-          element={<RegisterEvent />}
-        />
+          <Route
+            path="/student/registered-events"
+            element={<RegisteredEvents />}
+          />
 
-        <Route
-          path="/student/registered-events"
-          element={<RegisteredEvents />}
-        />
+          <Route
+            path="/student/calendar"
+            element={<PersonalCalendar />}
+          />
 
-        <Route
-          path="/student/calendar"
-          element={<PersonalCalendar />}
-        />
+          <Route
+            path="/student/add-event"
+            element={<AddPersonalEvent />}
+          />
 
-        <Route
-          path="/student/add-event"
-          element={<AddPersonalEvent />}
-        />
-
-<Route path="/student/profile" element={<StudentProfile />} />
+          <Route path="/student/profile" element={<StudentProfile />} />
+        </Route>
         {/* =========================
             FACULTY ROUTES
         ========================= */}

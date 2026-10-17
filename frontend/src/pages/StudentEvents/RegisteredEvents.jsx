@@ -1,106 +1,100 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiRequest } from "../../api";
 import "./RegisteredEvents.css";
 import Footer from "../../components/Footer";
+
+function formatEventDate(date) {
+  if (!date) return "Date not specified";
+  const parsedDate = new Date(`${String(date).slice(0, 10)}T00:00:00`);
+  return Number.isNaN(parsedDate.getTime())
+    ? date
+    : parsedDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+}
+
 function RegisteredEvents() {
-  const registeredEvents = [
-    {
-      id: 1,
-      title: "Tech Fest 2026",
-      date: "15 October 2026",
-      time: "10:00 AM - 4:00 PM",
-      venue: "Main Auditorium",
-      category: "Technology",
-      status: "Registered",
-    },
-    {
-      id: 2,
-      title: "AI Workshop",
-      date: "20 October 2026",
-      time: "11:00 AM - 2:00 PM",
-      venue: "Seminar Hall",
-      category: "Workshop",
-      status: "Registered",
-    },
-  ];
+  const [registeredEvents, setRegisteredEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRegisteredEvents() {
+      try {
+        const response = await apiRequest("/api/student/registrations");
+        if (!response.ok) {
+          throw new Error("Unable to fetch your registered events.");
+        }
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error("The registered events response was invalid.");
+        }
+        if (!cancelled) setRegisteredEvents(data);
+      } catch (loadError) {
+        console.error("Error loading registered events:", loadError);
+        if (!cancelled) setError("Unable to load your registered events. Please try again.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadRegisteredEvents();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="registered-events-page">
-
-      {/* Header */}
       <div className="registered-header">
         <div>
           <h1>My Registered Events</h1>
-          <p>View all the events you have registered for.</p>
+          <p>Events registered by your signed-in student account.</p>
         </div>
-
         <Link to="/student-dashboard" className="back-btn">
           ← Dashboard
         </Link>
       </div>
 
-      {/* Events */}
       <div className="registered-events-container">
-
-        {registeredEvents.length > 0 ? (
+        {loading ? (
+          <div className="no-events"><h2>Loading your events...</h2></div>
+        ) : error ? (
+          <div className="no-events" role="alert"><h2>{error}</h2></div>
+        ) : registeredEvents.length > 0 ? (
           <div className="registered-events-grid">
-
             {registeredEvents.map((event) => (
-              <div className="registered-event-card" key={event.id}>
-
+              <div className="registered-event-card" key={event._id}>
                 <div className="registered-card-top">
-                  <span className="event-category">
-                    {event.category}
-                  </span>
-
-                  <span className="event-status">
-                    {event.status}
-                  </span>
+                  <span className="event-category">{event.category || "Campus event"}</span>
+                  <span className="event-status">Registered</span>
                 </div>
-
                 <h2>{event.title}</h2>
-
                 <div className="event-info">
-                  <p>
-                    <strong>Date:</strong> {event.date}
-                  </p>
-
-                  <p>
-                    <strong>Time:</strong> {event.time}
-                  </p>
-
-                  <p>
-                    <strong>Venue:</strong> {event.venue}
-                  </p>
+                  <p><strong>Date:</strong> {formatEventDate(event.date)}</p>
+                  <p><strong>Time:</strong> {event.time || "Not specified"}</p>
+                  <p><strong>Venue:</strong> {event.venue || "Not specified"}</p>
                 </div>
-
-                <Link
-                  to="/student/event-details"
-                  className="details-btn"
-                >
-                  View Details →
-                </Link>
-
               </div>
             ))}
-
           </div>
         ) : (
           <div className="no-events">
             <div className="no-events-icon">📅</div>
             <h2>No Registered Events</h2>
-            <p>
-              You have not registered for any campus events yet.
-            </p>
-
+            <p>You have not registered for any campus events yet.</p>
             <Link to="/student/events" className="browse-btn">
               Browse Events
             </Link>
           </div>
         )}
-
       </div>
       <Footer />
-
     </div>
   );
 }
