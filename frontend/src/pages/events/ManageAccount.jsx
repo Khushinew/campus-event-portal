@@ -251,7 +251,7 @@ function ManageAccount() {
         </section>
 
       </main>
-      <Footer />
+      
     </div>
   );
 }

@@ -190,7 +190,7 @@ function FacultySidebar() {
           </button>
 
         </div>
-        <Footer />
+        
 
       </aside>
     </>

@@ -112,6 +112,7 @@ app.get("/api/test", (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+
     const normalizedEmail = String(email || "")
       .trim()
       .toLowerCase();
@@ -141,8 +142,7 @@ app.post("/api/login", async (req, res) => {
       email: normalizedEmail,
     });
 
-    // Create the local account from the college directory
-    // when the user logs in for the first time.
+    // Create an account the first time a directory user logs in.
     if (!user) {
       const collegeUser = await CollegeUser.findOne({
         email: normalizedEmail,
@@ -161,6 +161,7 @@ app.post("/api/login", async (req, res) => {
         });
       }
 
+      // The initial password is allowed only when creating the account.
       if (password !== DEFAULT_INITIAL_PASSWORD) {
         return res.status(401).json({
           message: "Invalid email or password.",
@@ -169,25 +170,31 @@ app.post("/api/login", async (req, res) => {
 
       user = new User({
         name: collegeUser.name,
-        email: collegeUser.email,
+        email: normalizedEmail,
         password: await bcrypt.hash(DEFAULT_INITIAL_PASSWORD, 10),
         role: collegeUser.role,
         department: collegeUser.department || "",
         semester: collegeUser.semester || "",
         facultyId: collegeUser.facultyId || "",
         designation: collegeUser.designation || "",
+        mustChangePassword: true,
       });
 
       try {
         await user.save();
       } catch (error) {
-        if (error.code !== 11000) throw error;
+        // Handle two first-login requests arriving simultaneously.
+        if (error.code !== 11000) {
+          throw error;
+        }
 
         user = await User.findOne({
           email: normalizedEmail,
         });
 
-        if (!user) throw error;
+        if (!user) {
+          throw error;
+        }
       }
     }
 
@@ -197,20 +204,17 @@ app.post("/api/login", async (req, res) => {
       });
     }
 
-    // Preserve the existing initial-password login behavior.
-    // This should be replaced with a proper password-change flow.
-    if (password !== DEFAULT_INITIAL_PASSWORD) {
+    // Verify the password stored in the database.
+    // Existing accounts can now use their changed passwords.
+    const passwordMatches = await bcrypt.compare(
+      password,
+      user.password || ""
+    );
+
+    if (!passwordMatches) {
       return res.status(401).json({
         message: "Invalid email or password.",
       });
-    }
-
-    if (
-      !user.password ||
-      !(await bcrypt.compare(DEFAULT_INITIAL_PASSWORD, user.password))
-    ) {
-      user.password = await bcrypt.hash(DEFAULT_INITIAL_PASSWORD, 10);
-      await user.save();
     }
 
     const token = jwt.sign(
@@ -224,9 +228,10 @@ app.post("/api/login", async (req, res) => {
       }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Login successful",
       token,
+      firstLogin: Boolean(user.mustChangePassword),
       user: {
         id: user._id,
         name: user.name,
@@ -236,17 +241,62 @@ app.post("/api/login", async (req, res) => {
         semester: user.semester,
         facultyId: user.facultyId,
         designation: user.designation,
-        mustChangePassword: user.mustChangePassword,
+        mustChangePassword: Boolean(user.mustChangePassword),
       },
     });
   } catch (error) {
     console.error("Login error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Login failed",
     });
   }
 });
+
+
+app.post("/api/change-password", verifyToken, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
+      return res.status(400).json({
+        message: "Your new password must contain at least 8 characters.",
+      });
+    }
+
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+      });
+    }
+
+    // Don't allow the initial password to remain unchanged.
+    if (newPassword === DEFAULT_INITIAL_PASSWORD) {
+      return res.status(400).json({
+        message: "Please choose a password different from the initial password.",
+      });
+    }
+
+    // Hash and save the new password in MongoDB.
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.mustChangePassword = false;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Password changed successfully.",
+    });
+  } catch (error) {
+    console.error("Change password error:", error);
+
+    return res.status(500).json({
+      message: "Failed to change password.",
+    });
+  }
+});
+
 
 // =====================================
 // CREATE EVENT

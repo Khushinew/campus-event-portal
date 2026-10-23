@@ -1,15 +1,12 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./ChangePassword.css";
-import Footer from "../components/Footer";
+
 
 function ChangePassword() {
 
     const navigate = useNavigate();
-    const location = useLocation();
-
-    const email =
-        location.state?.email || "";
+    
 
     const [password, setPassword] =
         useState("");
@@ -59,23 +56,27 @@ function ChangePassword() {
 
         try {
 
-            const response =
-                await fetch(
-                    "http://localhost:5000/api/change-password",
-                    {
-                        method: "POST",
+            
+const token = localStorage.getItem("token");
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+if (!token) {
+    setError("Your session has expired. Please login again.");
+    return;
+}
 
-                        body: JSON.stringify({
-                            email: email,
-                            newPassword: password
-                        })
-                    }
-                );
+const response = await fetch(
+    "http://localhost:5000/api/change-password",
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            newPassword: password
+        })
+    }
+);
 
             const data =
                 await response.json();
@@ -90,17 +91,16 @@ function ChangePassword() {
                 return;
             }
 
-            setMessage(
-                "Password changed successfully. Please login again."
-            );
+           setMessage("Password changed successfully. Please login again.");
 
-            setTimeout(() => {
+localStorage.removeItem("token");
+localStorage.removeItem("user");
 
-                navigate("/login", {
-                    replace: true
-                });
-
-            }, 1500);
+setTimeout(() => {
+    navigate("/login", {
+        replace: true
+    });
+}, 1500);
 
         } catch (error) {
 
@@ -192,7 +192,7 @@ function ChangePassword() {
                 </form>
 
             </div>
-            <Footer />
+            
         </div>
         
         

@@ -42,24 +42,22 @@ function Login() {
         return;
       }
 
-      // Redirect users who need to change their password on first login.
-      if (data.firstLogin) {
-        navigate("/change-password", {
-          state: {
-            email: normalizedEmail,
-          },
-        });
+      // Save the user's information and token before redirecting.
+      if (!data.token) {
+        setError("Login succeeded, but no authentication token was received.");
         return;
       }
 
-      // Save the logged-in user's information.
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token);
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      // Redirect first-time users to change their password.
+      if (data.firstLogin || data.user.mustChangePassword) {
+        navigate("/change-password", { replace: true });
+        return;
       }
 
-      // Redirect to the correct dashboard based on the user's role.
+      // Redirect other users to their dashboard.
       navigate(getDashboardPath(data.user.role), {
         replace: true,
       });
@@ -75,7 +73,6 @@ function Login() {
 
   return (
     <div className="login-page">
-      {/* Header */}
       <header className="header">
         <div className="logo">Campusphere</div>
 
@@ -88,7 +85,6 @@ function Login() {
         </nav>
       </header>
 
-      {/* Login Section */}
       <main className="login-section">
         <div className="login-box">
           <p className="login-label">WELCOME BACK</p>
@@ -102,12 +98,9 @@ function Login() {
             with your campus.
           </p>
 
-          {/* Error Message */}
           {error && <p className="error-message">{error}</p>}
 
-          {/* Login Form */}
           <form className="login-form" onSubmit={handleLogin}>
-            {/* Email */}
             <div className="form-group">
               <label htmlFor="email">Email Address</label>
 
@@ -122,7 +115,6 @@ function Login() {
               />
             </div>
 
-            {/* Password */}
             <div className="form-group">
               <label htmlFor="password">Password</label>
 
@@ -149,7 +141,6 @@ function Login() {
               </div>
             </div>
 
-            {/* Login Options */}
             <div className="login-options">
               <label className="remember">
                 <input
@@ -163,7 +154,6 @@ function Login() {
               <Link to="/forgot-password">Forgot Password?</Link>
             </div>
 
-            {/* Login Button */}
             <button
               type="submit"
               className="login-btn"
@@ -174,6 +164,7 @@ function Login() {
           </form>
         </div>
       </main>
+
       <Footer />
     </div>
   );
