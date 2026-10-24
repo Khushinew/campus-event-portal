@@ -11,54 +11,61 @@ function FacultyDashboard() {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+  
+useEffect(() => {
+  const savedUser = localStorage.getItem("user");
 
-    if (!savedUser) {
-      navigate("/login");
-      return;
+  if (!savedUser) {
+    navigate("/login");
+    return;
+  }
+
+  let currentUser;
+
+  try {
+    currentUser = JSON.parse(savedUser);
+  } catch (error) {
+    console.error("Invalid user data:", error);
+    localStorage.removeItem("user");
+    navigate("/login");
+    return;
+  }
+
+  setUser(currentUser);
+
+  if (currentUser.role !== "faculty") {
+    navigate("/");
+    return;
+  }
+
+  fetch(
+    `http://localhost:5000/api/events/faculty/${currentUser.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to load dashboard events");
+      }
 
-    let currentUser;
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Dashboard events:", data);
+      setEventCount(Array.isArray(data) ? data.length : 0);
+    })
+    .catch((error) => {
+      console.error("Error loading dashboard events:", error);
+      setEventCount(0);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}, [navigate]);
 
-    try {
-      currentUser = JSON.parse(savedUser);
-    } catch (error) {
-      console.error("Invalid user data:", error);
-      localStorage.removeItem("user");
-      navigate("/login");
-      return;
-    }
-
-    if (currentUser.role !== "faculty") {
-      navigate("/");
-      return;
-    }
-
-    setUser(currentUser);
-
-    fetch(
-      `http://localhost:5000/api/events/faculty/${currentUser.id}`
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Unable to load events");
-        }
-
-        return response.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setEventCount(data.length);
-        }
-      })
-      .catch((error) => {
-        console.error("Error loading events:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");

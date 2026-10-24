@@ -34,31 +34,40 @@ function MyEvents() {
       return;
     }
 
-    fetch(
-      `http://localhost:5000/api/events/faculty/${currentUser.id}`
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to load events");
-        }
+    
+fetch(
+  `http://localhost:5000/api/events/faculty/${currentUser.id}`,
+  {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Failed to load events");
+    }
 
-        return response.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setEvents(data);
-        } else {
-          setEvents([]);
-        }
-      })
-      .catch((error) => {
-        console.error("Error loading events:", error);
-        setEvents([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [navigate]);
+    return response.json();
+  })
+  .then((data) => {
+    console.log("My Events response:", data);
+
+    if (Array.isArray(data)) {
+      setEvents(data);
+    } else {
+      setEvents([]);
+    }
+  })
+  .catch((error) => {
+    console.error("Error loading events:", error);
+    setEvents([]);
+  })
+  .finally(() => {
+    setLoading(false);
+  });
+    }, [navigate]);
+
 
   /* ================= LOADING ================= */
 

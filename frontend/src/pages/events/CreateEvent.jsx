@@ -27,59 +27,77 @@ function CreateEvent() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const savedUser = localStorage.getItem("user");
+  const savedUser = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
 
-    if (!savedUser) {
-      navigate("/login");
+  if (!savedUser || !token) {
+    navigate("/login");
+    return;
+  }
+
+  let user;
+
+  try {
+    user = JSON.parse(savedUser);
+  } catch {
+    alert("Your saved login session is invalid. Please log in again.");
+    navigate("/login");
+    return;
+  }
+
+  if (user.role !== "faculty") {
+    alert("Only faculty members can create events.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/events",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+          capacity: Number(formData.capacity),
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      alert(result.message || "Failed to create event.");
+      console.error("Create event failed:", result);
       return;
     }
 
-    const user = JSON.parse(savedUser);
+    alert("Event created successfully!");
 
-    setLoading(true);
+    setFormData({
+      title: "",
+      description: "",
+      date: "",
+      time: "",
+      venue: "",
+      category: "",
+      capacity: "",
+    });
 
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/events",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...formData,
-            facultyId: user.id,
-            createdBy: user.name,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        alert("Event created successfully!");
-
-        setFormData({
-          title: "",
-          description: "",
-          date: "",
-          time: "",
-          venue: "",
-          category: "",
-          capacity: "",
-        });
-
-        navigate("/faculty/events");
-      } else {
-        alert("Failed to create event.");
-      }
-    } catch (error) {
-      console.error("Error creating event:", error);
-      alert("Server error. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    navigate("/faculty/events");
+  } catch (error) {
+    console.error("Error creating event:", error);
+    alert("Could not connect to the server. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="create-event-page">

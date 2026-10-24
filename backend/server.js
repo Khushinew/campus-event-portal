@@ -17,12 +17,29 @@ require("dotenv").config({
 
 const User = require("./models/User");
 const Event = require("./models/Event");
+console.log("Event model file:", require.resolve("./models/Event"));
+
+console.log(
+  "Event schema fields:",
+  Object.keys(Event.schema.paths)
+);
+
+console.log(
+  "organizer required:",
+  Event.schema.path("organizer")?.isRequired
+);
+
+console.log(
+  "organizerName required:",
+  Event.schema.path("organizerName")?.isRequired
+);
 const CollegeUser = require("./models/CollegeUser");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const DEFAULT_INITIAL_PASSWORD = "Campus@123";
 const CAMPUS_DOMAIN = "campus.edu.in";
+console.log("Event model file:", require.resolve("./models/Event"));
 
 // =====================================
 // MIDDLEWARE
@@ -356,29 +373,31 @@ app.post(
       }
 
       const event = await Event.create({
-        title: title.trim(),
-        description: description.trim(),
-        date,
-        time,
-        venue: venue.trim(),
-        category,
-        capacity: requestedCapacity,
-        organizer: faculty._id,
-        organizerName: faculty.name || faculty.email,
-        registrations: [],
-      });
+  title: title.trim(),
+  description: description.trim(),
+  date,
+  time,
+  venue: venue.trim(),
+  category,
+  capacity: requestedCapacity,
+  facultyId: String(faculty._id),
+  createdBy: faculty.name || faculty.email,
+  imageUrl: "",
+  registrations: [],
+});
 
       res.status(201).json({
         message: "Event created successfully",
         event,
       });
     } catch (error) {
-      console.error("Create event error:", error);
+  console.error("Create event error:", error);
 
-      res.status(500).json({
-        message: "Failed to create event.",
-      });
-    }
+  res.status(500).json({
+    message: "Failed to create event.",
+    error: error.message,
+  });
+}
   }
 );
 
@@ -389,9 +408,7 @@ app.post(
 
 app.get("/api/events", async (req, res) => {
   try {
-    const events = await Event.find()
-      .populate("organizer", "name email department")
-      .sort({ createdAt: -1 });
+    const events = await Event.find().sort({ createdAt: -1 });
 
     res.json(events);
   } catch (error) {
@@ -422,8 +439,8 @@ app.get(
       }
 
       const events = await Event.find({
-        organizer: req.user.userId,
-      }).sort({ createdAt: -1 });
+  facultyId: String(req.user.userId),
+}).sort({ createdAt: -1 });
 
       res.json(events);
     } catch (error) {
@@ -449,9 +466,7 @@ app.get("/api/events/:eventId", async (req, res) => {
       });
     }
 
-    const event = await Event.findById(req.params.eventId)
-      .populate("organizer", "name email department");
-
+    const event = await Event.findById(req.params.eventId);
     if (!event) {
       return res.status(404).json({
         message: "Event not found.",
