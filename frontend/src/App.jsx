@@ -35,6 +35,7 @@ import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent";
 import StudentProfile from "./pages/StudentEvents/StudentProfile";
+import EditEventsList from "./pages/events/EditEventsList";
 function App() {
   return (
     <BrowserRouter>
@@ -140,10 +141,8 @@ function App() {
         />
 
         {/* Edit Event */}
-        <Route
-          path="/faculty/edit-events"
-          element={<EditEvent />}
-        />
+        <Route path="/faculty/edit-events" element={<EditEventsList />} />
+<Route path="/faculty/edit-events/:id" element={<EditEvent />} />
 
         {/* Monitor Registrations */}
         <Route

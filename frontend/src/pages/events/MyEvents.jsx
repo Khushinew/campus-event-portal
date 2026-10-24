@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./MyEvent.css";
 import FacultySidebar from "./FacultySidebar";
 import Footer from "../../components/Footer";
+import { useLocation } from "react-router-dom";
 
 function MyEvents() {
   const navigate = useNavigate();
@@ -239,26 +240,7 @@ fetch(
 
   
 
-                  {/* ACTIONS */}
-
-                  <div className="event-actions">
-
-                    <Link
-                      to={`/faculty/events/${eventId}`}
-                      className="view-event-btn"
-                    >
-                      View
-                    </Link>
-
-
-                    <Link
-                      to={`/faculty/events/edit/${eventId}`}
-                      className="edit-event-btn"
-                    >
-                      Edit Event
-                    </Link>
-
-                  </div>
+                  
 
                 </article>
               );
