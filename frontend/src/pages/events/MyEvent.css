@@ -229,6 +229,8 @@
   height: fit-content;
 min-height: 0;
 align-self: start;
+ width: 100%;
+  box-sizing: border-box;
 }
 
 

@@ -3,13 +3,15 @@ const dns = require("dns");
 
 // Use Google Public DNS for hostname resolution
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
-
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const path = require("path");
+
 
 require("dotenv").config({
   path: path.join(__dirname, ".env"),
@@ -39,7 +41,38 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const DEFAULT_INITIAL_PASSWORD = "Campus@123";
 const CAMPUS_DOMAIN = "campus.edu.in";
-console.log("Event model file:", require.resolve("./models/Event"));
+
+const uploadDirectory = path.join(__dirname, "uploads");
+
+fs.mkdirSync(uploadDirectory, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDirectory);
+  },
+  filename: (req, file, cb) => {
+    const extension = path.extname(file.originalname).toLowerCase();
+    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${extension}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only JPG, PNG, and WebP images are allowed."));
+    }
+  },
+});
+
+app.use("/uploads", express.static(uploadDirectory));
 
 // =====================================
 // MIDDLEWARE
@@ -324,6 +357,7 @@ app.post(
   "/api/events",
   verifyToken,
   requireRole("faculty"),
+  upload.single("image"),
   async (req, res) => {
     try {
       const {
@@ -382,7 +416,7 @@ app.post(
   capacity: requestedCapacity,
   facultyId: String(faculty._id),
   createdBy: faculty.name || faculty.email,
-  imageUrl: "",
+  imageUrl: req.file ? `/uploads/${req.file.filename}` : "",
   registrations: [],
 });
 

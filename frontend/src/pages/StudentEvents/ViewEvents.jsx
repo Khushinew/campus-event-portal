@@ -1,67 +1,16 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getDashboardPath, getStoredUser } from "../../auth";
-import businessImage from "../../assets/buisness.jpg";
-import debateImage from "../../assets/debate.jpg";
 import dotsImage from "../../assets/dots.jpg";
 import "./ViewEvents.css";
 import Footer from "../../components/Footer";
 
 function ViewEvents() {
   const user = getStoredUser();
-  const events = [
-    {
-      id: "business",
-      title: "Business Analytics Workshop",
-      date: "18 October 2026",
-      time: "10:00 AM - 12:30 PM",
-      venue: "School of Business, Room 204",
-      guest: "Business faculty guest speaker",
-      capacity: 80,
-      charge: "Free",
-      attendanceRegistration: true,
-      category: "Business",
-      image: businessImage,
-      imageAlt: "Business charts being reviewed during a workshop",
-      imageRatio: "4 / 3",
-      description:
-        "Learn to read business data, make confident decisions, and turn numbers into a clear story.",
-    },
-    {
-      id: "debate",
-      title: "Debate: Prepare to Raise Your Voice",
-      date: "22 October 2026",
-      time: "2:00 PM - 4:00 PM",
-      venue: "University Assembly Hall",
-      guest: "Debate society coach",
-      capacity: 120,
-      charge: "Free",
-      attendanceRegistration: true,
-      category: "Debate",
-      image: debateImage,
-      imageAlt: "Students gathered in a large debate assembly hall",
-      imageRatio: "16 / 10",
-      description:
-        "Shape a strong argument, listen with purpose, and speak up for the ideas you believe in.",
-    },
-    {
-      id: "dots",
-      title: "Dots: Build Your Own AI Agent",
-      date: "29 October 2026",
-      time: "11:00 AM - 1:30 PM",
-      venue: "Innovation Lab",
-      guest: "Campus AI workshop facilitator",
-      capacity: 40,
-      charge: "Free",
-      attendanceRegistration: true,
-      category: "AI & Technology",
-      image: dotsImage,
-      imageAlt: "Colorful Dots characters beneath the OpenAI wordmark",
-      imageRatio: "1 / 1",
-      description:
-        "Discover how to create a personal AI agent, shape its instructions, and put it to work on your ideas.",
-    },
-  ];
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [activeInfo, setActiveInfo] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
@@ -77,11 +26,36 @@ function ViewEvents() {
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [activeInfo]);
 
+  useEffect(() => {
+    fetch("http://localhost:5000/api/events")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to load events");
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        setEvents(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error("Error loading events:", err);
+        setError("Unable to load events. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   const filteredEvents = events.filter((event) => {
-    const matchesSearch = `${event.title} ${event.category} ${event.description}`
+    const matchesSearch = `${event.title || ""} ${
+      event.category || ""
+    } ${event.description || ""}`
       .toLowerCase()
       .includes(searchQuery.trim().toLowerCase());
-    const matchesCategory = categoryFilter === "All" || event.category === categoryFilter;
+
+    const matchesCategory =
+      categoryFilter === "All" || event.category === categoryFilter;
 
     return matchesSearch && matchesCategory;
   });
@@ -95,7 +69,10 @@ function ViewEvents() {
           <p>Workshops, conversations, and new perspectives, all on campus.</p>
         </div>
 
-        <Link to={user ? getDashboardPath(user.role) : "/"} className="back-btn">
+        <Link
+          to={user ? getDashboardPath(user.role) : "/"}
+          className="back-btn"
+        >
           {user ? "Dashboard" : "Home"}
         </Link>
       </div>
@@ -123,76 +100,133 @@ function ViewEvents() {
         </select>
       </div>
 
-      <div className="events-grid">
-        {filteredEvents.map((event) => (
-          <article
-            className="view-event-card"
-            key={event.id}
-            style={{ "--event-image-ratio": event.imageRatio }}
-          >
-            <div className="event-image-wrap">
-              <img src={event.image} alt={event.imageAlt} className="event-image" />
-              <span className="event-category">{event.category}</span>
-            </div>
-
-            <div className="event-card-content">
-              <p className="event-date">{event.date}</p>
-              <h2>{event.title}</h2>
-              <p className="event-description">{event.description}</p>
-              <div className="event-actions">
-                <Link
-                  to="/student/register-event"
-                  state={{ event }}
-                  className="event-register-button"
-                >
-                  Register
-                </Link>
-                <button
-                  type="button"
-                  className="info-event-button"
-                  aria-expanded={activeInfo === event.id}
-                  aria-controls={`event-info-${event.id}`}
-                  onClick={() => setActiveInfo(activeInfo === event.id ? null : event.id)}
-                >
-                  Info
-                </button>
+      {!loading && !error && (
+        <div className="events-grid">
+          {filteredEvents.map((event) => (
+            <article className="view-event-card" key={event._id}>
+              <div className="event-image-wrap">
+                <img
+                  src={
+                    event.imageUrl
+                      ? `http://localhost:5000${event.imageUrl}`
+                      : dotsImage
+                  }
+                  alt={event.title || "Campus event"}
+                  className="event-image"
+                />
+                <span className="event-category">{event.category}</span>
               </div>
-            </div>
 
-            {activeInfo === event.id && (
-              <section
-                className="event-info-popover"
-                id={`event-info-${event.id}`}
-                role="dialog"
-                aria-label={`${event.title} information`}
-              >
-                <button
-                  type="button"
-                  className="event-info-close"
-                  onClick={() => setActiveInfo(null)}
-                  aria-label="Close event information"
+              <div className="event-card-content">
+                <p className="event-date">{event.date}</p>
+                <h2>{event.title}</h2>
+                <p className="event-description">{event.description}</p>
+
+                <div className="event-actions">
+                  <Link
+                    to="/student/register-event"
+                    state={{ event }}
+                    className="event-register-button"
+                  >
+                    Register
+                  </Link>
+
+                  <button
+                    type="button"
+                    className="info-event-button"
+                    aria-expanded={activeInfo === event._id}
+                    aria-controls={`event-info-${event._id}`}
+                    onClick={() =>
+                      setActiveInfo(
+                        activeInfo === event._id ? null : event._id
+                      )
+                    }
+                  >
+                    Info
+                  </button>
+                </div>
+              </div>
+
+              {activeInfo === event._id && (
+                <section
+                  className="event-info-popover"
+                  id={`event-info-${event._id}`}
+                  role="dialog"
+                  aria-label={`${event.title} information`}
                 >
-                  ×
-                </button>
-                <p className="event-info-kicker">EVENT DETAILS</p>
-                <h3>{event.title}</h3>
-                <dl className="event-info-list">
-                  <div><dt>Date &amp; time</dt><dd>{event.date}<br />{event.time}</dd></div>
-                  <div><dt>Venue</dt><dd>{event.venue}</dd></div>
-                  <div><dt>Guest</dt><dd>{event.guest}</dd></div>
-                  <div><dt>Total capacity</dt><dd>{event.capacity} people</dd></div>
-                  <div><dt>Charge</dt><dd>{event.charge || "Free"}</dd></div>
-                  <div><dt>Attendance registration</dt><dd>{event.attendanceRegistration ? "Yes" : "No"}</dd></div>
-                </dl>
-              </section>
-            )}
-          </article>
-        ))}
-      </div>
+                  <button
+                    type="button"
+                    className="event-info-close"
+                    onClick={() => setActiveInfo(null)}
+                    aria-label="Close event information"
+                  >
+                    ×
+                  </button>
 
-      {filteredEvents.length === 0 && (
-        <p className="events-empty-state">No events match your search.</p>
+                  <p className="event-info-kicker">EVENT DETAILS</p>
+                  <h3>{event.title}</h3>
+
+                  <dl className="event-info-list">
+                    <div>
+                      <dt>Date &amp; time</dt>
+                      <dd>
+                        {event.date || "Not specified"}
+                        <br />
+                        {event.time || "Not specified"}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Venue</dt>
+                      <dd>{event.venue || "Not specified"}</dd>
+                    </div>
+
+                    <div>
+                      <dt>Organizer</dt>
+                      <dd>{event.createdBy || "Faculty organizer"}</dd>
+                    </div>
+
+                    <div>
+                      <dt>Total capacity</dt>
+                      <dd>
+                        {event.capacity ?? "Not specified"}
+                        {event.capacity != null ? " people" : ""}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Charge</dt>
+                      <dd>{event.charge || "Free"}</dd>
+                    </div>
+
+                    <div>
+                      <dt>Attendance registration</dt>
+                      <dd>
+                        {event.attendanceRegistration ? "Yes" : "No"}
+                      </dd>
+                    </div>
+                  </dl>
+                </section>
+              )}
+            </article>
+          ))}
+        </div>
       )}
+
+      {loading && (
+        <p className="events-empty-state">Loading events...</p>
+      )}
+
+      {!loading && error && (
+        <p className="events-empty-state">{error}</p>
+      )}
+
+      {!loading && !error && filteredEvents.length === 0 && (
+        <p className="events-empty-state">
+          No events match your search.
+        </p>
+      )}
+
       <Footer />
     </main>
   );
