@@ -178,6 +178,9 @@ fetch(
                   className="my-event-card"
                   key={eventId || index}
                 >
+ 
+                  
+
 
                   {/* TOP */}
 
@@ -203,50 +206,38 @@ fetch(
                   </h2>
 
 
-                  {/* DESCRIPTION */}
-
-                  <p className="event-description">
-
-                    {event.description ||
-                      "No description available for this event."}
-
-                  </p>
-
-
                   {/* DETAILS */}
+<div className="event-details">
+  <div>
+    <span>VENUE</span>
+    <strong>
+      {event.venue || event.location || "Not specified"}
+    </strong>
+  </div>
 
-                  <div className="event-details">
+  <div>
+    <span>TIME</span>
+    <strong>{event.time || "Not specified"}</strong>
+  </div>
+  
 
-                    <div>
+{event.imageUrl && (
+  <div className="event-image-wrapper">
+    <img
+      src={`http://localhost:5000${event.imageUrl}`}
+      alt={event.title || "Campus event"}
+      className="my-event-image"
+    />
+  </div>
+)}
+  
 
-                      <span>
-                        VENUE
-                      </span>
+</div>
 
-                      <strong>
-                        {event.venue ||
-                          event.location ||
-                          "Not specified"}
-                      </strong>
+              
+    
 
-                    </div>
-
-
-                    <div>
-
-                      <span>
-                        TIME
-                      </span>
-
-                      <strong>
-                        {event.time ||
-                          "Not specified"}
-                      </strong>
-
-                    </div>
-
-                  </div>
-
+  
 
                   {/* ACTIONS */}
 

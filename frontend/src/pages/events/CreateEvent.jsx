@@ -18,6 +18,8 @@ function CreateEvent() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [image, setImage] = useState(null);
+const [imagePreview, setImagePreview] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -25,6 +27,26 @@ function CreateEvent() {
       [e.target.name]: e.target.value,
     });
   };
+  const handleImageChange = (e) => {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    alert("Please select a JPG, PNG, or WebP image.");
+    e.target.value = "";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("Image must be 5 MB or smaller.");
+    e.target.value = "";
+    return;
+  }
+
+  setImage(file);
+  setImagePreview(URL.createObjectURL(file));
+};
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -55,20 +77,25 @@ function CreateEvent() {
   setLoading(true);
 
   try {
-    const response = await fetch(
-      "http://localhost:5000/api/events",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...formData,
-          capacity: Number(formData.capacity),
-        }),
-      }
-    );
+   const payload = new FormData();
+
+Object.entries(formData).forEach(([key, value]) => {
+  payload.append(key, value);
+});
+
+payload.set("capacity", String(Number(formData.capacity)));
+
+if (image) {
+  payload.append("image", image);
+}
+
+const response = await fetch("http://localhost:5000/api/events", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+  body: payload,
+});
 
     const result = await response.json();
 
@@ -96,6 +123,8 @@ function CreateEvent() {
     alert("Could not connect to the server. Please try again.");
   } finally {
     setLoading(false);
+    setImage(null);
+    setImagePreview("");
   }
 };
 
@@ -331,6 +360,35 @@ function CreateEvent() {
               </div>
 
             </div>
+
+            
+<div className="form-group">
+  <label htmlFor="event-image">Event Image (optional)</label>
+
+  <input
+    id="event-image"
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    onChange={handleImageChange}
+  />
+
+  {imagePreview && (
+    <img
+      src={imagePreview}
+      alt="Event preview"
+      style={{
+        display: "block",
+        width: "100%",
+        maxWidth: "320px",
+        maxHeight: "200px",
+        objectFit: "cover",
+        marginTop: "12px",
+        borderRadius: "8px",
+      }}
+    />
+  )}
+</div>
+
 
             {/* =================================================
                 CAPACITY
