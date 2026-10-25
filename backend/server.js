@@ -665,7 +665,7 @@ app.delete(
         });
       }
 
-      if (String(event.organizer) !== String(req.user.userId)) {
+      if (String(event.facultyId) !== String(req.user.userId)) {
         return res.status(403).json({
           message: "You cannot delete another faculty member's event.",
         });
@@ -685,7 +685,6 @@ app.delete(
     }
   }
 );
-
 // =====================================
 // MONITOR EVENT REGISTRATIONS
 // GET /api/events/:eventId/registrations
@@ -715,7 +714,7 @@ app.get(
         });
       }
 
-      if (String(event.organizer) !== String(req.user.userId)) {
+      if (String(event.facultyId) !== String(req.user.userId)) {
         return res.status(403).json({
           message: "You cannot view registrations for this event.",
         });
@@ -731,7 +730,6 @@ app.get(
     }
   }
 );
-
 // =====================================
 // REGISTER FOR EVENT
 // POST /api/events/:eventId/register

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
 
 
 /* =========================================================
@@ -23,7 +23,6 @@ body {
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
-
     padding: 28px 7% 80px;
 
     background:
@@ -73,13 +72,10 @@ body {
 
 .monitor-page::after {
     content: "";
-
     position: fixed;
-
     top: 0;
     bottom: 0;
     left: 5.2%;
-
     width: 2px;
 
     background: rgba(225, 116, 116, 0.18);
@@ -95,12 +91,9 @@ body {
 
 .monitor-page .monitor-main::before {
     content: "";
-
     position: fixed;
-
     left: -45px;
     top: 145px;
-
     width: 275px;
     height: 235px;
 
@@ -115,7 +108,6 @@ body {
         #fffdf3;
 
     border-radius: 5px;
-
     transform: rotate(-7deg);
 
     box-shadow:
@@ -123,7 +115,6 @@ body {
         0 15px 30px rgba(40, 40, 40, 0.07);
 
     opacity: 0.85;
-
     z-index: 0;
     pointer-events: none;
 }
@@ -135,12 +126,9 @@ body {
 
 .monitor-page .monitor-main::after {
     content: "";
-
     position: fixed;
-
     right: -65px;
     bottom: 65px;
-
     width: 255px;
     height: 220px;
 
@@ -155,7 +143,6 @@ body {
         #f5edfa;
 
     border-radius: 6px;
-
     transform: rotate(8deg);
 
     box-shadow:
@@ -163,7 +150,6 @@ body {
         0 18px 35px rgba(40, 40, 40, 0.08);
 
     opacity: 0.88;
-
     z-index: 0;
     pointer-events: none;
 }
@@ -189,11 +175,8 @@ body {
 
 .monitor-header {
     position: relative;
-
     background: rgba(255, 253, 247, 0.96);
-
     padding: 35px 45px 38px;
-
     margin-bottom: 28px;
 
     border: 1px solid rgba(70, 70, 70, 0.10);
@@ -210,21 +193,16 @@ body {
 
 .monitor-header::before {
     content: "";
-
     position: absolute;
-
     top: -7px;
     left: 7%;
-
     width: 120px;
     height: 25px;
 
     background: rgba(239, 203, 119, 0.62);
-
     transform: rotate(-1deg);
 
-    box-shadow:
-        0 3px 8px rgba(70, 70, 70, 0.08);
+    box-shadow: 0 3px 8px rgba(70, 70, 70, 0.08);
 }
 
 
@@ -232,14 +210,11 @@ body {
 
 .monitor-header::after {
     content: "✦";
-
     position: absolute;
-
     right: 30px;
     top: 25px;
 
     font-size: 24px;
-
     color: #efc536;
 }
 
@@ -250,32 +225,24 @@ body {
 
 .monitor-back-btn {
     display: inline-block;
-
     padding: 11px 20px;
 
     background: #182236;
     color: white;
-
     text-decoration: none;
 
     font-size: 14px;
     font-weight: 700;
-
     border-radius: 7px;
 
-    box-shadow:
-        5px 6px 0 rgba(40, 40, 40, 0.14);
-
+    box-shadow: 5px 6px 0 rgba(40, 40, 40, 0.14);
     transition: 0.2s ease;
-
     margin-bottom: 20px;
 }
 
 .monitor-back-btn:hover {
     transform: translate(-2px, -2px);
-
-    box-shadow:
-        7px 8px 0 rgba(40, 40, 40, 0.14);
+    box-shadow: 7px 8px 0 rgba(40, 40, 40, 0.14);
 }
 
 
@@ -285,28 +252,18 @@ body {
 
 .monitor-label {
     margin: 0 0 5px;
-
     font-family: "Caveat", cursive;
-
     font-size: 22px;
-
     font-weight: 600;
-
     color: #7890aa;
-
     font-style: italic;
 }
 
-
 .monitor-header h1 {
     margin: 0;
-
     font-family: "Playfair Display", serif;
-
     font-size: clamp(40px, 5vw, 58px);
-
     line-height: 1.08;
-
     color: #172033;
 }
 
@@ -316,26 +273,18 @@ body {
 .title-line {
     width: 155px;
     height: 6px;
-
     margin: 12px auto 15px;
 
     background: #efc536;
-
     border-radius: 50%;
-
     transform: rotate(-1deg);
 }
 
-
 .monitor-subtitle {
     max-width: 700px;
-
     margin: 0 auto;
-
     color: #7186a1;
-
     font-size: 16px;
-
     line-height: 1.6;
 }
 
@@ -346,19 +295,14 @@ body {
 
 .monitor-error {
     margin-bottom: 22px;
-
     padding: 17px 20px;
 
     background: #fde8e6;
-
     border-left: 4px solid #d96b61;
-
     color: #ad5148;
-
     font-size: 14px;
 
-    box-shadow:
-        5px 5px 0 rgba(80, 60, 60, 0.06);
+    box-shadow: 5px 5px 0 rgba(80, 60, 60, 0.06);
 }
 
 
@@ -387,7 +331,6 @@ body {
         0 15px 35px rgba(55, 55, 55, 0.07);
 
     padding: 38px;
-
     margin-bottom: 30px;
 }
 
@@ -397,17 +340,13 @@ body {
 .events-selection-card::before,
 .students-card::before {
     content: "";
-
     position: absolute;
-
     left: 52px;
     top: 0;
     bottom: 0;
-
     width: 2px;
 
     background: rgba(224, 110, 110, 0.14);
-
     pointer-events: none;
 }
 
@@ -419,19 +358,15 @@ body {
 .section-heading {
     display: flex;
     align-items: flex-start;
-
     gap: 20px;
-
     margin-bottom: 30px;
 
     position: relative;
     z-index: 1;
 }
 
-
 .section-number {
     flex-shrink: 0;
-
     width: 66px;
     height: 66px;
 
@@ -440,58 +375,39 @@ body {
     justify-content: center;
 
     background: #f8d45b;
-
     border-radius: 10px;
 
     font-family: "Caveat", cursive;
-
     font-size: 22px;
-
     color: #172033;
 
-    box-shadow:
-        6px 7px 0 rgba(55, 55, 55, 0.08);
-
+    box-shadow: 6px 7px 0 rgba(55, 55, 55, 0.08);
     transform: rotate(-2deg);
 }
-
 
 .section-number.purple {
     background: #d6b5ea;
 }
 
-
 .section-label {
     margin: 0 0 2px;
-
     font-family: "Caveat", cursive;
-
     font-size: 22px;
-
     color: #7890aa;
-
     font-style: italic;
 }
 
-
 .section-heading h2 {
     margin: 0;
-
     font-family: "Playfair Display", serif;
-
     font-size: 32px;
-
     color: #172033;
 }
 
-
 .section-description {
     margin: 10px 0 0;
-
     color: #7186a1;
-
     line-height: 1.6;
-
     max-width: 850px;
 }
 
@@ -502,76 +418,54 @@ body {
 
 .event-search-wrapper {
     margin-bottom: 25px;
-
     position: relative;
     z-index: 1;
 }
 
-
 .event-search-wrapper label {
     display: block;
-
     margin-bottom: 8px;
 
     font-family: "Caveat", cursive;
-
     font-size: 21px;
-
     color: #4d4d4d;
-
     text-align: left;
 }
-
 
 .event-search {
     position: relative;
 }
 
-
 .search-icon {
     position: absolute;
-
     left: 17px;
     top: 50%;
-
     transform: translateY(-50%);
 
     color: #7c8ea3;
-
     font-size: 23px;
-
     z-index: 2;
 }
 
-
 .event-search input {
     width: 100%;
-
     padding: 15px 18px 15px 47px;
 
     border: 1px solid #d7d2c7;
-
     border-radius: 6px;
-
     background: rgba(255, 254, 250, 0.90);
 
     font-family: "DM Sans", sans-serif;
-
     font-size: 15px;
-
     color: #172033;
 
     outline: none;
-
     transition: 0.2s ease;
 }
 
-
 .event-search input:focus {
     border-color: #839ab3;
-
-    box-shadow:
-        0 0 0 3px rgba(131, 154, 179, 0.12);
+    box-shadow: 0 0 0 3px rgba(131, 154, 179, 0.12);
 }
 
 
@@ -581,41 +475,34 @@ body {
 
 .events-list {
     display: flex;
-
     flex-direction: column;
-
-    gap: 12px;
+    gap: 16px;
 
     position: relative;
-
     z-index: 1;
 }
 
 
 /* =========================================================
-   EVENT ROW
+   EVENT ROW - IMPROVED DISPLAY
 ========================================================= */
 
 .event-row {
     width: 100%;
+    min-height: 100px;
 
     display: flex;
     align-items: center;
+    gap: 22px;
 
-    gap: 20px;
+    padding: 20px 24px;
 
-    padding: 17px 20px;
-
-    background: rgba(255, 254, 249, 0.92);
-
+    background: rgba(255, 254, 249, 0.96);
     border: 1px solid #ddd8cd;
-
-    border-radius: 7px;
+    border-radius: 9px;
 
     cursor: pointer;
-
     text-align: left;
-
     font-family: "DM Sans", sans-serif;
 
     transition:
@@ -625,33 +512,26 @@ body {
         background 0.2s ease;
 }
 
-
 .event-row:hover {
-    transform: translateX(4px);
+    transform: translateY(-2px);
+    border-color: #c9b76d;
 
-    border-color: #b9c5d0;
-
-    box-shadow:
-        5px 6px 0 rgba(50, 50, 50, 0.06);
+    box-shadow: 5px 7px 0 rgba(50, 50, 50, 0.07);
 }
-
 
 .event-row-selected {
     background: #fff8d9;
-
     border-color: #e8c548;
 
-    box-shadow:
-        5px 6px 0 rgba(80, 70, 40, 0.08);
+    box-shadow: 5px 6px 0 rgba(80, 70, 40, 0.08);
 }
 
 
-/* Number */
+/* Event number */
 
 .event-row-number {
-    width: 45px;
-    height: 45px;
-
+    width: 52px;
+    height: 52px;
     flex-shrink: 0;
 
     display: flex;
@@ -659,13 +539,10 @@ body {
     justify-content: center;
 
     background: #f8d45b;
-
     border-radius: 8px;
 
     font-family: "Caveat", cursive;
-
-    font-size: 20px;
-
+    font-size: 23px;
     color: #172033;
 }
 
@@ -674,56 +551,49 @@ body {
 
 .event-row-info {
     flex: 1;
-
     min-width: 0;
 }
 
-
 .event-row-info h3 {
-    margin: 0 0 7px;
+    margin: 0 0 10px;
 
     font-family: "Playfair Display", serif;
-
-    font-size: 21px;
-
+    font-size: 23px;
+    line-height: 1.35;
     color: #172033;
 
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
+
+/* Event metadata */
 
 .event-row-meta {
     display: flex;
-
     flex-wrap: wrap;
-
     gap: 8px;
+    row-gap: 8px;
 }
 
-
 .event-row-meta span {
-    padding: 4px 9px;
+    padding: 6px 11px;
 
-    background: #f1f3f5;
-
-    border-radius: 20px;
+    background: #f2eee3;
+    border: 1px solid #e7dfce;
+    border-radius: 5px;
 
     color: #69788a;
-
     font-size: 12px;
+    line-height: 1.4;
 }
 
 
 /* Arrow */
 
 .event-row-arrow {
-    width: 38px;
-    height: 38px;
-
+    width: 42px;
+    height: 42px;
     flex-shrink: 0;
 
     display: flex;
@@ -731,19 +601,16 @@ body {
     justify-content: center;
 
     border-radius: 50%;
-
     background: #182236;
-
     color: white;
+    font-size: 20px;
 
-    font-size: 18px;
-
-    transition: 0.2s ease;
+    transition: transform 0.2s ease, background 0.2s ease;
 }
 
-
 .event-row:hover .event-row-arrow {
-    transform: translateX(3px);
+    background: #35435b;
+    transform: translateX(4px);
 }
 
 
@@ -753,18 +620,15 @@ body {
 
 .no-events {
     text-align: center;
-
     padding: 55px 20px 35px;
 
     position: relative;
     z-index: 1;
 }
 
-
 .no-events-icon {
     width: 78px;
     height: 78px;
-
     margin: 0 auto 17px;
 
     display: flex;
@@ -772,48 +636,32 @@ body {
     justify-content: center;
 
     background: #f8d45b;
-
     border-radius: 11px;
-
     font-size: 33px;
 
-    box-shadow:
-        6px 7px 0 rgba(55, 55, 55, 0.07);
+    box-shadow: 6px 7px 0 rgba(55, 55, 55, 0.07);
 }
-
 
 .no-events-label,
 .no-students-label {
     margin: 0 0 4px;
-
     font-family: "Caveat", cursive;
-
     font-size: 23px;
-
     color: #7890aa;
-
     font-style: italic;
 }
 
-
 .no-events h2 {
     margin: 0 0 10px;
-
     font-family: "Playfair Display", serif;
-
     font-size: 32px;
-
     color: #172033;
 }
 
-
 .no-events p:last-child {
     max-width: 600px;
-
     margin: 0 auto;
-
     color: #7186a1;
-
     line-height: 1.6;
 }
 
@@ -824,33 +672,24 @@ body {
 
 .no-search-result {
     text-align: center;
-
     padding: 35px;
-
     color: #7186a1;
 
     position: relative;
     z-index: 1;
 }
 
-
 .no-search-result div {
     font-size: 34px;
-
     margin-bottom: 8px;
 }
 
-
 .no-search-result h3 {
     margin: 0 0 5px;
-
     font-family: "Playfair Display", serif;
-
     font-size: 24px;
-
     color: #172033;
 }
-
 
 .no-search-result p {
     margin: 0;
@@ -865,40 +704,27 @@ body {
     padding-bottom: 45px;
 }
 
-
 .students-header {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 20px;
-
     margin-bottom: 25px;
 
     position: relative;
-
     z-index: 1;
 }
 
-
 .students-title {
     display: flex;
-
     align-items: flex-start;
-
     gap: 20px;
 }
 
-
 .students-title h2 {
     margin: 0;
-
     font-family: "Playfair Display", serif;
-
     font-size: 31px;
-
     color: #172033;
 }
 
@@ -907,30 +733,21 @@ body {
 
 .registration-count {
     min-width: 90px;
-
     padding: 11px 15px;
 
     background: #dff0dc;
-
     border-radius: 7px;
-
     color: #385b3b;
 
     font-size: 21px;
-
     font-weight: 700;
-
     text-align: center;
 }
 
-
 .registration-count span {
     display: block;
-
     font-size: 11px;
-
     font-weight: 600;
-
     margin-top: 2px;
 }
 
@@ -941,53 +758,36 @@ body {
 
 .selected-event-info {
     display: grid;
-
-    grid-template-columns:
-        repeat(5, minmax(0, 1fr));
-
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 12px;
-
     margin-bottom: 25px;
 
     position: relative;
-
     z-index: 1;
 }
-
 
 .selected-event-info > div {
     padding: 13px;
 
     background: rgba(245, 242, 233, 0.78);
-
     border: 1px solid #e0dbd0;
-
     border-radius: 6px;
 }
 
-
 .selected-event-info span {
     display: block;
-
     margin-bottom: 4px;
 
     font-size: 10px;
-
     font-weight: 700;
-
     letter-spacing: 1px;
-
     color: #8a8a83;
 }
 
-
 .selected-event-info strong {
     display: block;
-
     font-size: 13px;
-
     color: #263247;
-
     overflow-wrap: anywhere;
 }
 
@@ -998,76 +798,53 @@ body {
 
 .students-table-wrapper {
     width: 100%;
-
     overflow-x: auto;
 
     position: relative;
-
     z-index: 1;
 }
 
-
 .students-table {
     width: 100%;
-
     border-collapse: collapse;
-
     min-width: 850px;
-
     background: rgba(255, 254, 249, 0.88);
 }
 
-
 .students-table th {
     padding: 14px 13px;
-
     background: #182236;
-
     color: white;
-
     text-align: left;
 
     font-size: 12px;
-
     font-weight: 700;
-
     letter-spacing: 0.5px;
 }
-
 
 .students-table th:first-child {
     text-align: center;
 }
 
-
 .students-table td {
     padding: 14px 13px;
-
     border-bottom: 1px solid #e2ded5;
-
     color: #5f6d7e;
-
     font-size: 13px;
-
     vertical-align: middle;
 }
-
 
 .students-table tbody tr {
     transition: 0.15s ease;
 }
 
-
 .students-table tbody tr:hover {
     background: #fff8d9;
 }
 
-
 .student-number {
     text-align: center;
-
     font-weight: 700;
-
     color: #8b98a8 !important;
 }
 
@@ -1076,17 +853,13 @@ body {
 
 .student-name {
     display: flex;
-
     align-items: center;
-
     gap: 10px;
 }
-
 
 .student-avatar {
     width: 35px;
     height: 35px;
-
     flex-shrink: 0;
 
     display: flex;
@@ -1094,20 +867,15 @@ body {
     justify-content: center;
 
     background: #d6b5ea;
-
     border-radius: 50%;
-
     color: #4d3761;
 
     font-family: "Playfair Display", serif;
-
     font-weight: 700;
 }
 
-
 .student-name strong {
     color: #263247;
-
     font-size: 13px;
 }
 
@@ -1118,13 +886,10 @@ body {
 
 .students-loading {
     padding: 50px;
-
     text-align: center;
 
     color: #7186a1;
-
     font-family: "Caveat", cursive;
-
     font-size: 23px;
 }
 
@@ -1135,36 +900,26 @@ body {
 
 .no-students {
     text-align: center;
-
     padding: 50px 20px;
 
     position: relative;
-
     z-index: 1;
 }
 
-
 .no-students-icon {
     font-size: 40px;
-
     margin-bottom: 8px;
 }
 
-
 .no-students h3 {
     margin: 0 0 8px;
-
     font-family: "Playfair Display", serif;
-
     font-size: 27px;
-
     color: #172033;
 }
 
-
 .no-students p:last-child {
     margin: 0;
-
     color: #7186a1;
 }
 
@@ -1181,9 +936,7 @@ body {
     justify-content: center;
 
     font-family: "Caveat", cursive;
-
     font-size: 26px;
-
     color: #7186a1;
 
     background:
@@ -1201,22 +954,17 @@ body {
 ========================================================= */
 
 @media (max-width: 1000px) {
-
     .monitor-page {
         padding-left: 4%;
         padding-right: 4%;
     }
 
     .selected-event-info {
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-
 }
 
-
 @media (max-width: 750px) {
-
     .monitor-header {
         padding: 30px 25px;
     }
@@ -1238,7 +986,6 @@ body {
     .section-number {
         width: 55px;
         height: 55px;
-
         font-size: 19px;
     }
 
@@ -1248,19 +995,15 @@ body {
     }
 
     .selected-event-info {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .students-header {
         align-items: flex-start;
     }
-
 }
 
-
 @media (max-width: 550px) {
-
     .monitor-page {
         padding: 15px 3% 50px;
     }
@@ -1306,26 +1049,28 @@ body {
 
     .event-row {
         gap: 12px;
-
-        padding: 13px;
+        padding: 15px;
+        align-items: flex-start;
     }
 
     .event-row-number {
         width: 38px;
         height: 38px;
+        font-size: 19px;
     }
 
     .event-row-info h3 {
-        font-size: 17px;
+        font-size: 18px;
     }
 
     .event-row-meta span {
-        font-size: 10px;
+        font-size: 11px;
     }
 
     .event-row-arrow {
         width: 32px;
         height: 32px;
+        font-size: 16px;
     }
 
     .selected-event-info {
@@ -1335,7 +1080,6 @@ body {
     .registration-count {
         align-self: flex-start;
     }
-
 }
 
 
@@ -1358,4 +1102,166 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #93836a;
+}
+
+/* =========================================================
+   FIX: EVENT DISPLAY AND HEADING VISIBILITY ONLY
+========================================================= */
+
+/* Keep event content above the notebook background */
+.monitor-main,
+.monitor-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Make the events heading visible */
+.monitor-main h2,
+.monitor-content h2 {
+    color: #172033;
+}
+
+/* Event list layout */
+.events-list,
+.monitor-events-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+/* Individual event cards */
+.event-row,
+.monitor-event-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 190px;
+    padding: 22px;
+
+    background: rgba(255, 253, 247, 0.97);
+    color: #172033;
+
+    border: 1px solid #ddd4c2;
+    border-radius: 8px;
+    box-shadow: 5px 6px 0 rgba(50, 50, 50, 0.06);
+
+    text-align: left;
+    font-family: "DM Sans", sans-serif;
+    cursor: pointer;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-row:hover,
+.monitor-event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 6px 9px 0 rgba(50, 50, 50, 0.09);
+}
+
+/* Event title */
+.event-row-info h3,
+.monitor-event-card h3 {
+    margin: 0 0 6px;
+    width: 100%;
+
+    font-family: "Playfair Display", serif;
+    font-size: 23px;
+    line-height: 1.3;
+    color: #172033;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/* Event details */
+.event-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.event-row-meta span {
+    background: #f2eee3;
+    color: #526176;
+    border: 1px solid #e7dfce;
+    border-radius: 5px;
+    padding: 6px 9px;
+    font-size: 12px;
+}
+
+/* Support the JSX structure currently using monitor-event-card */
+.monitor-event-card p {
+    margin: 0;
+    color: #526176;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.monitor-event-card strong {
+    color: #172033;
+}
+
+/* View registrations label */
+.event-row-arrow,
+.view-registrations {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-top: auto;
+    padding-top: 8px;
+
+    color: #526b87;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Selected event */
+.event-row-selected,
+.monitor-event-card.selected {
+    background: #fff8d9;
+    border-color: #e8c548;
+    box-shadow: 5px 6px 0 rgba(80, 70, 40, 0.08);
+}
+
+/* Keep the events section separated from the footer */
+.events-section {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 35px;
+}
+
+/* Mobile layout */
+@media (max-width: 700px) {
+    .events-list,
+    .monitor-events-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .event-row,
+    .monitor-event-card {
+        min-height: 0;
+        padding: 18px;
+    }
+
+    .event-row-info h3,
+    .monitor-event-card h3 {
+        font-size: 20px;
+    }
+}
+
+
+/* Hide decorative paper flaps on the registration details page */
+.registration-details-main::before,
+.registration-details-main::after {
+    display: none;
+    content: none;
 }
