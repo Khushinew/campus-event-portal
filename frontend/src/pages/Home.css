@@ -144,3 +144,21 @@ body {
 
     border-radius: 18px;
 }
+
+
+/* Center and enlarge the Campusphere logo on the homepage */
+.home .header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
+  padding: 20px 32px;
+  box-sizing: border-box;
+}
+
+.home .header .logo {
+  font-size: clamp(42px, 4vw, 54px);
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+}
