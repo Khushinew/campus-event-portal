@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import ChangePassword from "./pages/ChangePassword";
@@ -15,12 +16,11 @@ import ResetPassword from "./pages/ResetPassword";
 // Faculty pages
 // =========================
 import FacultyDashboard from "./pages/FacultyDashboard";
-
 import CreateEvent from "./pages/events/CreateEvent";
 import EditEvent from "./pages/events/EditEvent";
+import EditEventsList from "./pages/events/EditEventsList";
 import MyEvents from "./pages/events/MyEvents";
 import MonitorRegistrations from "./pages/events/MonitorRegistrations";
-
 import ManageAccount from "./pages/events/ManageAccount";
 import MyProfile from "./pages/events/MyProfile";
 
@@ -35,48 +35,40 @@ import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent";
 import StudentProfile from "./pages/StudentEvents/StudentProfile";
-import EditEventsList from "./pages/events/EditEventsList";
+
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
-
         {/* =========================
             PUBLIC ROUTES
         ========================= */}
 
+        <Route path="/" element={<Home />} />
+
+        <Route path="/login" element={<Login />} />
+
         <Route
-          path="/"
-          element={<Home />}
+          path="/forgot-password"
+          element={<ForgotPassword />}
         />
 
-
         <Route
-          path="/login"
-          element={<Login />}
+          path="/verify-otp"
+          element={<OtpVerification />}
         />
 
         <Route
-  path="/forgot-password"
-  element={<ForgotPassword />}
-/>
-
-<Route path="/verify-otp" element={<OtpVerification />} />
-
-<Route path="/reset-password" element={<ResetPassword />} />
-
-        <Route
-          path="/events"
-          element={<ViewEvents />}
+          path="/reset-password"
+          element={<ResetPassword />}
         />
+
         <Route
-    path="/change-password"
-    element={<ChangePassword />}
-/>
+          path="/change-password"
+          element={<ChangePassword />}
+        />
 
-        
-
+        <Route path="/events" element={<ViewEvents />} />
 
         {/* =========================
             STUDENT ROUTES
@@ -117,53 +109,57 @@ function App() {
           element={<AddPersonalEvent />}
         />
 
-<Route path="/student/profile" element={<StudentProfile />} />
+        <Route
+          path="/student/profile"
+          element={<StudentProfile />}
+        />
+
         {/* =========================
             FACULTY ROUTES
         ========================= */}
 
-        {/* Faculty Dashboard */}
         <Route
           path="/faculty-dashboard"
           element={<FacultyDashboard />}
         />
 
-        {/* Create Event */}
         <Route
           path="/faculty/create-event"
           element={<CreateEvent />}
         />
 
-        {/* My Events */}
         <Route
           path="/faculty/events"
           element={<MyEvents />}
         />
 
-        {/* Edit Event */}
-        <Route path="/faculty/edit-events" element={<EditEventsList />} />
-<Route path="/faculty/edit-events/:id" element={<EditEvent />} />
+        {/* Event selection page */}
+        <Route
+          path="/faculty/edit-events"
+          element={<EditEventsList />}
+        />
 
-        {/* Monitor Registrations */}
+        {/* Edit one selected event */}
+        <Route
+          path="/faculty/edit-events/:eventId"
+          element={<EditEvent />}
+        />
+
         <Route
           path="/faculty/registrations"
           element={<MonitorRegistrations />}
         />
 
-        {/* Manage Account */}
         <Route
           path="/faculty/account"
           element={<ManageAccount />}
         />
 
-        {/* My Profile */}
         <Route
           path="/faculty/profile"
           element={<MyProfile />}
         />
-
       </Routes>
-
     </BrowserRouter>
   );
 }

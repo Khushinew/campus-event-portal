@@ -13,6 +13,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 
+
 require("dotenv").config({
   path: path.join(__dirname, ".env"),
 });
@@ -454,10 +455,6 @@ app.get("/api/events", async (req, res) => {
   }
 });
 
-// =====================================
-// GET FACULTY EVENTS
-// GET /api/events/faculty/:facultyId
-// =====================================
 
 app.get(
   "/api/events/faculty/:facultyId",
@@ -465,22 +462,30 @@ app.get(
   requireRole("faculty"),
   async (req, res) => {
     try {
-      // A faculty member can only fetch their own events.
-      if (String(req.user.userId) !== req.params.facultyId) {
+      const loggedInFacultyId = String(req.user.userId);
+      const requestedFacultyId = String(req.params.facultyId);
+
+      if (loggedInFacultyId !== requestedFacultyId) {
         return res.status(403).json({
           message: "You can only view your own events.",
         });
       }
 
       const events = await Event.find({
-  facultyId: String(req.user.userId),
-}).sort({ createdAt: -1 });
+        facultyId: loggedInFacultyId,
+      }).sort({ createdAt: -1 });
 
-      res.json(events);
+      console.log("FACULTY EVENTS FETCHED:", {
+        facultyId: loggedInFacultyId,
+        eventCount: events.length,
+        eventIds: events.map((event) => String(event._id)),
+      });
+
+      return res.status(200).json(events);
     } catch (error) {
       console.error("Get faculty events error:", error);
 
-      res.status(500).json({
+      return res.status(500).json({
         message: "Failed to fetch faculty events.",
       });
     }
@@ -522,15 +527,27 @@ app.get("/api/events/:eventId", async (req, res) => {
 // PUT /api/events/:eventId
 // =====================================
 
+
+ 
 app.put(
   "/api/events/:eventId",
   verifyToken,
   requireRole("faculty"),
   async (req, res) => {
+    console.log("UPDATE EVENT ROUTE REACHED");
+
     try {
       if (!validObjectId(req.params.eventId)) {
         return res.status(400).json({
           message: "Invalid event ID.",
+        });
+      }
+
+      const faculty = await User.findById(req.user.userId);
+
+      if (!faculty || faculty.role !== "faculty") {
+        return res.status(404).json({
+          message: "Faculty account not found.",
         });
       }
 
@@ -542,65 +559,76 @@ app.put(
         });
       }
 
-      if (String(event.organizer) !== String(req.user.userId)) {
+      // Use the same ownership field as the My Events route.
+      if (String(event.facultyId) !== String(faculty._id)) {
+        console.log("EDIT OWNERSHIP MISMATCH:", {
+          loggedInUserId: String(faculty._id),
+          eventFacultyId: String(event.facultyId),
+          eventId: String(event._id),
+        });
+
         return res.status(403).json({
-          message: "You cannot edit another faculty member's event.",
+          message:
+            "This event does not belong to your faculty account. Please check the event's facultyId in MongoDB.",
         });
       }
 
-      const fields = [
-        "title",
-        "description",
-        "date",
-        "time",
-        "venue",
-        "category",
-      ];
+      const { date, time, venue, category, capacity } = req.body;
 
-      for (const field of fields) {
-        if (req.body[field] !== undefined) {
-          event[field] = req.body[field];
+      if (date !== undefined) event.date = date;
+      if (time !== undefined) event.time = time;
+
+      if (venue !== undefined) {
+        if (!String(venue).trim()) {
+          return res.status(400).json({
+            message: "Venue cannot be empty.",
+          });
         }
+        event.venue = String(venue).trim();
       }
 
-      const newCapacity =
-        req.body.capacity ??
-        req.body.maxStudents ??
-        req.body.max_participants;
+      if (category !== undefined) {
+        if (!String(category).trim()) {
+          return res.status(400).json({
+            message: "Category cannot be empty.",
+          });
+        }
+        event.category = String(category).trim();
+      }
 
-      if (newCapacity !== undefined) {
-        const capacityNumber = Number(newCapacity);
+      if (capacity !== undefined) {
+        const newCapacity = Number(capacity);
 
-        if (
-          !Number.isInteger(capacityNumber) ||
-          capacityNumber < 1
-        ) {
+        if (!Number.isInteger(newCapacity) || newCapacity < 1) {
           return res.status(400).json({
             message: "Capacity must be a positive whole number.",
           });
         }
 
-        if (capacityNumber < event.registrations.length) {
+        if (newCapacity < event.registrations.length) {
           return res.status(400).json({
             message:
               "Capacity cannot be lower than the current registration count.",
           });
         }
 
-        event.capacity = capacityNumber;
+        event.capacity = newCapacity;
       }
 
       await event.save();
 
-      res.json({
-        message: "Event updated successfully",
+      console.log("EVENT UPDATED SUCCESSFULLY:", String(event._id));
+
+      return res.status(200).json({
+        message: "Event updated successfully.",
         event,
       });
     } catch (error) {
       console.error("Update event error:", error);
 
-      res.status(500).json({
+      return res.status(500).json({
         message: "Failed to update event.",
+        error: error.message,
       });
     }
   }
