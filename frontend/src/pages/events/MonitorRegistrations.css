@@ -1265,3 +1265,9 @@ body {
     display: none;
     content: none;
 }
+
+.registration-details-main::before,
+.registration-details-main::after {
+  display: none;
+  content: none;
+}

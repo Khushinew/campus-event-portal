@@ -4,6 +4,27 @@ import { Link, useParams } from "react-router-dom";
 import FacultySidebar from "./FacultySidebar";
 import Footer from "../../components/Footer";
 import "./EventRegistrationDetails.css";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from "recharts";
+const CHART_COLORS = [
+  "#6b8fbd",
+  "#e5b567",
+  "#8eb7a1",
+  "#c78f9a",
+  "#9b91c6",
+  "#d39a70",
+];
 
 function EventRegistrationDetails() {
   const { eventId } = useParams();
@@ -107,35 +128,90 @@ function EventRegistrationDetails() {
     };
   }, [students, event]);
 
-  function renderBreakdown(title, entries) {
-    const maximum = Math.max(...entries.map(([, count]) => count), 1);
+  function renderSemesterChart(entries) {
+  const data = entries.map(([name, value]) => ({
+    name: name === "Not specified" ? name : `Semester ${name}`,
+    value,
+  }));
 
-    return (
-      <section className="analytics-panel">
-        <h2>{title}</h2>
+  return (
+    <section className="analytics-panel">
+      <h2>Registrations by Semester</h2>
 
-        {entries.length === 0 ? (
-          <p className="analytics-empty">No registration data available yet.</p>
-        ) : (
-          entries.map(([label, count]) => (
-            <div className="analytics-bar-item" key={label}>
-              <div className="analytics-bar-label">
-                <span>{label}</span>
-                <strong>{count}</strong>
-              </div>
-
-              <div className="analytics-bar-track">
-                <div
-                  className="analytics-bar-fill"
-                  style={{ width: `${(count / maximum) * 100}%` }}
+      {data.length === 0 ? (
+        <p className="analytics-empty">
+          No registration data available yet.
+        </p>
+      ) : (
+        <ResponsiveContainer width="100%" height={280}>
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={85}
+              label={({ name, percent }) =>
+                `${name}: ${(percent * 100).toFixed(0)}%`
+              }
+            >
+              {data.map((item, index) => (
+                <Cell
+                  key={item.name}
+                  fill={CHART_COLORS[index % CHART_COLORS.length]}
                 />
-              </div>
-            </div>
-          ))
-        )}
-      </section>
-    );
-  }
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      )}
+    </section>
+  );
+}
+
+function renderDepartmentChart(entries) {
+  const data = entries.map(([department, registrations]) => ({
+    department,
+    registrations,
+  }));
+
+  return (
+    <section className="analytics-panel">
+      <h2>Registrations by Department</h2>
+
+      {data.length === 0 ? (
+        <p className="analytics-empty">
+          No registration data available yet.
+        </p>
+      ) : (
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="department"
+              interval={0}
+              angle={-15}
+              textAnchor="end"
+              height={65}
+              tick={{ fontSize: 11 }}
+            />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Bar
+              dataKey="registrations"
+              name="Registrations"
+              fill="#6b8fbd"
+              radius={[5, 5, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </section>
+  );
+}
 
   return (
     <div className="monitor-page">
@@ -143,9 +219,11 @@ function EventRegistrationDetails() {
 
       <main className="monitor-main registration-details-main">
         <header className="monitor-header">
-          <Link to="/faculty/monitor-registrations" className="monitor-back-btn">
-            ← Back to Events
-          </Link>
+          
+<Link to="/faculty/registrations" className="monitor-back-btn">
+  ← Back to Events
+</Link>
+
 
           <p className="monitor-label">Faculty Dashboard</p>
 
@@ -233,12 +311,9 @@ function EventRegistrationDetails() {
             )}
 
             <section className="registration-breakdowns">
-              {renderBreakdown("Registrations by Semester", analytics.semesters)}
-              {renderBreakdown(
-                "Registrations by Department",
-                analytics.departments
-              )}
-            </section>
+  {renderSemesterChart(analytics.semesters)}
+  {renderDepartmentChart(analytics.departments)}
+</section>
 
             <section className="registered-students-panel">
               <div className="registered-students-heading">
