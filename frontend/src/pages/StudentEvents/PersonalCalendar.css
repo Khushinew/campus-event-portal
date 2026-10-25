@@ -852,3 +852,252 @@
 .personal-calendar-page::-webkit-scrollbar-thumb:hover {
   background: #85827b;
 }
+
+/* =========================================
+   DYNAMIC CALENDAR CONTROLS
+   ========================================= */
+
+.calendar-month-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+}
+
+.calendar-month-title h2 {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 23px;
+  color: #292d38;
+}
+
+.calendar-today-btn {
+  border: none;
+  background: transparent;
+  color: #536b8d;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.calendar-today-btn:hover {
+  color: #303945;
+}
+
+.calendar-nav:focus-visible,
+.calendar-today-btn:focus-visible {
+  outline: 2px solid #536b8d;
+  outline-offset: 3px;
+}
+
+
+/* =========================================
+   TODAY'S DATE
+   ========================================= */
+
+.calendar-day.is-today .day-number {
+  background: #dfe7f2;
+  border-radius: 50%;
+  color: #43546e;
+  box-shadow: 1px 2px 0 rgba(67, 84, 110, 0.1);
+}
+
+
+/* =========================================
+   CAMPUS AND PERSONAL EVENTS
+   ========================================= */
+
+.calendar-event {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.calendar-event strong {
+  overflow-wrap: anywhere;
+}
+
+.campus-calendar-event {
+  background: #f0dfbd;
+  border-left: 3px solid #c99568;
+}
+
+.personal-calendar-event {
+  background: #e5edf9;
+  border-left: 3px solid #6489bd;
+}
+
+.campus-calendar-event:hover {
+  background: #ead5ad;
+}
+
+.personal-calendar-event:hover {
+  background: #d7e3f5;
+}
+
+
+/* =========================================
+   EVENT LEGEND
+   ========================================= */
+
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  padding: 16px;
+  background: rgba(255, 253, 247, 0.94);
+  border-top: 1px dashed rgba(95, 101, 115, 0.2);
+  color: #5e626c;
+  font-size: 12px;
+}
+
+.calendar-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.campus-dot {
+  background: #c99568;
+}
+
+.personal-dot {
+  background: #6489bd;
+}
+
+
+/* =========================================
+   BACKEND LOADING AND ERROR STATES
+   ========================================= */
+
+.calendar-status {
+  margin: 0;
+  padding: 12px 18px;
+  color: #5e626c;
+  font-size: 13px;
+  text-align: center;
+  background: rgba(239, 235, 226, 0.72);
+}
+
+.calendar-error {
+  margin: 14px;
+  padding: 15px;
+  border: 1px solid #e5baba;
+  border-radius: 5px;
+  background: #fff1ee;
+  color: #963d35;
+  font-size: 13px;
+}
+
+.calendar-error p {
+  margin: 0 0 10px;
+}
+
+.calendar-error button {
+  padding: 8px 13px;
+  border: 1px solid #c98b83;
+  border-radius: 4px;
+  background: #fffdf8;
+  color: #80352e;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+}
+
+.calendar-error button:hover {
+  background: #f8e3df;
+}
+
+
+/* =========================================
+   EMPTY SCHEDULE
+   ========================================= */
+
+.empty-schedule {
+  grid-column: 1 / -1;
+  padding: 30px;
+  text-align: center;
+  background: rgba(255, 253, 247, 0.94);
+  border: 1px dashed rgba(95, 101, 115, 0.3);
+  border-radius: 5px;
+}
+
+.empty-schedule h3 {
+  margin-top: 0;
+  font-family: "Playfair Display", serif;
+  color: #292d38;
+}
+
+.empty-schedule p {
+  margin-bottom: 18px;
+  color: #77766f;
+  font-size: 14px;
+}
+
+
+/* =========================================
+   LONG EVENT TITLES
+   ========================================= */
+
+.schedule-card {
+  min-width: 0;
+}
+
+.schedule-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-info h3,
+.schedule-info p,
+.schedule-info small {
+  overflow-wrap: anywhere;
+}
+
+.schedule-info small {
+  display: block;
+  margin-top: 7px;
+  color: #6c6b65;
+  font-size: 12px;
+}
+
+
+/* =========================================
+   RESPONSIVE CALENDAR
+   ========================================= */
+
+@media (max-width: 700px) {
+  .calendar-month-title h2 {
+    font-size: 19px;
+  }
+
+  .calendar-legend {
+    gap: 12px;
+    padding: 13px 8px;
+  }
+
+  .calendar-error {
+    margin: 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .calendar-month-title h2 {
+    font-size: 16px;
+  }
+
+  .calendar-legend {
+    font-size: 11px;
+  }
+}
