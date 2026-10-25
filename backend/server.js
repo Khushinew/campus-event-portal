@@ -11,7 +11,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const personalEventRoutes = require("./models/personalEventRoutes");
 
 
 require("dotenv").config({
@@ -82,6 +82,12 @@ app.use("/uploads", express.static(uploadDirectory));
 app.use(cors());
 app.use(express.json());
 
+// Personal calendar API
+app.use(
+  "/api/personal-events",
+  verifyToken,
+  personalEventRoutes
+);
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -916,6 +922,9 @@ app.put("/api/profile", verifyToken, async (req, res) => {
 // =====================================
 
 async function startServer() {
+  app.get("/api/personal-events/test", (req, res) => {
+  res.json({ message: "Personal events route is reachable" });
+});
   try {
     if (!process.env.MONGO_URI) {
       throw new Error("MONGO_URI is missing in backend/.env");
