@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import ChangePassword from "./pages/ChangePassword";
 
+
 // =========================
 // Public pages
 // =========================
@@ -35,6 +36,7 @@ import RegisteredEvents from "./pages/StudentEvents/RegisteredEvents";
 import PersonalCalendar from "./pages/StudentEvents/PersonalCalendar";
 import AddPersonalEvent from "./pages/StudentEvents/AddPersonalEvent";
 import StudentProfile from "./pages/StudentEvents/StudentProfile";
+import EventRegistrationDetails from "./pages/events/EventRegistrationDetails";
 
 function App() {
   return (
@@ -154,12 +156,17 @@ function App() {
           path="/faculty/account"
           element={<ManageAccount />}
         />
+        <Route
+  path="/faculty/events/:eventId/registrations"
+  element={<EventRegistrationDetails />}
+/>
 
         <Route
           path="/faculty/profile"
           element={<MyProfile />}
         />
       </Routes>
+      
     </BrowserRouter>
   );
 }
