@@ -1,684 +1,413 @@
-import { useEffect, useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import FacultySidebar from "./FacultySidebar";
 import "./EditEvent.css";
-import Footer from "../../components/Footer";
+
+const API_URL = "http://localhost:5000/api/events";
 
 function EditEvent() {
-  const { id } = useParams();
+  const { eventId } = useParams();
   const navigate = useNavigate();
 
-  const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const [eventName, setEventName] = useState("");
-  const [category, setCategory] = useState("");
-  const [verifyDate, setVerifyDate] = useState("");
-
-  const [verified, setVerified] = useState(false);
-  const [verificationError, setVerificationError] = useState("");
-
-  const [formData, setFormData] = useState({
+  const [event, setEvent] = useState({
     title: "",
-    category: "",
+    description: "",
     date: "",
     time: "",
     venue: "",
-    description: "",
-    max_participants: "",
+    category: "",
+    capacity: 100,
   });
 
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  /* =====================================================
-     LOAD EVENT
-  ===================================================== */
-
+  // Load the selected event from MongoDB.
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+    const fetchEvent = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-    if (!savedUser) {
-      navigate("/login");
-      return;
-    }
+        const token = localStorage.getItem("token");
 
-    let currentUser;
+        const response = await fetch(`${API_URL}/${eventId}`, {
+          headers: {
+            Authorization: `Bearer ${token || ""}`,
+          },
+        });
 
-    try {
-      currentUser = JSON.parse(savedUser);
-    } catch (error) {
-      console.error("Invalid user data:", error);
-      localStorage.removeItem("user");
-      navigate("/login");
-      return;
-    }
+        const data = await response.json();
 
-    if (currentUser.role !== "faculty") {
-      navigate("/");
-      return;
-    }
-
-    fetch(`http://localhost:5000/api/events/${id}`)
-      .then((response) => {
         if (!response.ok) {
-          throw new Error("Unable to load event");
+          throw new Error(data.message || "Unable to load event.");
         }
 
-        return response.json();
-      })
-      .then((data) => {
-        const loadedEvent = {
-          title: data.title || data.name || "",
-          category: data.category || "",
-          date: data.date || "",
-          time: data.time || "",
-          venue: data.venue || data.location || "",
-          description: data.description || "",
-          max_participants:
-            data.max_participants ||
-            data.maxParticipants ||
-            "",
-        };
+        const selectedEvent = data.event || data;
 
-        setEvent(loadedEvent);
-        setFormData(loadedEvent);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Unable to load this event.");
-      })
-      .finally(() => {
+        setEvent({
+          title: selectedEvent.title || "",
+          description: selectedEvent.description || "",
+          date: selectedEvent.date
+            ? String(selectedEvent.date).slice(0, 10)
+            : "",
+          time: selectedEvent.time || "",
+          venue: selectedEvent.venue || "",
+          category: selectedEvent.category || "",
+          capacity: selectedEvent.capacity ?? 100,
+        });
+      } catch (err) {
+        setError(err.message || "Unable to load event details.");
+      } finally {
         setLoading(false);
-      });
-  }, [id, navigate]);
+      }
+    };
 
-  /* =====================================================
-     VERIFY EVENT
-  ===================================================== */
-
-  const handleVerify = (e) => {
-    e.preventDefault();
-
-    setVerificationError("");
-
-    if (!event) {
-      return;
-    }
-
-    const enteredName = eventName.trim().toLowerCase();
-    const actualName = event.title.trim().toLowerCase();
-
-    const enteredCategory = category.trim().toLowerCase();
-    const actualCategory = event.category.trim().toLowerCase();
-
-    const enteredDate = verifyDate;
-
-    if (
-      enteredName === actualName &&
-      enteredCategory === actualCategory &&
-      enteredDate === event.date
-    ) {
-      setVerified(true);
-      setVerificationError("");
-
-      setFormData({
-        title: event.title,
-        category: event.category,
-        date: event.date,
-        time: event.time,
-        venue: event.venue,
-        description: event.description,
-        max_participants: event.max_participants,
-      });
+    if (eventId) {
+      fetchEvent();
     } else {
-      setVerified(false);
-
-      setVerificationError(
-        "Event details do not match. Please check the event name, category and date."
-      );
+      setError("Event ID is missing.");
+      setLoading(false);
     }
-  };
+  }, [eventId]);
 
-  /* =====================================================
-     FORM CHANGE
-  ===================================================== */
-
+  // Handle form changes.
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData((previous) => ({
+    setEvent((previous) => ({
       ...previous,
       [name]: value,
     }));
-
-    setError("");
-    setSuccess("");
   };
 
-  /* =====================================================
-     SAVE EVENT
-  ===================================================== */
-
+  // Save event changes.
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!verified) {
-      return;
-    }
 
     setSaving(true);
     setError("");
     setSuccess("");
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/events/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const token = localStorage.getItem("token");
 
-      if (!response.ok) {
-        throw new Error("Failed to update event");
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
       }
 
-      setSuccess("Event updated successfully!");
+      const response = await fetch(`${API_URL}/${eventId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          date: event.date,
+          time: event.time,
+          venue: event.venue.trim(),
+          category: event.category.trim(),
+          capacity: Number(event.capacity),
+        }),
+      });
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to update event.");
+      }
+
+      setSuccess("Event details updated successfully!");
+
+      // Return to the Edit Your Events list after saving.
       setTimeout(() => {
-        navigate("/faculty-dashboard");
-      }, 1200);
+        navigate("/faculty/edit-events");
+      }, 1000);
     } catch (err) {
-      console.error(err);
-
-      setError(
-        "Unable to update the event. Please try again."
-      );
+      setError(err.message || "Something went wrong while saving.");
     } finally {
       setSaving(false);
     }
   };
 
-  /* =====================================================
-     LOADING
-  ===================================================== */
-
+  // Loading screen.
   if (loading) {
     return (
-      <div className="edit-event-page">
-
-        {/* FACULTY SIDEBAR */}
+      <div className="edit-event-layout">
         <FacultySidebar />
 
-        {/* Decorative Notes */}
-        <div className="edit-note edit-note-left"></div>
-        <div className="edit-note edit-note-right"></div>
-
-        <div className="edit-loading">
-          <div className="loading-icon">
-            ✎
+        <main className="edit-event-page">
+          <div className="edit-event-status">
+            <span className="loading-spinner" />
+            Loading event details...
           </div>
-
-          <h2>
-            Loading Event...
-          </h2>
-
-          <p>
-            Please wait while we fetch the event details.
-          </p>
-        </div>
-
+        </main>
       </div>
     );
   }
 
-  /* =====================================================
-     MAIN PAGE
-  ===================================================== */
+  // Error screen if the event could not be loaded.
+  if (error && !event.title) {
+    return (
+      <div className="edit-event-layout">
+        <FacultySidebar />
+
+        <main className="edit-event-page">
+          <section className="edit-event-header">
+            <p className="portal-label">Faculty Portal</p>
+            <h1>Edit Your Event</h1>
+            <div className="header-line" />
+
+            <p className="header-description">
+              We could not load the selected event.
+            </p>
+          </section>
+
+          <div className="edit-event-feedback verification-error">
+            {error}
+          </div>
+
+          <div className="edit-event-back">
+            <button
+              type="button"
+              className="back-dashboard-btn"
+              onClick={() => navigate("/faculty/edit-events")}
+            >
+              ← Back To Edit Events
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className="edit-event-page">
-
-      {/* =================================================
-          FACULTY SIDEBAR
-      ================================================= */}
-
+    <div className="edit-event-layout">
       <FacultySidebar />
 
-      {/* Decorative Notes */}
+      <main className="edit-event-page">
+        {/* Page header */}
+        <header className="edit-event-header">
+          <p className="portal-label">Faculty Portal</p>
 
-      <div className="edit-note edit-note-left"></div>
-      <div className="edit-note edit-note-right"></div>
+          <h1>Edit Your Event</h1>
 
-      {/* =================================================
-          EDIT EVENT HEADER
-      ================================================= */}
+          <div className="header-line" />
 
-      <header className="edit-event-header">
-
-        <button
-          className="back-dashboard-btn"
-          onClick={() => navigate("/faculty-dashboard")}
-        >
-          ← Back to Dashboard
-        </button>
-
-        <p className="portal-label">
-          FACULTY PORTAL
-        </p>
-
-        <h1>
-          Edit Campus Event
-        </h1>
-
-        <div className="header-line"></div>
-
-        <p className="header-description">
-          Verify your event details first, then update
-          the information you want to change.
-        </p>
-
-      </header>
-
-      {/* =================================================
-          MAIN CONTENT
-      ================================================= */}
-
-      <main className="edit-event-container">
-
-        {/* =================================================
-            ERROR / SUCCESS
-        ================================================= */}
-
-        {error && (
-          <div className="edit-message error-message">
-            ⚠ {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="edit-message success-message">
-            ✓ {success}
-          </div>
-        )}
-
-        {/* =================================================
-            VERIFICATION CARD
-        ================================================= */}
-
-        <section className="verification-card">
-
-          <div className="verification-title">
-
-            <div className="verification-icon">
-              01
-            </div>
-
-            <div>
-              <p>
-                EVENT VERIFICATION
-              </p>
-
-              <h2>
-                Confirm Event Details
-              </h2>
-            </div>
-
-          </div>
-
-          <p className="verification-description">
-            Enter the event name, category and original date
-            exactly as they were created. You can edit the
-            remaining details after verification.
+          <p className="header-description">
+            Update your event schedule and arrangements while keeping
+            the original event name and description unchanged.
           </p>
 
-          <form
-            className="verification-form"
-            onSubmit={handleVerify}
+          <button
+            type="button"
+            className="back-dashboard-btn"
+            onClick={() => navigate("/faculty/edit-events")}
           >
+            ← Back to Edit Events
+          </button>
+        </header>
 
-            {/* EVENT NAME */}
-
-            <div className="form-group">
-
-              <label htmlFor="verify-event-name">
-                Event Name
-              </label>
-
-              <input
-                id="verify-event-name"
-                type="text"
-                value={eventName}
-                onChange={(e) =>
-                  setEventName(e.target.value)
-                }
-                placeholder="Enter event name"
-                required
-              />
-
-            </div>
-
-            {/* CATEGORY */}
-
-            <div className="form-group">
-
-              <label htmlFor="verify-category">
-                Category
-              </label>
-
-              <input
-                id="verify-category"
-                type="text"
-                value={category}
-                onChange={(e) =>
-                  setCategory(e.target.value)
-                }
-                placeholder="Enter category"
-                required
-              />
-
-            </div>
-
-            {/* DATE */}
-
-            <div className="form-group">
-
-              <label htmlFor="verify-date">
-                Original Event Date
-              </label>
-
-              <input
-                id="verify-date"
-                type="date"
-                value={verifyDate}
-                onChange={(e) =>
-                  setVerifyDate(e.target.value)
-                }
-                required
-              />
-
-            </div>
-
-            <button
-              type="submit"
-              className="verify-btn"
-            >
-              {verified
-                ? "✓ Event Verified"
-                : "Verify Event →"}
-            </button>
-
-          </form>
-
-          {verificationError && (
-            <div className="verification-error">
-
-              <span>⚠</span>
-
-              {verificationError}
-
-            </div>
-          )}
-
-          {verified && (
-            <div className="verification-success">
-
-              <span>✓</span>
-
-              Event verified successfully. You can now
-              edit the event details below.
-
-            </div>
-          )}
-
-        </section>
-
-        {/* =================================================
-            EDIT FORM
-        ================================================= */}
-
-        <section
-          className={`edit-details-card ${
-            !verified ? "details-locked" : ""
-          }`}
-        >
-
-          {!verified && (
-            <div className="locked-overlay">
-
-              <div className="lock-icon">
-                🔒
-              </div>
-
-              <h3>
-                Details Locked
-              </h3>
-
-              <p>
-                Verify Event Name, Category and Date above
-                to unlock editing.
-              </p>
-
-            </div>
-          )}
-
-          {/* FORM HEADER */}
-
+        {/* Read-only event information */}
+        <section className="edit-details-card">
           <div className="edit-details-title">
-
-            <div className="details-icon">
-              02
-            </div>
+            <div className="details-icon">✎</div>
 
             <div>
-
-              <p>
-                EVENT DETAILS
-              </p>
-
-              <h2>
-                Update Event Information
-              </h2>
-
+              <p>Selected Event</p>
+              <h2>Event Information</h2>
             </div>
-
           </div>
 
-          <form
-            className="edit-event-form"
-            onSubmit={handleSubmit}
-          >
-
-            {/* EVENT NAME */}
-
-            <div className="form-group">
-
-              <label>
-                Event Name
-              </label>
+          <div className="edit-event-form">
+            <div className="form-group full-width">
+              <label htmlFor="event-title">Event Name</label>
 
               <input
+                id="event-title"
                 type="text"
-                value={formData.title}
-                disabled
+                value={event.title}
+                readOnly
+                aria-readonly="true"
+                className="readonly-field"
               />
 
-              <small>
-                Event name cannot be changed.
-              </small>
-
+              <small>Event name cannot be changed here.</small>
             </div>
-
-            {/* CATEGORY */}
-
-            <div className="form-group">
-
-              <label>
-                Category
-              </label>
-
-              <input
-                type="text"
-                value={formData.category}
-                disabled
-              />
-
-              <small>
-                Category cannot be changed.
-              </small>
-
-            </div>
-
-            {/* DATE */}
-
-            <div className="form-group">
-
-              <label htmlFor="edit-date">
-                Event Date
-              </label>
-
-              <input
-                id="edit-date"
-                name="date"
-                type="date"
-                value={formData.date}
-                onChange={handleChange}
-                disabled={!verified}
-                required
-              />
-
-            </div>
-
-            {/* TIME */}
-
-            <div className="form-group">
-
-              <label htmlFor="edit-time">
-                Event Time
-              </label>
-
-              <input
-                id="edit-time"
-                name="time"
-                type="time"
-                value={formData.time}
-                onChange={handleChange}
-                disabled={!verified}
-                required
-              />
-
-            </div>
-
-            {/* VENUE */}
-
-            <div className="form-group">
-
-              <label htmlFor="edit-venue">
-                Venue
-              </label>
-
-              <input
-                id="edit-venue"
-                name="venue"
-                type="text"
-                value={formData.venue}
-                onChange={handleChange}
-                disabled={!verified}
-                placeholder="Enter venue"
-                required
-              />
-
-            </div>
-
-            {/* MAX STUDENTS */}
-
-            <div className="form-group">
-
-              <label htmlFor="edit-capacity">
-                Maximum Students
-              </label>
-
-              <input
-                id="edit-capacity"
-                name="max_participants"
-                type="number"
-                min="1"
-                value={formData.max_participants}
-                onChange={handleChange}
-                disabled={!verified}
-                placeholder="Enter maximum students"
-                required
-              />
-
-            </div>
-
-            {/* DESCRIPTION */}
 
             <div className="form-group full-width">
-
-              <label htmlFor="edit-description">
-                Description
-              </label>
+              <label htmlFor="event-description">Description</label>
 
               <textarea
-                id="edit-description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                disabled={!verified}
-                placeholder="Enter event description"
-                rows="6"
-                required
+                id="event-description"
+                value={event.description}
+                readOnly
+                aria-readonly="true"
+                rows={4}
+                className="readonly-field"
               />
 
+              <small>
+                Event description cannot be changed here.
+              </small>
+            </div>
+          </div>
+        </section>
+
+        {/* Editable event details */}
+        <section className="edit-details-card editable-details-card">
+          <div className="edit-details-title">
+            <div className="details-icon">✎</div>
+
+            <div>
+              <p>Make Changes</p>
+              <h2>Schedule &amp; Arrangements</h2>
+            </div>
+          </div>
+
+          {error && (
+            <div className="edit-event-feedback verification-error">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="edit-event-feedback verification-success">
+              ✓ {success}
+            </div>
+          )}
+
+          <form className="edit-event-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="date">Event Date</label>
+
+              <input
+                id="date"
+                type="date"
+                name="date"
+                value={event.date}
+                onChange={handleChange}
+                required
+              />
             </div>
 
-            {/* BUTTONS */}
+            <div className="form-group">
+              <label htmlFor="time">Event Time</label>
 
-            <div className="form-actions">
+              <input
+                id="time"
+                type="time"
+                name="time"
+                value={event.time}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
+            <div className="form-group full-width">
+              <label htmlFor="venue">Venue</label>
+
+              <input
+                id="venue"
+                type="text"
+                name="venue"
+                value={event.venue}
+                onChange={handleChange}
+                placeholder="Enter event venue"
+                maxLength={200}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="category">Event Category</label>
+
+              <select
+                id="category"
+                name="category"
+                value={event.category}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select category</option>
+
+                {[
+                  "Cultural",
+                  "Technical",
+                  "Workshop",
+                  "Sports",
+                  "Academic",
+                  "Seminar",
+                  "Other",
+                ].map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+
+                {![
+                  "Cultural",
+                  "Technical",
+                  "Workshop",
+                  "Sports",
+                  "Academic",
+                  "Seminar",
+                  "Other",
+                ].includes(event.category) &&
+                  event.category && (
+                    <option value={event.category}>
+                      {event.category}
+                    </option>
+                  )}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="capacity">Event Capacity</label>
+
+              <input
+                id="capacity"
+                type="number"
+                name="capacity"
+                value={event.capacity}
+                onChange={handleChange}
+                min="1"
+                step="1"
+                required
+              />
+            </div>
+
+            <div className="edit-form-note full-width">
+              <span className="note-star">✦</span>
+              Only the date, time, venue, category, and capacity will
+              be updated. The event name and description will remain
+              unchanged.
+            </div>
+
+            <div className="edit-form-actions full-width">
               <button
                 type="button"
-                className="cancel-btn"
-                onClick={() =>
-                  navigate("/faculty-dashboard")
-                }
+                className="cancel-edit-btn"
+                onClick={() => navigate("/faculty/edit-events")}
+                disabled={saving}
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="save-event-btn"
-                disabled={!verified || saving}
+                className="verify-btn save-event-btn"
+                disabled={saving}
               >
-
-                {saving ? (
-                  <>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    ✓ Save Changes
-                  </>
-                )}
-
+                {saving ? "Saving Changes..." : "Save Changes →"}
               </button>
-
             </div>
-
           </form>
-
         </section>
-
       </main>
-      <Footer />
-
     </div>
   );
 }

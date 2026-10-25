@@ -1,6 +1,13 @@
+
 const express = require("express");
 const mongoose = require("mongoose");
 const Event = require("../models/Event");
+
+// IMPORTANT:
+// Update this import to match your actual authentication middleware.
+// It must verify the Bearer token and set req.user.
+// Example only:
+// const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -10,9 +17,12 @@ const isValidId = (id) => mongoose.isValidObjectId(id);
 router.get("/", async (req, res) => {
   try {
     const events = await Event.find().sort({ createdAt: -1 });
-    res.json(events);
+    return res.json(events);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch events" });
+    console.error("Fetch events error:", error);
+    return res.status(500).json({
+      message: "Failed to fetch events",
+    });
   }
 });
 
@@ -20,33 +30,40 @@ router.get("/", async (req, res) => {
 router.get("/faculty/:facultyId", async (req, res) => {
   try {
     const events = await Event.find({
-      facultyId: req.params.facultyId,
+      facultyId: String(req.params.facultyId),
     }).sort({ createdAt: -1 });
 
-    res.json(events);
+    return res.json(events);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch faculty events" });
+    console.error("Fetch faculty events error:", error);
+    return res.status(500).json({
+      message: "Failed to fetch faculty events",
+    });
   }
 });
 
 // GET registrations made by a student
 router.get("/student/:studentId", async (req, res) => {
   try {
+    const studentId = String(req.params.studentId);
+
     const events = await Event.find({
-      "registrations.studentId": req.params.studentId,
+      "registrations.studentId": studentId,
     });
 
-    res.json(
+    return res.json(
       events.map((event) => ({
         ...event.toObject(),
         registrations: event.registrations.filter(
-          (registration) =>
-            registration.studentId === req.params.studentId
+          (registration) => registration.studentId === studentId
         ),
       }))
     );
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch student registrations" });
+    console.error("Fetch student registrations error:", error);
+    return res.status(500).json({
+      message: "Failed to fetch student registrations",
+    });
   }
 });
 
@@ -54,18 +71,25 @@ router.get("/student/:studentId", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     if (!isValidId(req.params.id)) {
-      return res.status(400).json({ message: "Invalid event ID" });
+      return res.status(400).json({
+        message: "Invalid event ID",
+      });
     }
 
     const event = await Event.findById(req.params.id);
 
     if (!event) {
-      return res.status(404).json({ message: "Event not found" });
+      return res.status(404).json({
+        message: "Event not found",
+      });
     }
 
-    res.json(event);
+    return res.json(event);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch event" });
+    console.error("Fetch event error:", error);
+    return res.status(500).json({
+      message: "Failed to fetch event",
+    });
   }
 });
 
@@ -118,20 +142,72 @@ router.post("/", async (req, res) => {
       createdBy: createdBy || "",
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Event created successfully",
       event,
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to create event" });
+    console.error("Create event error:", error);
+    return res.status(500).json({
+      message: "Failed to create event",
+    });
   }
 });
 
 // UPDATE an event
+// IMPORTANT: Add your real authentication middleware to this route.
+// It must validate the token and populate req.user.
 router.put("/:id", async (req, res) => {
   try {
     if (!isValidId(req.params.id)) {
-      return res.status(400).json({ message: "Invalid event ID" });
+      return res.status(400).json({
+        message: "Invalid event ID",
+      });
+    }
+
+    const loggedInUser = req.user;
+
+    if (!loggedInUser) {
+      return res.status(401).json({
+        message:
+          "User authentication is missing. Configure the authentication middleware.",
+      });
+    }
+
+    if (loggedInUser.role !== "faculty") {
+      return res.status(403).json({
+        message: "Only faculty members can edit events.",
+      });
+    }
+
+    const loggedInFacultyId = String(
+      loggedInUser.id ||
+      loggedInUser._id ||
+      loggedInUser.userId ||
+      ""
+    );
+
+    if (!loggedInFacultyId) {
+      return res.status(401).json({
+        message: "Could not identify the logged-in faculty member.",
+      });
+    }
+
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        message: "Event not found",
+      });
+    }
+
+    console.log("Logged-in faculty ID:", loggedInFacultyId);
+    console.log("Event owner facultyId:", String(event.facultyId));
+
+    if (String(event.facultyId) !== loggedInFacultyId) {
+      return res.status(403).json({
+        message: "You cannot edit another faculty member's event.",
+      });
     }
 
     const allowedFields = [
@@ -149,9 +225,37 @@ router.put("/:id", async (req, res) => {
 
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
-        const targetField = field === "maxStudents" ? "capacity" : field;
+        const targetField =
+          field === "maxStudents" ? "capacity" : field;
+
         updates[targetField] = req.body[field];
       }
+    }
+
+    if (updates.title !== undefined) {
+      if (
+        typeof updates.title !== "string" ||
+        !updates.title.trim()
+      ) {
+        return res.status(400).json({
+          message: "Event title is required.",
+        });
+      }
+
+      updates.title = updates.title.trim();
+    }
+
+    if (updates.venue !== undefined) {
+      if (
+        typeof updates.venue !== "string" ||
+        !updates.venue.trim()
+      ) {
+        return res.status(400).json({
+          message: "Venue is required.",
+        });
+      }
+
+      updates.venue = updates.venue.trim();
     }
 
     if (updates.capacity !== undefined) {
@@ -165,32 +269,27 @@ router.put("/:id", async (req, res) => {
           message: "Capacity must be a positive whole number",
         });
       }
-    }
 
-    const event = await Event.findById(req.params.id);
-
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    if (
-      updates.capacity !== undefined &&
-      updates.capacity < event.registrations.length
-    ) {
-      return res.status(400).json({
-        message: "Capacity cannot be lower than existing registrations",
-      });
+      if (updates.capacity < event.registrations.length) {
+        return res.status(400).json({
+          message:
+            "Capacity cannot be lower than existing registrations",
+        });
+      }
     }
 
     Object.assign(event, updates);
     await event.save();
 
-    res.json({
+    return res.json({
       message: "Event updated successfully",
       event,
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update event" });
+    console.error("Update event error:", error);
+    return res.status(500).json({
+      message: "Failed to update event",
+    });
   }
 });
 
@@ -198,18 +297,25 @@ router.put("/:id", async (req, res) => {
 router.get("/:id/registrations", async (req, res) => {
   try {
     if (!isValidId(req.params.id)) {
-      return res.status(400).json({ message: "Invalid event ID" });
+      return res.status(400).json({
+        message: "Invalid event ID",
+      });
     }
 
     const event = await Event.findById(req.params.id);
 
     if (!event) {
-      return res.status(404).json({ message: "Event not found" });
+      return res.status(404).json({
+        message: "Event not found",
+      });
     }
 
-    res.json(event.registrations);
+    return res.json(event.registrations);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch registrations" });
+    console.error("Fetch registrations error:", error);
+    return res.status(500).json({
+      message: "Failed to fetch registrations",
+    });
   }
 });
 
@@ -217,10 +323,17 @@ router.get("/:id/registrations", async (req, res) => {
 router.post("/:id/register", async (req, res) => {
   try {
     if (!isValidId(req.params.id)) {
-      return res.status(400).json({ message: "Invalid event ID" });
+      return res.status(400).json({
+        message: "Invalid event ID",
+      });
     }
 
-    const { studentId, studentName, studentEmail, department } = req.body;
+    const {
+      studentId,
+      studentName,
+      studentEmail,
+      department,
+    } = req.body;
 
     if (
       !studentId ||
@@ -235,7 +348,9 @@ router.post("/:id/register", async (req, res) => {
     const event = await Event.findById(req.params.id);
 
     if (!event) {
-      return res.status(404).json({ message: "Event not found" });
+      return res.status(404).json({
+        message: "Event not found",
+      });
     }
 
     const normalizedEmail = studentEmail.trim().toLowerCase();
@@ -267,12 +382,16 @@ router.post("/:id/register", async (req, res) => {
 
     await event.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Registration successful",
-      registration: event.registrations[event.registrations.length - 1],
+      registration:
+        event.registrations[event.registrations.length - 1],
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to register for event" });
+    console.error("Register student error:", error);
+    return res.status(500).json({
+      message: "Failed to register for event",
+    });
   }
 });
 
