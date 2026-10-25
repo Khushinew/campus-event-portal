@@ -357,13 +357,11 @@ body {
 
 .faculty-stats {
   display: grid;
-
-  grid-template-columns: repeat(4, 1fr);
-
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
-
   margin-bottom: 70px;
 }
+
 
 
 .stat-card {

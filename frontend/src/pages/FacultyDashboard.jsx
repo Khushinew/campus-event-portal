@@ -315,22 +315,6 @@ useEffect(() => {
           </div>
 
 
-          <div className="stat-card stat-blue">
-
-            <h3>
-              REGISTRATIONS
-            </h3>
-
-            <p>
-              0
-            </p>
-
-            <span>
-              Student registrations
-            </span>
-
-          </div>
-
 
           <div className="stat-card stat-green">
 
