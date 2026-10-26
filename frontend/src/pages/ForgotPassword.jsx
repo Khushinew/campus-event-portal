@@ -70,7 +70,7 @@ function ForgotPassword() {
           Remember your password? <Link to="/login">Back to Login</Link>
         </p>
       </div>
-      <Footer />
+      
     </div>
   );
 }
