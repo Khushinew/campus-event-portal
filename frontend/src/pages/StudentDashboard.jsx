@@ -34,7 +34,7 @@ function StudentDashboard() {
         <div className="student-grid">
 
           {/* View Events */}
-          <Link to="/student/events" className="student-card">
+          <Link to="/events" className="student-card">
             <div className="card-top">
               <div className="card-icon">📅</div>
               <span className="card-number">01</span>

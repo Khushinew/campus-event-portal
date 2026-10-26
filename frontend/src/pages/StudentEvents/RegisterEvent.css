@@ -24,6 +24,55 @@
     #f4f0e8;
 }
 
+.already-registered-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(28, 31, 38, 0.58);
+}
+
+.already-registered-dialog {
+  width: min(100%, 420px);
+  padding: 30px;
+  color: #2f3441;
+  background: #fffdf7;
+  border: 1px solid rgba(80, 75, 65, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(20, 24, 32, 0.25);
+  text-align: center;
+}
+
+.already-registered-dialog h2 {
+  margin: 0 0 12px;
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+}
+
+.already-registered-dialog p {
+  margin: 0 0 24px;
+  color: #626775;
+  line-height: 1.6;
+}
+
+.already-registered-dialog button {
+  min-height: 44px;
+  padding: 0 20px;
+  color: #fffdf8;
+  background: #303542;
+  border: 0;
+  border-radius: 5px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.already-registered-dialog button:hover {
+  background: #4a5364;
+}
+
 /* Notebook paper lines */
 .register-event-page::before {
   content: "";

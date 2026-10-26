@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getStoredUser } from "../../auth";
 import { apiRequest } from "../../api";
+import { isPastEvent } from "./eventDateUtils";
 import "./RegisterEvent.css";
 import Footer from "../../components/Footer";
 
@@ -20,9 +21,12 @@ function formatEventDate(date) {
 
 function RegisterEvent() {
   const location = useLocation();
+  const navigate = useNavigate();
   const user = getStoredUser();
   const linkedEvent = location.state?.event;
   const [events, setEvents] = useState([]);
+  const [registeredEventIds, setRegisteredEventIds] = useState(new Set());
+  const [registrationsLoaded, setRegistrationsLoaded] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(
     linkedEvent?._id || linkedEvent?.id || ""
   );
@@ -31,23 +35,45 @@ function RegisterEvent() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [alreadyRegisteredEvent, setAlreadyRegisteredEvent] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadEvents() {
       try {
-        const response = await apiRequest("/api/events");
-        if (!response.ok) {
+        const [eventsResponse, registrationsResponse] = await Promise.all([
+          apiRequest("/api/events"),
+          apiRequest("/api/student/registrations"),
+        ]);
+        if (!eventsResponse.ok) {
           throw new Error("Unable to load events.");
         }
+        if (!registrationsResponse.ok) {
+          throw new Error("Unable to load your registered events.");
+        }
 
-        const data = await response.json();
-        if (!Array.isArray(data)) {
+        const [eventData, registrationData] = await Promise.all([
+          eventsResponse.json(),
+          registrationsResponse.json(),
+        ]);
+        if (!Array.isArray(eventData) || !Array.isArray(registrationData)) {
           throw new Error("The events response was invalid.");
         }
 
-        if (!cancelled) setEvents(data);
+        if (!cancelled) {
+          if (linkedEvent && isPastEvent(linkedEvent)) {
+            navigate("/student/events", { replace: true });
+          }
+          const registrationIds = new Set(
+            registrationData.map((registeredEvent) =>
+              String(registeredEvent._id || registeredEvent.id)
+            )
+          );
+          setEvents(eventData.filter((availableEvent) => !isPastEvent(availableEvent)));
+          setRegisteredEventIds(registrationIds);
+          setRegistrationsLoaded(true);
+        }
       } catch (loadError) {
         console.error("Error loading events for registration:", loadError);
         if (!cancelled) setError("Unable to load events. Please try again.");
@@ -60,15 +86,27 @@ function RegisterEvent() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [linkedEvent, navigate]);
 
   const event =
     events.find((item) => (item._id || item.id) === selectedEventId) ||
     linkedEvent ||
     null;
 
+  const returnToEvents = () => {
+    navigate("/student/events", { replace: true });
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (!registrationsLoaded) {
+      setError("Unable to verify your existing registrations. Please try again.");
+      return;
+    }
+    if (event?._id && registeredEventIds.has(String(event._id))) {
+      setAlreadyRegisteredEvent(event);
+      return;
+    }
     if (!event?._id) {
       setError("Select an available event before registering.");
       return;
@@ -89,6 +127,7 @@ function RegisterEvent() {
         throw new Error(data.message || "Registration failed.");
       }
 
+      setRegisteredEventIds((currentIds) => new Set(currentIds).add(String(event._id)));
       setSuccess("Registration successful. Your event is now saved.");
     } catch (registrationError) {
       console.error("Event registration error:", registrationError);
@@ -160,21 +199,38 @@ function RegisterEvent() {
                 id="selectedEvent"
                 value={selectedEventId}
                 onChange={(e) => {
-                  setSelectedEventId(e.target.value);
+                  const nextEventId = e.target.value;
+                  setSelectedEventId(nextEventId);
                   setError("");
                   setSuccess("");
+                  if (registeredEventIds.has(String(nextEventId))) {
+                    setAlreadyRegisteredEvent(
+                      events.find((item) => String(item._id || item.id) === nextEventId)
+                    );
+                  }
                 }}
                 required
-                disabled={loadingEvents || events.length === 0 || Boolean(success)}
+                disabled={
+                  loadingEvents ||
+                  !registrationsLoaded ||
+                  events.length === 0 ||
+                  Boolean(success)
+                }
               >
                 <option value="">
                   {loadingEvents ? "Loading events..." : "Select an event"}
                 </option>
-                {events.map((availableEvent) => (
-                  <option key={availableEvent._id} value={availableEvent._id}>
-                    {availableEvent.title}
-                  </option>
-                ))}
+                {events.map((availableEvent) => {
+                  const availableEventId = availableEvent._id || availableEvent.id;
+                  const alreadyRegistered = registeredEventIds.has(String(availableEventId));
+                  return (
+                    <option key={availableEventId} value={availableEventId}>
+                      {alreadyRegistered
+                        ? `${availableEvent.title} (Already registered)`
+                        : availableEvent.title}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
@@ -208,13 +264,39 @@ function RegisterEvent() {
             <button
               type="submit"
               className="register-btn"
-              disabled={loadingEvents || submitting || !event?._id || Boolean(success)}
+              disabled={
+                loadingEvents ||
+                !registrationsLoaded ||
+                submitting ||
+                !event?._id ||
+                Boolean(success)
+              }
             >
               {submitting ? "Registering..." : success ? "Registered" : "Register for Event →"}
             </button>
           </form>
         </div>
       </div>
+      {alreadyRegisteredEvent && (
+        <div className="already-registered-backdrop">
+          <section
+            className="already-registered-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="already-registered-title"
+            aria-describedby="already-registered-message"
+          >
+            <h2 id="already-registered-title">Already registered</h2>
+            <p id="already-registered-message">
+              You have already registered for{" "}
+              <strong>{alreadyRegisteredEvent.title || "this event"}</strong>.
+            </p>
+            <button type="button" onClick={returnToEvents}>
+              Return to events
+            </button>
+          </section>
+        </div>
+      )}
       <Footer />
     </div>
   );

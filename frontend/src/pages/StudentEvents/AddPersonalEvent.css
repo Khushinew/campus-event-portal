@@ -286,6 +286,24 @@
   transform: translateY(-1px);
 }
 
+.event-visibility label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+}
+
+.event-visibility input[type='checkbox'] {
+  width: auto;
+  margin: 0;
+}
+
+.event-form-error {
+  color: #a83232;
+  font-size: 14px;
+}
+
 /* Date and Time Row */
 
 .form-row {

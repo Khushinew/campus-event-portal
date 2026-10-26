@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
+import { getDashboardPath, getStoredUser } from "../auth";
 import "./Home.css";
 import Footer from "../components/Footer";
 function Home() {
+    const user = getStoredUser();
+
     return (
         <div className="home">
 
@@ -14,7 +17,10 @@ function Home() {
                 <nav className="nav-links">
                     <Link to="/">Home</Link>
                     <Link to="/events">Events</Link>
-                    <Link to="/login" className="register-btn">
+                    <Link
+                        to={user ? getDashboardPath(user.role) : "/login"}
+                        className="register-btn"
+                    >
                         Login
                     </Link>
                 </nav>
@@ -47,7 +53,10 @@ function Home() {
                             Explore Events
                         </Link>
 
-                        <Link to="/login" className="secondary-btn">
+                        <Link
+                            to={user ? getDashboardPath(user.role) : "/login"}
+                            className="secondary-btn"
+                        >
                             Get Started
                         </Link>
 

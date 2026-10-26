@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { apiRequest } from "../../api";
 import "./CreateEvent.css";
 import FacultySidebar from "./FacultySidebar";
 import Footer from "../../components/Footer";
@@ -41,20 +42,14 @@ function CreateEvent() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/events",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...formData,
-            facultyId: user.id,
-            createdBy: user.name,
-          }),
-        }
-      );
+      const response = await apiRequest("/api/events", {
+        method: "POST",
+        body: JSON.stringify({
+          ...formData,
+          facultyId: user.id,
+          createdBy: user.name,
+        }),
+      });
 
       if (response.ok) {
         alert("Event created successfully!");

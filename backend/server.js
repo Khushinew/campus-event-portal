@@ -17,6 +17,7 @@ require("dotenv").config({
 
 const User = require("./models/User");
 const Event = require("./models/Event");
+const PersonalEvent = require("./models/PersonalEvent");
 const CollegeUser = require("./models/CollegeUser");
 
 const app = express();
@@ -732,6 +733,103 @@ app.get(
 
       res.status(500).json({
         message: "Failed to fetch student registrations.",
+      });
+    }
+  }
+);
+
+// =====================================
+// PERSONAL CALENDAR EVENTS
+// =====================================
+
+app.get(
+  "/api/personal-events",
+  verifyToken,
+  requireRole("student"),
+  async (req, res) => {
+    try {
+      const events = await PersonalEvent.find({
+        $or: [
+          { createdBy: req.user.userId },
+          { createdBy: null },
+          { isPublic: true },
+        ],
+      })
+        .populate("createdBy", "name email")
+        .sort({ startDate: 1 });
+
+      res.json(events);
+    } catch (error) {
+      console.error("Get personal events error:", error);
+
+      res.status(500).json({
+        message: "Failed to fetch personal events.",
+      });
+    }
+  }
+);
+
+app.post(
+  "/api/personal-events",
+  verifyToken,
+  requireRole("student"),
+  async (req, res) => {
+    try {
+      if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
+        return res.status(400).json({
+          message: "Event details must be provided as an object.",
+        });
+      }
+
+      const { title, description, startDate, endDate, location, isPublic } =
+        req.body;
+      const parsedStartDate = new Date(startDate);
+      const parsedEndDate = new Date(endDate);
+
+      if (
+        typeof title !== "string" ||
+        !title.trim() ||
+        title.trim().length > 160 ||
+        typeof startDate !== "string" ||
+        typeof endDate !== "string" ||
+        Number.isNaN(parsedStartDate.getTime()) ||
+        Number.isNaN(parsedEndDate.getTime()) ||
+        parsedEndDate < parsedStartDate
+      ) {
+        return res.status(400).json({
+          message: "Provide a title and valid start and end dates.",
+        });
+      }
+
+      if (
+        (description !== undefined && typeof description !== "string") ||
+        (location !== undefined && typeof location !== "string") ||
+        (isPublic !== undefined && typeof isPublic !== "boolean")
+      ) {
+        return res.status(400).json({
+          message: "Event details have an invalid format.",
+        });
+      }
+
+      const event = await PersonalEvent.create({
+        title: title.trim(),
+        description: description?.trim() || "",
+        startDate: parsedStartDate,
+        endDate: parsedEndDate,
+        location: location?.trim() || "",
+        createdBy: req.user.userId,
+        isPublic: isPublic ?? false,
+      });
+
+      res.status(201).json({
+        message: "Personal event added successfully.",
+        event,
+      });
+    } catch (error) {
+      console.error("Create personal event error:", error);
+
+      res.status(500).json({
+        message: "Failed to create personal event.",
       });
     }
   }
