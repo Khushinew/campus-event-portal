@@ -10,7 +10,6 @@ function FacultyDashboard() {
 
   const [user] = useState(() => getStoredUser());
   const [eventCount, setEventCount] = useState(0);
-  const [seatsRemaining, setSeatsRemaining] = useState(0);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -58,26 +57,10 @@ useEffect(() => {
       console.log("Dashboard events:", data);
       const facultyEvents = Array.isArray(data) ? data : [];
       setEventCount(facultyEvents.length);
-      setSeatsRemaining(
-        facultyEvents.reduce(
-          (total, event) =>
-            total +
-            Number(
-              event.seatsRemaining ??
-                Math.max(
-                  Number(event.capacity || 0) -
-                    Number(event.registrationCount || 0),
-                  0
-                )
-            ),
-          0
-        )
-      );
     })
     .catch((error) => {
       console.error("Error loading dashboard events:", error);
       setEventCount(0);
-      setSeatsRemaining(0);
     })
     .finally(() => {
       setLoading(false);
@@ -331,14 +314,6 @@ useEffect(() => {
 
           </div>
 
-          <div className="stat-card stat-blue">
-            <h3>SEATS AVAILABLE</h3>
-            <p>{loading ? "..." : seatsRemaining}</p>
-            <span>Remaining across your events</span>
-          </div>
-
-
-
           <div className="stat-card stat-green">
 
             <h3>
@@ -427,6 +402,29 @@ useEffect(() => {
                 ↗
               </span>
 
+            </Link>
+
+            <Link
+              to="/faculty/view-events"
+              className="action-card action-green"
+            >
+              <div className="action-icon">
+                ◉
+              </div>
+
+              <div className="action-content">
+                <h3>
+                  View Events
+                </h3>
+
+                <p>
+                  Browse campus events created by others.
+                </p>
+              </div>
+
+              <span className="action-arrow">
+                ↗
+              </span>
             </Link>
 
 

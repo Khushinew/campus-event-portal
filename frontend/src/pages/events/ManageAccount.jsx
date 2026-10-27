@@ -4,6 +4,14 @@ import FacultySidebar from "../events/FacultySidebar";
 import "./ManageAccount.css";
 import { getStoredUser } from "../../auth";
 
+const PERSONAL_SECURITY_QUESTIONS = [
+  "What was the name of your favorite pet?",
+  "What was the name of your first school?",
+  "Who was your best friend?",
+  "What is your favorite memory place?",
+  "What was the name of your first company?",
+];
+
 function ManageAccount() {
   const navigate = useNavigate();
 
@@ -18,10 +26,54 @@ function ManageAccount() {
   });
 
   const [message, setMessage] = useState("");
+  const [securityQuestion, setSecurityQuestion] = useState("");
+  const [securityAnswer, setSecurityAnswer] = useState("");
+  const [hasSecurityAnswer, setHasSecurityAnswer] = useState(false);
+  const [securityMessage, setSecurityMessage] = useState("");
+  const [securityError, setSecurityError] = useState("");
+  const [loadingSecurityQuestion, setLoadingSecurityQuestion] = useState(true);
+  const [savingSecurityQuestion, setSavingSecurityQuestion] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== "faculty") navigate("/login");
   }, [navigate, user]);
+
+  useEffect(() => {
+    if (!user || user.role !== "faculty") return undefined;
+
+    let cancelled = false;
+    async function loadPersonalQuestion() {
+      try {
+        const token = sessionStorage.getItem("token");
+        const response = await fetch("http://localhost:5000/api/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Unable to load your personal question.");
+        }
+
+        if (!cancelled) {
+          setSecurityQuestion(data.securityQuestion || "");
+          setHasSecurityAnswer(Boolean(data.hasSecurityAnswer));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setSecurityError(
+            error.message || "Unable to load your personal question."
+          );
+        }
+      } finally {
+        if (!cancelled) setLoadingSecurityQuestion(false);
+      }
+    }
+
+    loadPersonalQuestion();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({
@@ -49,6 +101,53 @@ function ManageAccount() {
     setUser(updatedUser);
 
     setMessage("Your account details have been updated successfully.");
+  };
+
+  const handleSecurityQuestionSave = async (event) => {
+    event.preventDefault();
+    setSecurityMessage("");
+    setSecurityError("");
+    setSavingSecurityQuestion(true);
+
+    try {
+      const token = sessionStorage.getItem("token");
+      const response = await fetch("http://localhost:5000/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          securityQuestion,
+          securityAnswer,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (
+          data.message ===
+          "No profile fields were provided to update."
+        ) {
+          throw new Error(
+            "The backend is still running older code. Restart the backend server, then try saving again."
+          );
+        }
+        throw new Error(data.message || "Unable to save your personal question.");
+      }
+
+      setSecurityQuestion(data.user.securityQuestion);
+      setHasSecurityAnswer(Boolean(data.user.hasSecurityAnswer));
+      setSecurityAnswer("");
+      setSecurityMessage("Your personal question and answer were saved securely.");
+    } catch (error) {
+      console.error("Save personal security question error:", error);
+      setSecurityError(
+        error.message || "Unable to save your personal question."
+      );
+    } finally {
+      setSavingSecurityQuestion(false);
+    }
   };
 
   if (!user) {
@@ -203,6 +302,106 @@ function ManageAccount() {
             </div>
 
           </form>
+        </section>
+
+        <section className="security-question-card">
+          <div className="account-card-heading">
+            <div>
+              <p className="small-label">ACCOUNT RECOVERY</p>
+              <h2>Personal Security Question</h2>
+            </div>
+          </div>
+
+          <p className="security-question-description">
+            Choose a question and answer to help verify your identity. You can
+            change them whenever you need to.
+          </p>
+
+          {loadingSecurityQuestion ? (
+            <p className="security-question-status">
+              Loading your saved question...
+            </p>
+          ) : (
+            <form
+              className="security-question-form"
+              onSubmit={handleSecurityQuestionSave}
+            >
+              <div className="account-field">
+                <label htmlFor="personal-security-question">
+                  Select a personal question
+                </label>
+                <select
+                  id="personal-security-question"
+                  value={securityQuestion}
+                  onChange={(event) => {
+                    setSecurityQuestion(event.target.value);
+                    setSecurityMessage("");
+                    setSecurityError("");
+                  }}
+                  required
+                >
+                  <option value="">Choose a question</option>
+                  {PERSONAL_SECURITY_QUESTIONS.map((question) => (
+                    <option key={question} value={question}>
+                      {question}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="account-field">
+                <label htmlFor="personal-security-answer">
+                  Your answer
+                </label>
+                <input
+                  id="personal-security-answer"
+                  type="text"
+                  value={securityAnswer}
+                  onChange={(event) => {
+                    setSecurityAnswer(event.target.value);
+                    setSecurityMessage("");
+                    setSecurityError("");
+                  }}
+                  placeholder={
+                    hasSecurityAnswer
+                      ? "Enter a new answer to replace the saved one"
+                      : "Enter your answer"
+                  }
+                  autoComplete="off"
+                  minLength={2}
+                  maxLength={120}
+                  required
+                />
+              </div>
+
+              {hasSecurityAnswer && (
+                <p className="security-question-status">
+                  An answer is saved for this account. Saving a new answer
+                  replaces it.
+                </p>
+              )}
+              {securityError && (
+                <p className="security-question-error" role="alert">
+                  {securityError}
+                </p>
+              )}
+              {securityMessage && (
+                <p className="security-question-success" role="status">
+                  {securityMessage}
+                </p>
+              )}
+
+              <div className="account-actions">
+                <button
+                  type="submit"
+                  className="account-save-btn"
+                  disabled={savingSecurityQuestion}
+                >
+                  {savingSecurityQuestion ? "Saving..." : "Save Question"}
+                </button>
+              </div>
+            </form>
+          )}
         </section>
 
         {/* Security Card */}

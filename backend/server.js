@@ -9,8 +9,9 @@ const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const personalEventRoutes = require("./models/personalEventRoutes");
 
 
@@ -20,6 +21,7 @@ require("dotenv").config({
 
 const User = require("./models/User");
 const Event = require("./models/Event");
+const PersonalSecurityQuestion = require("./models/PersonalSecurityQuestion");
 console.log("Event model file:", require.resolve("./models/Event"));
 
 console.log(
@@ -42,6 +44,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const DEFAULT_INITIAL_PASSWORD = "Campus@123";
 const CAMPUS_DOMAIN = "campus.edu.in";
+const PERSONAL_SECURITY_QUESTIONS = [
+  "What was the name of your favorite pet?",
+  "What was the name of your first school?",
+  "Who was your best friend?",
+  "What is your favorite memory place?",
+  "What was the name of your first company?",
+];
 
 const uploadDirectory = path.join(__dirname, "uploads");
 
@@ -129,6 +138,45 @@ function requireRole(role) {
 function validObjectId(id) {
   return mongoose.isValidObjectId(id);
 }
+
+function studentDepartmentPattern(department) {
+  const patterns = {
+    BBA: /^\s*(?:BBA|Bachelor(?:s)?\s+of\s+Business\s+Administration)(?:\s+.*)?\s*$/i,
+    BTech: /^\s*(?:B\.?\s*Tech|BT|Bachelor(?:s)?\s+of\s+Technology)(?:\s+.*)?\s*$/i,
+    BCA: /^\s*(?:BCA|Bachelor(?:s)?\s+of\s+Computer\s+Applications)(?:\s+.*)?\s*$/i,
+    Chemical: /^\s*Chemical(?:\s+.*)?\s*$/i,
+    MBA: /^\s*(?:MBA|Master(?:s)?\s+of\s+Business\s+Administration)(?:\s+.*)?\s*$/i,
+    Biotech: /^\s*(?:Bio(?:tech(?:nology)?)?|Biotechnology)(?:\s+.*)?\s*$/i,
+    MSc: /^\s*(?:M\.?\s*Sc(?:ience)?|Master(?:s)?\s+of\s+Science)(?:\s+.*)?\s*$/i,
+  };
+
+  return patterns[department] || null;
+}
+
+function parseStringArray(value) {
+  if (value === undefined) return [];
+  if (Array.isArray(value)) {
+    return value.every((item) => typeof item === "string") ? value : null;
+  }
+  if (typeof value !== "string") return null;
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) &&
+      parsed.every((item) => typeof item === "string")
+      ? parsed
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+const ATTENDANCE_YEAR_RANGES = [
+  "2024-2028",
+  "2024-2029",
+  "2024-2025",
+  "2022-2025",
+];
 
 function eventSummary(event) {
   const summary = event.toObject ? event.toObject() : { ...event };
@@ -401,6 +449,13 @@ app.post(
         category,
         domain,
         capacity,
+        participationFeeRequired,
+        participationFee,
+        paymentMode,
+        attendanceEnabled,
+        attendanceType,
+        attendanceDepartments: attendanceDepartmentsInput,
+        attendanceYears: attendanceYearsInput,
         maxStudents,
         max_participants,
       } = req.body;
@@ -439,6 +494,130 @@ app.post(
         });
       }
 
+      const hasParticipationFee = participationFeeRequired === "true";
+      if (
+        participationFeeRequired !== undefined &&
+        participationFeeRequired !== "true" &&
+        participationFeeRequired !== "false"
+      ) {
+        return res.status(400).json({
+          message: "Participation fee selection is invalid.",
+        });
+      }
+
+      const requestedFee = hasParticipationFee
+        ? Number(participationFee)
+        : 0;
+      const normalizedPaymentMode = hasParticipationFee
+        ? String(paymentMode || "")
+        : "";
+
+      if (
+        hasParticipationFee &&
+        (!Number.isFinite(requestedFee) ||
+          requestedFee <= 0 ||
+          !["Online", "Offline"].includes(normalizedPaymentMode))
+      ) {
+        return res.status(400).json({
+          message:
+            "Enter a participation fee greater than zero and select Online or Offline payment.",
+        });
+      }
+
+      const hasAttendanceRequirements = attendanceEnabled === "true";
+      if (
+        attendanceEnabled !== undefined &&
+        attendanceEnabled !== "true" &&
+        attendanceEnabled !== "false"
+      ) {
+        return res.status(400).json({
+          message: "Attendance selection is invalid.",
+        });
+      }
+
+      const normalizedAttendanceType = hasAttendanceRequirements
+        ? String(attendanceType || "")
+        : "";
+      const attendanceDepartments = parseStringArray(
+        attendanceDepartmentsInput
+      );
+      const attendanceYears = parseStringArray(attendanceYearsInput);
+
+      if (!attendanceDepartments || !attendanceYears) {
+        return res.status(400).json({
+          message: "Attendance departments and year ranges must be valid lists.",
+        });
+      }
+
+      const normalizedAttendanceDepartments =
+        hasAttendanceRequirements &&
+        ["compulsory", "both"].includes(normalizedAttendanceType)
+          ? [...new Set(attendanceDepartments.map((item) => item.trim()).filter(Boolean))]
+          : [];
+      const normalizedAttendanceYears =
+        hasAttendanceRequirements &&
+        ["compulsory", "both"].includes(normalizedAttendanceType)
+          ? [...new Set(attendanceYears.map((item) => item.trim()).filter(Boolean))]
+          : [];
+
+      if (
+        hasAttendanceRequirements &&
+        !["compulsory", "open", "both"].includes(normalizedAttendanceType)
+      ) {
+        return res.status(400).json({
+          message: "Select a valid attendance requirement.",
+        });
+      }
+
+      if (
+        hasAttendanceRequirements &&
+        ["compulsory", "both"].includes(normalizedAttendanceType)
+      ) {
+        if (!normalizedAttendanceDepartments.length) {
+          return res.status(400).json({
+            message: "Select at least one student department for attendance tracking.",
+          });
+        }
+
+        if (!normalizedAttendanceYears.length) {
+          return res.status(400).json({
+            message: "Select at least one student year range.",
+          });
+        }
+
+        const departmentPatterns = normalizedAttendanceDepartments.map(
+          studentDepartmentPattern
+        );
+        if (departmentPatterns.some((pattern) => !pattern)) {
+          return res.status(400).json({
+            message: "Select only supported student departments.",
+          });
+        }
+
+        if (
+          normalizedAttendanceYears.some(
+            (yearRange) => !ATTENDANCE_YEAR_RANGES.includes(yearRange)
+          )
+        ) {
+          return res.status(400).json({
+            message: "Select only supported student year ranges.",
+          });
+        }
+
+        const matchingDepartments = await CollegeUser.distinct("department", {
+          role: "student",
+          $or: departmentPatterns.map((department) => ({
+            department,
+          })),
+        });
+
+        if (!matchingDepartments.length) {
+          return res.status(400).json({
+            message: "None of the selected departments are available in the college directory.",
+          });
+        }
+      }
+
       const event = await Event.create({
   title: title.trim(),
   description: description.trim(),
@@ -448,6 +627,13 @@ app.post(
   category,
   domain: domain || "",
   capacity: requestedCapacity,
+  participationFeeRequired: hasParticipationFee,
+  participationFee: requestedFee,
+  paymentMode: normalizedPaymentMode,
+  attendanceEnabled: hasAttendanceRequirements,
+  attendanceType: normalizedAttendanceType,
+  attendanceDepartments: normalizedAttendanceDepartments,
+  attendanceYears: normalizedAttendanceYears,
   facultyId: String(faculty._id),
   createdBy: faculty.name || faculty.email,
   imageUrl: req.file ? `/uploads/${req.file.filename}` : "",
@@ -819,9 +1005,37 @@ app.post(
         });
       }
 
+      const event = await Event.findById(req.params.eventId);
+      if (!event) {
+        return res.status(404).json({
+          message: "Event not found.",
+        });
+      }
+
       const directoryStudent = await CollegeUser.findOne({
         email: student.email,
-      }).select("studentId");
+      }).select("studentId department semester");
+      const studentDepartment =
+        directoryStudent?.department || student.department || "";
+      const attendanceDepartments =
+        event.attendanceDepartments?.length
+          ? event.attendanceDepartments
+          : event.attendanceDepartment
+            ? [event.attendanceDepartment]
+            : [];
+
+      if (
+        event.attendanceEnabled &&
+        event.attendanceType === "compulsory" &&
+        !attendanceDepartments.some((department) =>
+          studentDepartmentPattern(department)?.test(studentDepartment)
+        )
+      ) {
+        return res.status(403).json({
+          message: `This event is compulsory for students in ${attendanceDepartments.join(", ")}.`,
+        });
+      }
+
       const enrollmentId =
         student.studentId ||
         directoryStudent?.studentId ||
@@ -930,13 +1144,14 @@ app.post(
               studentId: enrollmentId,
               studentName: student.name || "",
               studentEmail: normalizedEmail,
-              department: student.department || "",
-              semester: student.semester || "",
+              department: studentDepartment,
+              semester:
+                directoryStudent?.semester || student.semester || "",
               registeredAt: new Date(),
             },
           },
         },
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
 
       if (!updatedEvent) {
@@ -1111,7 +1326,18 @@ app.get("/api/profile", verifyToken, async (req, res) => {
       });
     }
 
-    res.json(user);
+    const savedSecurityQuestion = await PersonalSecurityQuestion.findOne({
+      email: user.email,
+    }).select("-answerHash").lean();
+
+    res.json({
+      ...user.toObject(),
+      securityQuestion:
+        savedSecurityQuestion?.question || user.securityQuestion || "",
+      hasSecurityAnswer: Boolean(
+        savedSecurityQuestion || user.securityQuestion
+      ),
+    });
   } catch (error) {
     console.error("Get profile error:", error);
 
@@ -1128,8 +1354,11 @@ app.get("/api/profile", verifyToken, async (req, res) => {
 
 app.put("/api/profile", verifyToken, async (req, res) => {
   try {
-    const { name, department } = req.body;
+    const { name, department, securityQuestion, securityAnswer } = req.body;
     const updates = {};
+    const updatingSecurityQuestion =
+      securityQuestion !== undefined || securityAnswer !== undefined;
+    let securityAnswerHash = "";
 
     if (name !== undefined) {
       if (!String(name).trim()) {
@@ -1145,22 +1374,74 @@ app.put("/api/profile", verifyToken, async (req, res) => {
       updates.department = String(department).trim();
     }
 
-    if (Object.keys(updates).length === 0) {
+    if (securityQuestion !== undefined || securityAnswer !== undefined) {
+      if (!["faculty", "student"].includes(req.user.role)) {
+        return res.status(403).json({
+          message: "Only student and faculty accounts can update personal security questions.",
+        });
+      }
+
+      if (!PERSONAL_SECURITY_QUESTIONS.includes(securityQuestion)) {
+        return res.status(400).json({
+          message: "Select one of the available personal security questions.",
+        });
+      }
+
+      if (
+        typeof securityAnswer !== "string" ||
+        securityAnswer.trim().length < 2 ||
+        securityAnswer.trim().length > 120
+      ) {
+        return res.status(400).json({
+          message: "Your answer must be between 2 and 120 characters.",
+        });
+      }
+
+      securityAnswerHash = await bcrypt.hash(
+        securityAnswer.trim().toLowerCase(),
+        10
+      );
+    }
+
+    if (Object.keys(updates).length === 0 && !updatingSecurityQuestion) {
       return res.status(400).json({
         message: "No profile fields were provided to update.",
       });
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.user.userId,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).select("-password");
+    const user =
+      Object.keys(updates).length > 0
+        ? await User.findByIdAndUpdate(
+            req.user.userId,
+            { $set: updates },
+            { returnDocument: "after", runValidators: true }
+          ).select("-password")
+        : await User.findById(req.user.userId).select("-password");
 
     if (!user) {
       return res.status(404).json({
         message: "User not found.",
       });
+    }
+
+    let savedSecurityQuestion = null;
+    if (updatingSecurityQuestion) {
+      savedSecurityQuestion = await PersonalSecurityQuestion.findOneAndUpdate(
+        { email: user.email },
+        {
+          $set: {
+            email: user.email,
+            question: securityQuestion,
+            answerHash: securityAnswerHash,
+          },
+        },
+        {
+          upsert: true,
+          returnDocument: "after",
+          runValidators: true,
+          setDefaultsOnInsert: true,
+        }
+      ).select("-answerHash");
     }
 
     if (user.role === "faculty" && user.name) {
@@ -1170,9 +1451,19 @@ app.put("/api/profile", verifyToken, async (req, res) => {
       );
     }
 
+    const sanitizedUser = user.toObject();
+    delete sanitizedUser.securityAnswerHash;
+
     res.json({
       message: "Profile updated successfully",
-      user,
+      user: {
+        ...sanitizedUser,
+        securityQuestion:
+          savedSecurityQuestion?.question || user.securityQuestion || "",
+        hasSecurityAnswer: Boolean(
+          savedSecurityQuestion || user.securityQuestion
+        ),
+      },
     });
   } catch (error) {
     console.error("Update profile error:", error);

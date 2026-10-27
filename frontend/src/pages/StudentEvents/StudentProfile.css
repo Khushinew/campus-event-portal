@@ -173,6 +173,95 @@
   line-height: 1.7;
 }
 
+.student-security-card {
+  margin-top: 32px;
+  padding: 34px;
+  border: 1px solid #eeeae2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 7px 8px 0 rgba(25, 34, 56, 0.06);
+}
+
+.student-security-card h2 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 29px;
+  font-weight: 400;
+}
+
+.student-security-description,
+.student-security-status {
+  margin: 12px 0 22px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.student-security-form {
+  display: grid;
+  gap: 18px;
+}
+
+.student-security-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #39465a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.student-security-form input,
+.student-security-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 15px;
+  border: 1px solid #d9dee5;
+  border-radius: 7px;
+  background: #fffdf7;
+  color: #182236;
+  font: inherit;
+}
+
+.student-security-form input:focus,
+.student-security-form select:focus {
+  border-color: #7890aa;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(120, 144, 170, 0.12);
+}
+
+.student-security-form button {
+  justify-self: end;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 7px;
+  background: #192238;
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.student-security-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.student-security-success,
+.student-security-error {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.student-security-success {
+  color: #4f7547;
+}
+
+.student-security-error {
+  color: #a5332c;
+}
+
 @media (max-width: 650px) {
   .student-profile-page {
     padding: 24px 18px;
@@ -186,6 +275,10 @@
 
   .student-profile-card {
     padding: 32px 18px;
+  }
+
+  .student-security-card {
+    padding: 26px 18px;
   }
 
   .student-profile-identity {
@@ -214,5 +307,9 @@
 
   .student-profile-detail {
     padding: 24px 8px;
+  }
+
+  .student-security-form button {
+    width: 100%;
   }
 }

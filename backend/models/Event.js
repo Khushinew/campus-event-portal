@@ -78,6 +78,42 @@ const eventSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+    participationFeeRequired: {
+      type: Boolean,
+      default: false,
+    },
+    participationFee: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    paymentMode: {
+      type: String,
+      enum: ["", "Online", "Offline"],
+      default: "",
+    },
+    attendanceEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    attendanceType: {
+      type: String,
+      enum: ["", "compulsory", "open", "both"],
+      default: "",
+    },
+    attendanceDepartment: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    attendanceDepartments: {
+      type: [String],
+      default: [],
+    },
+    attendanceYears: {
+      type: [String],
+      default: [],
+    },
     facultyId: {
       type: String,
       required: true,
