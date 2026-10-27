@@ -2,18 +2,21 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./FacultyDashboard.css";
 import Footer from "../components/Footer";
+import { clearAuthSession } from "../auth";
+import { getStoredUser } from "../auth";
 
 function FacultyDashboard() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
+  const [user] = useState(() => getStoredUser());
   const [eventCount, setEventCount] = useState(0);
+  const [seatsRemaining, setSeatsRemaining] = useState(0);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   
 useEffect(() => {
-  const savedUser = localStorage.getItem("user");
+  const savedUser = sessionStorage.getItem("user");
 
   if (!savedUser) {
     navigate("/login");
@@ -26,12 +29,10 @@ useEffect(() => {
     currentUser = JSON.parse(savedUser);
   } catch (error) {
     console.error("Invalid user data:", error);
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
     navigate("/login");
     return;
   }
-
-  setUser(currentUser);
 
   if (currentUser.role !== "faculty") {
     navigate("/");
@@ -42,7 +43,7 @@ useEffect(() => {
     `http://localhost:5000/api/events/faculty/${currentUser.id}`,
     {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
     }
   )
@@ -55,11 +56,28 @@ useEffect(() => {
     })
     .then((data) => {
       console.log("Dashboard events:", data);
-      setEventCount(Array.isArray(data) ? data.length : 0);
+      const facultyEvents = Array.isArray(data) ? data : [];
+      setEventCount(facultyEvents.length);
+      setSeatsRemaining(
+        facultyEvents.reduce(
+          (total, event) =>
+            total +
+            Number(
+              event.seatsRemaining ??
+                Math.max(
+                  Number(event.capacity || 0) -
+                    Number(event.registrationCount || 0),
+                  0
+                )
+            ),
+          0
+        )
+      );
     })
     .catch((error) => {
       console.error("Error loading dashboard events:", error);
       setEventCount(0);
+      setSeatsRemaining(0);
     })
     .finally(() => {
       setLoading(false);
@@ -68,8 +86,7 @@ useEffect(() => {
 
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    clearAuthSession();
     navigate("/login");
   };
 
@@ -312,6 +329,12 @@ useEffect(() => {
               Events created by you
             </span>
 
+          </div>
+
+          <div className="stat-card stat-blue">
+            <h3>SEATS AVAILABLE</h3>
+            <p>{loading ? "..." : seatsRemaining}</p>
+            <span>Remaining across your events</span>
           </div>
 
 

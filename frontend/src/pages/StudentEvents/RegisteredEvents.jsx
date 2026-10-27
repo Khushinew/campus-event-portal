@@ -1,32 +1,52 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getSessionToken } from "../../auth";
+import { formatEventDate, getRemainingSeats } from "../../eventUtils";
 import "./RegisteredEvents.css";
 import Footer from "../../components/Footer";
+
 function RegisteredEvents() {
-  const registeredEvents = [
-    {
-      id: 1,
-      title: "Tech Fest 2026",
-      date: "15 October 2026",
-      time: "10:00 AM - 4:00 PM",
-      venue: "Main Auditorium",
-      category: "Technology",
-      status: "Registered",
-    },
-    {
-      id: 2,
-      title: "AI Workshop",
-      date: "20 October 2026",
-      time: "11:00 AM - 2:00 PM",
-      venue: "Seminar Hall",
-      category: "Workshop",
-      status: "Registered",
-    },
-  ];
+  const [registeredEvents, setRegisteredEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRegisteredEvents() {
+      const token = getSessionToken();
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/student/registrations",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load your registrations.");
+        }
+        if (!Array.isArray(data)) {
+          throw new Error("The server returned an unexpected response.");
+        }
+        if (!cancelled) setRegisteredEvents(data);
+      } catch (loadError) {
+        console.error("Registered events error:", loadError);
+        if (!cancelled) {
+          setError(loadError.message || "Unable to load your registrations.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadRegisteredEvents();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="registered-events-page">
-
-      {/* Header */}
       <div className="registered-header">
         <div>
           <h1>My Registered Events</h1>
@@ -38,69 +58,57 @@ function RegisteredEvents() {
         </Link>
       </div>
 
-      {/* Events */}
       <div className="registered-events-container">
-
-        {registeredEvents.length > 0 ? (
+        {loading ? (
+          <p className="no-events">Loading your registrations...</p>
+        ) : error ? (
+          <p className="no-events" role="alert">{error}</p>
+        ) : registeredEvents.length > 0 ? (
           <div className="registered-events-grid">
-
             {registeredEvents.map((event) => (
-              <div className="registered-event-card" key={event.id}>
-
+              <article className="registered-event-card" key={event._id}>
                 <div className="registered-card-top">
-                  <span className="event-category">
-                    {event.category}
-                  </span>
-
-                  <span className="event-status">
-                    {event.status}
-                  </span>
+                  <span className="event-category">{event.category}</span>
+                  <span className="event-status">Registered</span>
                 </div>
 
                 <h2>{event.title}</h2>
 
                 <div className="event-info">
+                  <p><strong>Date:</strong> {formatEventDate(event.date)}</p>
+                  <p><strong>Time:</strong> {event.time || "Not specified"}</p>
+                  <p><strong>Venue:</strong> {event.venue || "Not specified"}</p>
+                  <p><strong>Seats left:</strong> {getRemainingSeats(event) ?? "—"}</p>
                   <p>
-                    <strong>Date:</strong> {event.date}
-                  </p>
-
-                  <p>
-                    <strong>Time:</strong> {event.time}
-                  </p>
-
-                  <p>
-                    <strong>Venue:</strong> {event.venue}
+                    <strong>Registered on:</strong>{" "}
+                    {event.registrations?.[0]?.registeredAt
+                      ? new Date(event.registrations[0].registeredAt).toLocaleDateString()
+                      : "—"}
                   </p>
                 </div>
 
                 <Link
                   to="/student/event-details"
+                  state={{ event }}
                   className="details-btn"
                 >
                   View Details →
                 </Link>
-
-              </div>
+              </article>
             ))}
-
           </div>
         ) : (
           <div className="no-events">
             <div className="no-events-icon">📅</div>
             <h2>No Registered Events</h2>
-            <p>
-              You have not registered for any campus events yet.
-            </p>
-
+            <p>You have not registered for any campus events yet.</p>
             <Link to="/student/events" className="browse-btn">
               Browse Events
             </Link>
           </div>
         )}
-
       </div>
       <Footer />
-
     </div>
   );
 }

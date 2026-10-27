@@ -1,25 +1,24 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./FacultySidebar.css";
-import Footer from "../../components/Footer";
+import { clearAuthSession } from "../../auth";
 
 function FacultySidebar() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const savedUser = localStorage.getItem("user");
+  const savedUser = sessionStorage.getItem("user");
 
   let user = null;
 
   try {
     user = savedUser ? JSON.parse(savedUser) : null;
-  } catch (error) {
+  } catch {
     console.error("Invalid user data");
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    clearAuthSession();
 
     setSidebarOpen(false);
 

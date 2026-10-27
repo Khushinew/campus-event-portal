@@ -2,16 +2,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./StudentSidebar.css";
+import { clearAuthSession } from "../../auth";
 
 
 function StudentSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  let user = {};
-
+  let user;
   try {
-    user = JSON.parse(localStorage.getItem("user")) || {};
+    user = JSON.parse(sessionStorage.getItem("user")) || {};
   } catch {
     user = {};
   }
@@ -23,8 +23,7 @@ function StudentSidebar() {
   const closeSidebar = () => setIsOpen(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    clearAuthSession();
     closeSidebar();
     navigate("/login", { replace: true });
   };

@@ -3,34 +3,15 @@ import { useNavigate } from "react-router-dom";
 import FacultySidebar from "../events/FacultySidebar";
 import "./MyProfile.css";
 import Footer from "../../components/Footer";
+import { getStoredUser } from "../../auth";
 
 function MyProfile() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user] = useState(() => getStoredUser());
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-
-    if (!savedUser) {
-      navigate("/login");
-      return;
-    }
-
-    try {
-      const currentUser = JSON.parse(savedUser);
-
-      if (currentUser.role !== "faculty") {
-        navigate("/");
-        return;
-      }
-
-      setUser(currentUser);
-    } catch (error) {
-      console.error("Invalid user data:", error);
-      localStorage.removeItem("user");
-      navigate("/login");
-    }
-  }, [navigate]);
+    if (!user || user.role !== "faculty") navigate("/login");
+  }, [navigate, user]);
 
   if (!user) {
     return (

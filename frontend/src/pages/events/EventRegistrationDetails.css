@@ -258,3 +258,15 @@
         font-size: 25px;
     }
 }
+
+.full-capacity-banner {
+    display: inline-block;
+    margin: 14px 0 0;
+    padding: 9px 14px;
+    color: #fff !important;
+    background: #d96b61;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}

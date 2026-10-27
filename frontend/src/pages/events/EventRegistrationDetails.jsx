@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import FacultySidebar from "./FacultySidebar";
 import Footer from "../../components/Footer";
 import "./EventRegistrationDetails.css";
+import { formatEventDate } from "../../eventUtils";
 import {
   ResponsiveContainer,
   PieChart,
@@ -36,7 +37,7 @@ function EventRegistrationDetails() {
 
   useEffect(() => {
     async function loadDetails() {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         setError("Please log in again to view registrations.");
@@ -93,7 +94,13 @@ function EventRegistrationDetails() {
 
   const analytics = useMemo(() => {
     const uniqueStudents = new Set(
-      students.map((student) => student._id || student.id || student.email)
+      students.map(
+        (student) =>
+          student.userId ||
+          student._id ||
+          student.studentId ||
+          student.studentEmail
+      )
     ).size;
 
     const semesterCounts = {};
@@ -247,10 +254,13 @@ function renderDepartmentChart(entries) {
             <section className="registration-event-heading">
               <p className="monitor-label">Selected Event</p>
               <h2>{event.title}</h2>
+              {analytics.capacity > 0 && analytics.remaining === 0 && (
+                <p className="full-capacity-banner" role="status">
+                  FULLY CAPACITY
+                </p>
+              )}
               <p>
-                {event.date
-                  ? new Date(event.date).toLocaleDateString()
-                  : "Date not specified"}
+                {formatEventDate(event.date)}
                 {" · "}
                 {event.time || "Time not specified"}
                 {" · "}
@@ -342,6 +352,7 @@ function renderDepartmentChart(entries) {
                         <th>Department</th>
                         <th>Semester</th>
                         <th>Student ID</th>
+                        <th>Date Registered</th>
                       </tr>
                     </thead>
 
@@ -351,10 +362,10 @@ function renderDepartmentChart(entries) {
                           <td className="student-number">{index + 1}</td>
                           <td>
                             <strong>
-                              {student.name || "Not provided"}
+                              {student.studentName || student.name || "Not provided"}
                             </strong>
                           </td>
-                          <td>{student.email || "—"}</td>
+                          <td>{student.studentEmail || student.email || "—"}</td>
                           <td>{student.department || "—"}</td>
                           <td>{student.semester || "—"}</td>
                           <td>
@@ -362,6 +373,11 @@ function renderDepartmentChart(entries) {
                               student.rollNumber ||
                               student.enrollmentNo ||
                               "—"}
+                          </td>
+                          <td>
+                            {student.registeredAt
+                              ? new Date(student.registeredAt).toLocaleString()
+                              : "—"}
                           </td>
                         </tr>
                       ))}

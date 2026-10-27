@@ -13,7 +13,7 @@ function EditEventsList() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = sessionStorage.getItem("user");
 
     if (!savedUser) {
       navigate("/login");
@@ -25,7 +25,7 @@ function EditEventsList() {
     try {
       currentUser = JSON.parse(savedUser);
     } catch {
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
       navigate("/login");
       return;
     }
@@ -46,7 +46,7 @@ function EditEventsList() {
           `http://localhost:5000/api/events/faculty/${currentUser.id}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+              Authorization: `Bearer ${sessionStorage.getItem("token") || ""}`,
             },
             signal: controller.signal,
           }

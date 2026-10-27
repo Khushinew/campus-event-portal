@@ -2,49 +2,26 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FacultySidebar from "../events/FacultySidebar";
 import "./ManageAccount.css";
-import Footer from "../../components/Footer";
+import { getStoredUser } from "../../auth";
 
 function ManageAccount() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    department: "",
+  const [user, setUser] = useState(() => getStoredUser());
+  const [formData, setFormData] = useState(() => {
+    const currentUser = getStoredUser() || {};
+    return {
+      name: currentUser.name || "",
+      email: currentUser.email || "",
+      department: currentUser.department || "",
+    };
   });
 
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-
-    if (!savedUser) {
-      navigate("/login");
-      return;
-    }
-
-    try {
-      const currentUser = JSON.parse(savedUser);
-
-      if (currentUser.role !== "faculty") {
-        navigate("/");
-        return;
-      }
-
-      setUser(currentUser);
-
-      setFormData({
-        name: currentUser.name || "",
-        email: currentUser.email || "",
-        department: currentUser.department || "",
-      });
-    } catch (error) {
-      console.error("Invalid user data:", error);
-      localStorage.removeItem("user");
-      navigate("/login");
-    }
-  }, [navigate]);
+    if (!user || user.role !== "faculty") navigate("/login");
+  }, [navigate, user]);
 
   const handleChange = (e) => {
     setFormData({
@@ -67,7 +44,7 @@ function ManageAccount() {
       department: formData.department,
     };
 
-    localStorage.setItem("user", JSON.stringify(updatedUser));
+    sessionStorage.setItem("user", JSON.stringify(updatedUser));
 
     setUser(updatedUser);
 

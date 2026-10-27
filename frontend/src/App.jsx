@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import ChangePassword from "./pages/ChangePassword";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 // =========================
@@ -67,10 +68,14 @@ function App() {
 
         <Route
           path="/change-password"
-          element={<ChangePassword />}
+          element={
+            <ProtectedRoute roles={["student", "faculty"]}>
+              <ChangePassword />
+            </ProtectedRoute>
+          }
         />
 
-        <Route path="/events" element={<ViewEvents />} />
+        <Route path="/events" element={<ViewEvents showPastEvents />} />
 
         {/* =========================
             STUDENT ROUTES
@@ -78,42 +83,74 @@ function App() {
 
         <Route
           path="/student-dashboard"
-          element={<StudentDashboard />}
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/student/events"
-          element={<ViewEvents />}
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <ViewEvents />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/student/event-details"
-          element={<EventDetails />}
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <EventDetails />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/student/register-event"
-          element={<RegisterEvent />}
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <RegisterEvent />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/student/registered-events"
-          element={<RegisteredEvents />}
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <RegisteredEvents />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/student/calendar"
-          element={<PersonalCalendar />}
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <PersonalCalendar />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/student/add-event"
-          element={<AddPersonalEvent />}
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <AddPersonalEvent />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/student/profile"
-          element={<StudentProfile />}
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <StudentProfile />
+            </ProtectedRoute>
+          }
         />
 
         {/* =========================
@@ -122,48 +159,84 @@ function App() {
 
         <Route
           path="/faculty-dashboard"
-          element={<FacultyDashboard />}
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <FacultyDashboard />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/faculty/create-event"
-          element={<CreateEvent />}
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <CreateEvent />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/faculty/events"
-          element={<MyEvents />}
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <MyEvents />
+            </ProtectedRoute>
+          }
         />
 
         {/* Event selection page */}
         <Route
           path="/faculty/edit-events"
-          element={<EditEventsList />}
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <EditEventsList />
+            </ProtectedRoute>
+          }
         />
 
         {/* Edit one selected event */}
         <Route
           path="/faculty/edit-events/:eventId"
-          element={<EditEvent />}
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <EditEvent />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/faculty/registrations"
-          element={<MonitorRegistrations />}
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <MonitorRegistrations />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/faculty/account"
-          element={<ManageAccount />}
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <ManageAccount />
+            </ProtectedRoute>
+          }
         />
         <Route
   path="/faculty/events/:eventId/registrations"
-  element={<EventRegistrationDetails />}
+  element={
+    <ProtectedRoute roles={["faculty"]}>
+      <EventRegistrationDetails />
+    </ProtectedRoute>
+  }
 />
 
         <Route
           path="/faculty/profile"
-          element={<MyProfile />}
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <MyProfile />
+            </ProtectedRoute>
+          }
         />
       </Routes>
       

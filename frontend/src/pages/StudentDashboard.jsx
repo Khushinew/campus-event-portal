@@ -50,28 +50,11 @@ function StudentDashboard() {
             <span className="arrow">→</span>
           </Link>
 
-          {/* Event Details */}
-          <Link to="/student/event-details" className="student-card">
-            <div className="card-top">
-              <div className="card-icon">📋</div>
-              <span className="card-number">02</span>
-            </div>
-
-            <div className="card-content">
-              <h3>Event Details</h3>
-              <p>
-                View complete information about campus events.
-              </p>
-            </div>
-
-            <span className="arrow">→</span>
-          </Link>
-
           {/* Register */}
           <Link to="/student/register-event" className="student-card">
             <div className="card-top">
               <div className="card-icon">🎟️</div>
-              <span className="card-number">03</span>
+              <span className="card-number">02</span>
             </div>
 
             <div className="card-content">
@@ -88,7 +71,7 @@ function StudentDashboard() {
           <Link to="/student/registered-events" className="student-card">
             <div className="card-top">
               <div className="card-icon">✅</div>
-              <span className="card-number">04</span>
+              <span className="card-number">03</span>
             </div>
 
             <div className="card-content">
@@ -105,7 +88,7 @@ function StudentDashboard() {
           <Link to="/student/calendar" className="student-card">
             <div className="card-top">
               <div className="card-icon">🗓️</div>
-              <span className="card-number">05</span>
+              <span className="card-number">04</span>
             </div>
 
             <div className="card-content">
@@ -122,7 +105,7 @@ function StudentDashboard() {
           <Link to="/student/add-event" className="student-card">
             <div className="card-top">
               <div className="card-icon">➕</div>
-              <span className="card-number">06</span>
+              <span className="card-number">05</span>
             </div>
 
             <div className="card-content">

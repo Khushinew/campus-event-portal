@@ -646,3 +646,81 @@
 .register-event-page::-webkit-scrollbar-thumb:hover {
   background: #85827b;
 }
+
+.student-registration-details {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+.student-registration-details div {
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(95, 101, 115, 0.2);
+}
+
+.student-registration-details dt {
+  margin-bottom: 4px;
+  color: #77766f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.student-registration-details dd {
+  margin: 0;
+  color: #303440;
+  overflow-wrap: anywhere;
+}
+
+.register-btn:disabled {
+  background: #989994;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.registration-error {
+  max-width: 1100px;
+  margin: 0 auto 20px;
+  padding: 13px 16px;
+  color: #8e2525;
+  background: #fff0ef;
+  border: 1px solid #edc4c1;
+  border-radius: 4px;
+}
+
+.registration-modal-backdrop {
+  z-index: 30;
+}
+
+.registration-result-modal {
+  width: min(420px, 100%);
+  padding: 32px;
+  text-align: center;
+  background: #fffdf8;
+  border: 1px solid rgba(80, 75, 65, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 18px 55px rgba(40, 38, 34, 0.28);
+}
+
+.registration-result-icon {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  margin: 0 auto 12px;
+  color: #455f4c;
+  background: #eef3ed;
+  border-radius: 50%;
+  font-size: 42px;
+}
+
+.registration-result-modal h2 {
+  margin: 0 0 10px;
+  font-family: "Playfair Display", serif;
+  font-size: 27px;
+}
+
+.registration-result-modal p {
+  margin: 0 0 20px;
+  color: #77766f;
+  line-height: 1.6;
+}
