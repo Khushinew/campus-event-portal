@@ -10,9 +10,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 // =========================
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import ForgotPassword from "./pages/ForgotPassword";
-import OtpVerification from "./pages/OtpVerification";
-import ResetPassword from "./pages/ResetPassword";
 
 // =========================
 // Faculty pages
@@ -50,21 +47,6 @@ function App() {
         <Route path="/" element={<Home />} />
 
         <Route path="/login" element={<Login />} />
-
-        <Route
-          path="/forgot-password"
-          element={<ForgotPassword />}
-        />
-
-        <Route
-          path="/verify-otp"
-          element={<OtpVerification />}
-        />
-
-        <Route
-          path="/reset-password"
-          element={<ResetPassword />}
-        />
 
         <Route
           path="/change-password"
