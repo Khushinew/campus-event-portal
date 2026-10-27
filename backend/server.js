@@ -20,6 +20,7 @@ require("dotenv").config({
 
 const User = require("./models/User");
 const Event = require("./models/Event");
+const PersonalSecurityQuestion = require("./models/PersonalSecurityQuestion");
 console.log("Event model file:", require.resolve("./models/Event"));
 
 console.log(
@@ -42,6 +43,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const DEFAULT_INITIAL_PASSWORD = "Campus@123";
 const CAMPUS_DOMAIN = "campus.edu.in";
+const PERSONAL_SECURITY_QUESTIONS = [
+  "What was the name of your favorite pet?",
+  "What was the name of your first school?",
+  "Who was your best friend?",
+  "What is your favorite memory place?",
+  "What was the name of your first company?",
+];
 
 const uploadDirectory = path.join(__dirname, "uploads");
 
@@ -1296,7 +1304,7 @@ app.post(
             },
           },
         },
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
 
       if (!updatedEvent) {
@@ -1471,7 +1479,18 @@ app.get("/api/profile", verifyToken, async (req, res) => {
       });
     }
 
-    res.json(user);
+    const savedSecurityQuestion = await PersonalSecurityQuestion.findOne({
+      email: user.email,
+    }).select("-answerHash").lean();
+
+    res.json({
+      ...user.toObject(),
+      securityQuestion:
+        savedSecurityQuestion?.question || user.securityQuestion || "",
+      hasSecurityAnswer: Boolean(
+        savedSecurityQuestion || user.securityQuestion
+      ),
+    });
   } catch (error) {
     console.error("Get profile error:", error);
 
@@ -1488,8 +1507,11 @@ app.get("/api/profile", verifyToken, async (req, res) => {
 
 app.put("/api/profile", verifyToken, async (req, res) => {
   try {
-    const { name, department } = req.body;
+    const { name, department, securityQuestion, securityAnswer } = req.body;
     const updates = {};
+    const updatingSecurityQuestion =
+      securityQuestion !== undefined || securityAnswer !== undefined;
+    let securityAnswerHash = "";
 
     if (name !== undefined) {
       if (!String(name).trim()) {
@@ -1505,22 +1527,74 @@ app.put("/api/profile", verifyToken, async (req, res) => {
       updates.department = String(department).trim();
     }
 
-    if (Object.keys(updates).length === 0) {
+    if (securityQuestion !== undefined || securityAnswer !== undefined) {
+      if (!["faculty", "student"].includes(req.user.role)) {
+        return res.status(403).json({
+          message: "Only student and faculty accounts can update personal security questions.",
+        });
+      }
+
+      if (!PERSONAL_SECURITY_QUESTIONS.includes(securityQuestion)) {
+        return res.status(400).json({
+          message: "Select one of the available personal security questions.",
+        });
+      }
+
+      if (
+        typeof securityAnswer !== "string" ||
+        securityAnswer.trim().length < 2 ||
+        securityAnswer.trim().length > 120
+      ) {
+        return res.status(400).json({
+          message: "Your answer must be between 2 and 120 characters.",
+        });
+      }
+
+      securityAnswerHash = await bcrypt.hash(
+        securityAnswer.trim().toLowerCase(),
+        10
+      );
+    }
+
+    if (Object.keys(updates).length === 0 && !updatingSecurityQuestion) {
       return res.status(400).json({
         message: "No profile fields were provided to update.",
       });
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.user.userId,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).select("-password");
+    const user =
+      Object.keys(updates).length > 0
+        ? await User.findByIdAndUpdate(
+            req.user.userId,
+            { $set: updates },
+            { returnDocument: "after", runValidators: true }
+          ).select("-password")
+        : await User.findById(req.user.userId).select("-password");
 
     if (!user) {
       return res.status(404).json({
         message: "User not found.",
       });
+    }
+
+    let savedSecurityQuestion = null;
+    if (updatingSecurityQuestion) {
+      savedSecurityQuestion = await PersonalSecurityQuestion.findOneAndUpdate(
+        { email: user.email },
+        {
+          $set: {
+            email: user.email,
+            question: securityQuestion,
+            answerHash: securityAnswerHash,
+          },
+        },
+        {
+          upsert: true,
+          returnDocument: "after",
+          runValidators: true,
+          setDefaultsOnInsert: true,
+        }
+      ).select("-answerHash");
     }
 
     if (user.role === "faculty" && user.name) {
@@ -1530,9 +1604,19 @@ app.put("/api/profile", verifyToken, async (req, res) => {
       );
     }
 
+    const sanitizedUser = user.toObject();
+    delete sanitizedUser.securityAnswerHash;
+
     res.json({
       message: "Profile updated successfully",
-      user,
+      user: {
+        ...sanitizedUser,
+        securityQuestion:
+          savedSecurityQuestion?.question || user.securityQuestion || "",
+        hasSecurityAnswer: Boolean(
+          savedSecurityQuestion || user.securityQuestion
+        ),
+      },
     });
   } catch (error) {
     console.error("Update profile error:", error);

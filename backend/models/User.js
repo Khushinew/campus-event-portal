@@ -58,6 +58,25 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    securityQuestion: {
+      type: String,
+      enum: [
+        "",
+        "What was the name of your favorite pet?",
+        "What was the name of your first school?",
+        "Who was your best friend?",
+        "What is your favorite memory place?",
+        "What was the name of your first company?",
+      ],
+      default: "",
+    },
+
+    securityAnswerHash: {
+      type: String,
+      default: "",
+      select: false,
+    },
   },
   {
     timestamps: true,
