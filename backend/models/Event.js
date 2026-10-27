@@ -92,6 +92,20 @@ const eventSchema = new mongoose.Schema(
       enum: ["", "Online", "Offline"],
       default: "",
     },
+    attendanceEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    attendanceType: {
+      type: String,
+      enum: ["", "compulsory", "open", "both"],
+      default: "",
+    },
+    attendanceDepartment: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     facultyId: {
       type: String,
       required: true,
