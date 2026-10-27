@@ -404,6 +404,29 @@ useEffect(() => {
 
             </Link>
 
+            <Link
+              to="/faculty/view-events"
+              className="action-card action-green"
+            >
+              <div className="action-icon">
+                ◉
+              </div>
+
+              <div className="action-content">
+                <h3>
+                  View Events
+                </h3>
+
+                <p>
+                  Browse campus events created by others.
+                </p>
+              </div>
+
+              <span className="action-arrow">
+                ↗
+              </span>
+            </Link>
+
 
             {/* MY EVENTS */}
 
