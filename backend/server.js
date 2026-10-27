@@ -9,8 +9,9 @@ const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const personalEventRoutes = require("./models/personalEventRoutes");
 
 
@@ -1132,6 +1133,206 @@ app.get(
     }
   }
 );
+
+app.post("/api/password-reset/security-question", async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({
+        message: "Enter a valid email address.",
+      });
+    }
+
+    const [user, securityQuestion] = await Promise.all([
+      User.findOne({ email }).select("_id"),
+      PersonalSecurityQuestion.findOne({ email }).select("question"),
+    ]);
+
+    if (!user || !securityQuestion) {
+      return res.status(404).json({
+        message: "No personal security question is saved for this email.",
+      });
+    }
+
+    return res.status(200).json({
+      question: securityQuestion.question,
+    });
+  } catch (error) {
+    console.error("Password reset question lookup error:", error);
+    return res.status(500).json({
+      message: "Could not load the personal security question.",
+    });
+  }
+});
+
+app.post("/api/password-reset/verify-answer", async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const answer =
+      typeof req.body.answer === "string" ? req.body.answer.trim() : "";
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !answer) {
+      return res.status(400).json({
+        message: "Enter your email and answer the security question.",
+      });
+    }
+
+    const securityQuestion = await PersonalSecurityQuestion.findOne({ email })
+      .select("+answerHash +resetFailedAttempts +resetLockedUntil");
+
+    if (!securityQuestion) {
+      return res.status(404).json({
+        message: "No personal security question is saved for this email.",
+      });
+    }
+
+    if (
+      securityQuestion.resetLockedUntil &&
+      securityQuestion.resetLockedUntil.getTime() > Date.now()
+    ) {
+      return res.status(429).json({
+        message: "Too many incorrect answers. Try again in 15 minutes.",
+      });
+    }
+
+    const answerMatches = await bcrypt.compare(
+      answer.toLowerCase(),
+      securityQuestion.answerHash
+    );
+    if (!answerMatches) {
+      const failedAttempts =
+        securityQuestion.resetFailedAttempts >= 5
+          ? 1
+          : securityQuestion.resetFailedAttempts + 1;
+      const lockedUntil =
+        failedAttempts >= 5 ? new Date(Date.now() + 15 * 60 * 1000) : null;
+
+      await PersonalSecurityQuestion.updateOne(
+        { _id: securityQuestion._id },
+        {
+          $set: {
+            resetFailedAttempts: failedAttempts,
+            resetLockedUntil: lockedUntil,
+          },
+        }
+      );
+
+      return res.status(failedAttempts >= 5 ? 429 : 400).json({
+        message:
+          failedAttempts >= 5
+            ? "Too many incorrect answers. Try again in 15 minutes."
+            : "That answer does not match. Please try again.",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const verifiedRecord = await PersonalSecurityQuestion.findOneAndUpdate(
+      {
+        _id: securityQuestion._id,
+        resetLockedUntil: { $not: { $gt: new Date() } },
+      },
+      {
+        $set: {
+          resetTokenHash: crypto
+            .createHash("sha256")
+            .update(resetToken)
+            .digest("hex"),
+          resetTokenExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+          resetFailedAttempts: 0,
+          resetLockedUntil: null,
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    if (!verifiedRecord) {
+      return res.status(429).json({
+        message: "Too many incorrect answers. Try again in 15 minutes.",
+      });
+    }
+
+    return res.status(200).json({ resetToken });
+  } catch (error) {
+    console.error("Password reset answer verification error:", error);
+    return res.status(500).json({
+      message: "Could not verify your security answer.",
+    });
+  }
+});
+
+app.post("/api/password-reset/complete", async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const { resetToken, newPassword } = req.body;
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({
+        message: "Enter a valid email address.",
+      });
+    }
+    if (
+      typeof newPassword !== "string" ||
+      newPassword.length < 8 ||
+      newPassword.length > 128
+    ) {
+      return res.status(400).json({
+        message: "Your new password must be between 8 and 128 characters.",
+      });
+    }
+    if (typeof resetToken !== "string" || !resetToken) {
+      return res.status(400).json({
+        message: "Verify your security answer before resetting your password.",
+      });
+    }
+
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    const user = await User.findOne({ email }).select("_id");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+      });
+    }
+
+    const consumedReset = await PersonalSecurityQuestion.findOneAndUpdate(
+      {
+        email,
+        resetTokenHash,
+        resetTokenExpiresAt: { $gt: new Date() },
+      },
+      {
+        $set: {
+          resetTokenHash: "",
+          resetTokenExpiresAt: null,
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    if (!consumedReset) {
+      return res.status(401).json({
+        message: "Your password reset session expired. Verify your answer again.",
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { password: passwordHash, mustChangePassword: false } }
+    );
+
+    return res.status(200).json({
+      message: "Your password has been updated. You can now log in.",
+    });
+  } catch (error) {
+    console.error("Password reset completion error:", error);
+    return res.status(500).json({
+      message: "Could not update your password.",
+    });
+  }
+});
 
 // =====================================
 // REGISTER FOR EVENT
