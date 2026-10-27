@@ -25,26 +25,6 @@ const personalSecurityQuestionSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
-    resetTokenHash: {
-      type: String,
-      default: "",
-      select: false,
-    },
-    resetTokenExpiresAt: {
-      type: Date,
-      default: null,
-      select: false,
-    },
-    resetFailedAttempts: {
-      type: Number,
-      default: 0,
-      select: false,
-    },
-    resetLockedUntil: {
-      type: Date,
-      default: null,
-      select: false,
-    },
   },
   { timestamps: true }
 );
