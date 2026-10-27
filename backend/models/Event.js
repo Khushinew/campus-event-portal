@@ -106,6 +106,14 @@ const eventSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    attendanceDepartments: {
+      type: [String],
+      default: [],
+    },
+    attendanceYears: {
+      type: [String],
+      default: [],
+    },
     facultyId: {
       type: String,
       required: true,

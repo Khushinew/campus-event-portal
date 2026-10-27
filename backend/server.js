@@ -144,6 +144,31 @@ function studentDepartmentPattern(department) {
   return patterns[department] || null;
 }
 
+function parseStringArray(value) {
+  if (value === undefined) return [];
+  if (Array.isArray(value)) {
+    return value.every((item) => typeof item === "string") ? value : null;
+  }
+  if (typeof value !== "string") return null;
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) &&
+      parsed.every((item) => typeof item === "string")
+      ? parsed
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+const ATTENDANCE_YEAR_RANGES = [
+  "2024-2028",
+  "2024-2029",
+  "2024-2025",
+  "2022-2025",
+];
+
 function eventSummary(event) {
   const summary = event.toObject ? event.toObject() : { ...event };
   const registrationCount = Array.isArray(summary.registrations)
@@ -420,7 +445,8 @@ app.post(
         paymentMode,
         attendanceEnabled,
         attendanceType,
-        attendanceDepartment,
+        attendanceDepartments: attendanceDepartmentsInput,
+        attendanceYears: attendanceYearsInput,
         maxStudents,
         max_participants,
       } = req.body;
@@ -503,11 +529,27 @@ app.post(
       const normalizedAttendanceType = hasAttendanceRequirements
         ? String(attendanceType || "")
         : "";
-      const normalizedAttendanceDepartment =
+      const attendanceDepartments = parseStringArray(
+        attendanceDepartmentsInput
+      );
+      const attendanceYears = parseStringArray(attendanceYearsInput);
+
+      if (!attendanceDepartments || !attendanceYears) {
+        return res.status(400).json({
+          message: "Attendance departments and year ranges must be valid lists.",
+        });
+      }
+
+      const normalizedAttendanceDepartments =
         hasAttendanceRequirements &&
         ["compulsory", "both"].includes(normalizedAttendanceType)
-          ? String(attendanceDepartment || "").trim()
-          : "";
+          ? [...new Set(attendanceDepartments.map((item) => item.trim()).filter(Boolean))]
+          : [];
+      const normalizedAttendanceYears =
+        hasAttendanceRequirements &&
+        ["compulsory", "both"].includes(normalizedAttendanceType)
+          ? [...new Set(attendanceYears.map((item) => item.trim()).filter(Boolean))]
+          : [];
 
       if (
         hasAttendanceRequirements &&
@@ -522,29 +564,47 @@ app.post(
         hasAttendanceRequirements &&
         ["compulsory", "both"].includes(normalizedAttendanceType)
       ) {
-        if (!normalizedAttendanceDepartment) {
+        if (!normalizedAttendanceDepartments.length) {
           return res.status(400).json({
-            message: "Select the student department for attendance tracking.",
+            message: "Select at least one student department for attendance tracking.",
           });
         }
 
-        const departmentPattern = studentDepartmentPattern(
-          normalizedAttendanceDepartment
+        if (!normalizedAttendanceYears.length) {
+          return res.status(400).json({
+            message: "Select at least one student year range.",
+          });
+        }
+
+        const departmentPatterns = normalizedAttendanceDepartments.map(
+          studentDepartmentPattern
         );
-        if (!departmentPattern) {
+        if (departmentPatterns.some((pattern) => !pattern)) {
           return res.status(400).json({
-            message: "Select a supported student department.",
+            message: "Select only supported student departments.",
           });
         }
 
-        const domainExists = await CollegeUser.exists({
+        if (
+          normalizedAttendanceYears.some(
+            (yearRange) => !ATTENDANCE_YEAR_RANGES.includes(yearRange)
+          )
+        ) {
+          return res.status(400).json({
+            message: "Select only supported student year ranges.",
+          });
+        }
+
+        const matchingDepartments = await CollegeUser.distinct("department", {
           role: "student",
-          department: departmentPattern,
+          $or: departmentPatterns.map((department) => ({
+            department,
+          })),
         });
 
-        if (!domainExists) {
+        if (!matchingDepartments.length) {
           return res.status(400).json({
-            message: "The selected student department is not in the college directory.",
+            message: "None of the selected departments are available in the college directory.",
           });
         }
       }
@@ -563,7 +623,8 @@ app.post(
   paymentMode: normalizedPaymentMode,
   attendanceEnabled: hasAttendanceRequirements,
   attendanceType: normalizedAttendanceType,
-  attendanceDepartment: normalizedAttendanceDepartment,
+  attendanceDepartments: normalizedAttendanceDepartments,
+  attendanceYears: normalizedAttendanceYears,
   facultyId: String(faculty._id),
   createdBy: faculty.name || faculty.email,
   imageUrl: req.file ? `/uploads/${req.file.filename}` : "",
@@ -936,20 +997,26 @@ app.get(
         });
       }
 
+      const attendanceDepartments =
+        event.attendanceDepartments?.length
+          ? event.attendanceDepartments
+          : event.attendanceDepartment
+            ? [event.attendanceDepartment]
+            : [];
       if (
         !event.attendanceEnabled ||
         !["compulsory", "both"].includes(event.attendanceType) ||
-        !event.attendanceDepartment
+        !attendanceDepartments.length
       ) {
         return res.status(400).json({
           message: "This event does not have a required attendance cohort.",
         });
       }
 
-      const departmentPattern = studentDepartmentPattern(
-        event.attendanceDepartment
+      const departmentPatterns = attendanceDepartments.map(
+        studentDepartmentPattern
       );
-      if (!departmentPattern) {
+      if (departmentPatterns.some((pattern) => !pattern)) {
         return res.status(400).json({
           message: "This event has an unsupported attendance department.",
         });
@@ -957,7 +1024,7 @@ app.get(
 
       const cohortStudents = await CollegeUser.find({
         role: "student",
-        department: departmentPattern,
+        $or: departmentPatterns.map((department) => ({ department })),
       })
         .select("name email studentId department semester")
         .lean();
@@ -1042,7 +1109,8 @@ app.get(
       ).length;
 
       return res.status(200).json({
-        department: event.attendanceDepartment,
+        departments: attendanceDepartments,
+        years: event.attendanceYears || [],
         total: students.length,
         registered: registeredCount,
         unregistered: students.length - registeredCount,
@@ -1094,15 +1162,22 @@ app.post(
       }).select("studentId department semester");
       const studentDepartment =
         directoryStudent?.department || student.department || "";
+      const attendanceDepartments =
+        event.attendanceDepartments?.length
+          ? event.attendanceDepartments
+          : event.attendanceDepartment
+            ? [event.attendanceDepartment]
+            : [];
 
       if (
         event.attendanceEnabled &&
         event.attendanceType === "compulsory" &&
-        String(studentDepartment).trim().toLowerCase() !==
-          String(event.attendanceDepartment).trim().toLowerCase()
+        !attendanceDepartments.some((department) =>
+          studentDepartmentPattern(department)?.test(studentDepartment)
+        )
       ) {
         return res.status(403).json({
-          message: `This event is compulsory for students in ${event.attendanceDepartment}.`,
+          message: `This event is compulsory for students in ${attendanceDepartments.join(", ")}.`,
         });
       }
 
