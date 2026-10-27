@@ -1,7 +1,5 @@
 export function getStoredUser() {
   try {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
     const token = sessionStorage.getItem("token");
     const serializedUser = sessionStorage.getItem("user");
 
@@ -10,12 +8,19 @@ export function getStoredUser() {
       return null;
     }
 
-    const encodedPayload = token
-      .split(".")[1]
+    const tokenParts = token.split(".");
+    const encodedPayload = tokenParts[1];
+
+    if (!encodedPayload) {
+      clearAuthSession();
+      return null;
+    }
+
+    const normalizedPayload = encodedPayload
       .replace(/-/g, "+")
       .replace(/_/g, "/");
     const payload = JSON.parse(
-      atob(encodedPayload.padEnd(Math.ceil(encodedPayload.length / 4) * 4, "="))
+      atob(normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, "="))
     );
 
     if (!payload.exp || payload.exp * 1000 <= Date.now()) {
