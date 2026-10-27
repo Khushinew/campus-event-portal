@@ -130,6 +130,20 @@ function validObjectId(id) {
   return mongoose.isValidObjectId(id);
 }
 
+function studentDepartmentPattern(department) {
+  const patterns = {
+    BBA: /^\s*(?:BBA|Bachelor(?:s)?\s+of\s+Business\s+Administration)(?:\s+.*)?\s*$/i,
+    BTech: /^\s*(?:B\.?\s*Tech|BT|Bachelor(?:s)?\s+of\s+Technology)(?:\s+.*)?\s*$/i,
+    BCA: /^\s*(?:BCA|Bachelor(?:s)?\s+of\s+Computer\s+Applications)(?:\s+.*)?\s*$/i,
+    Chemical: /^\s*Chemical(?:\s+.*)?\s*$/i,
+    MBA: /^\s*(?:MBA|Master(?:s)?\s+of\s+Business\s+Administration)(?:\s+.*)?\s*$/i,
+    Biotech: /^\s*(?:Bio(?:tech(?:nology)?)?|Biotechnology)(?:\s+.*)?\s*$/i,
+    MSc: /^\s*(?:M\.?\s*Sc(?:ience)?|Master(?:s)?\s+of\s+Science)(?:\s+.*)?\s*$/i,
+  };
+
+  return patterns[department] || null;
+}
+
 function eventSummary(event) {
   const summary = event.toObject ? event.toObject() : { ...event };
   const registrationCount = Array.isArray(summary.registrations)
@@ -404,6 +418,9 @@ app.post(
         participationFeeRequired,
         participationFee,
         paymentMode,
+        attendanceEnabled,
+        attendanceType,
+        attendanceDepartment,
         maxStudents,
         max_participants,
       } = req.body;
@@ -472,6 +489,66 @@ app.post(
         });
       }
 
+      const hasAttendanceRequirements = attendanceEnabled === "true";
+      if (
+        attendanceEnabled !== undefined &&
+        attendanceEnabled !== "true" &&
+        attendanceEnabled !== "false"
+      ) {
+        return res.status(400).json({
+          message: "Attendance selection is invalid.",
+        });
+      }
+
+      const normalizedAttendanceType = hasAttendanceRequirements
+        ? String(attendanceType || "")
+        : "";
+      const normalizedAttendanceDepartment =
+        hasAttendanceRequirements &&
+        ["compulsory", "both"].includes(normalizedAttendanceType)
+          ? String(attendanceDepartment || "").trim()
+          : "";
+
+      if (
+        hasAttendanceRequirements &&
+        !["compulsory", "open", "both"].includes(normalizedAttendanceType)
+      ) {
+        return res.status(400).json({
+          message: "Select a valid attendance requirement.",
+        });
+      }
+
+      if (
+        hasAttendanceRequirements &&
+        ["compulsory", "both"].includes(normalizedAttendanceType)
+      ) {
+        if (!normalizedAttendanceDepartment) {
+          return res.status(400).json({
+            message: "Select the student department for attendance tracking.",
+          });
+        }
+
+        const departmentPattern = studentDepartmentPattern(
+          normalizedAttendanceDepartment
+        );
+        if (!departmentPattern) {
+          return res.status(400).json({
+            message: "Select a supported student department.",
+          });
+        }
+
+        const domainExists = await CollegeUser.exists({
+          role: "student",
+          department: departmentPattern,
+        });
+
+        if (!domainExists) {
+          return res.status(400).json({
+            message: "The selected student department is not in the college directory.",
+          });
+        }
+      }
+
       const event = await Event.create({
   title: title.trim(),
   description: description.trim(),
@@ -484,6 +561,9 @@ app.post(
   participationFeeRequired: hasParticipationFee,
   participationFee: requestedFee,
   paymentMode: normalizedPaymentMode,
+  attendanceEnabled: hasAttendanceRequirements,
+  attendanceType: normalizedAttendanceType,
+  attendanceDepartment: normalizedAttendanceDepartment,
   facultyId: String(faculty._id),
   createdBy: faculty.name || faculty.email,
   imageUrl: req.file ? `/uploads/${req.file.filename}` : "",
@@ -830,6 +910,153 @@ app.get(
     }
   }
 );
+
+app.get(
+  "/api/events/:eventId/attendance",
+  verifyToken,
+  requireRole("faculty"),
+  async (req, res) => {
+    try {
+      if (!validObjectId(req.params.eventId)) {
+        return res.status(400).json({
+          message: "Invalid event ID.",
+        });
+      }
+
+      const event = await Event.findById(req.params.eventId);
+      if (!event) {
+        return res.status(404).json({
+          message: "Event not found.",
+        });
+      }
+
+      if (String(event.facultyId) !== String(req.user.userId)) {
+        return res.status(403).json({
+          message: "You cannot view attendance for this event.",
+        });
+      }
+
+      if (
+        !event.attendanceEnabled ||
+        !["compulsory", "both"].includes(event.attendanceType) ||
+        !event.attendanceDepartment
+      ) {
+        return res.status(400).json({
+          message: "This event does not have a required attendance cohort.",
+        });
+      }
+
+      const departmentPattern = studentDepartmentPattern(
+        event.attendanceDepartment
+      );
+      if (!departmentPattern) {
+        return res.status(400).json({
+          message: "This event has an unsupported attendance department.",
+        });
+      }
+
+      const cohortStudents = await CollegeUser.find({
+        role: "student",
+        department: departmentPattern,
+      })
+        .select("name email studentId department semester")
+        .lean();
+      const cohortEmails = cohortStudents
+        .map((student) => String(student.email || "").toLowerCase())
+        .filter(Boolean);
+      const cohortAccounts = cohortEmails.length
+        ? await User.find({ email: { $in: cohortEmails } })
+            .select("name email studentId")
+            .lean()
+        : [];
+      const accountByEmail = new Map(
+        cohortAccounts.map((account) => [
+          String(account.email || "").toLowerCase(),
+          account,
+        ])
+      );
+
+      const registeredEmails = new Set();
+      const registeredIds = new Set();
+      const legacyAccountIds = [];
+
+      event.registrations.forEach((registration) => {
+        if (registration.studentEmail) {
+          registeredEmails.add(
+            String(registration.studentEmail).trim().toLowerCase()
+          );
+        }
+        if (registration.studentId) {
+          registeredIds.add(String(registration.studentId));
+        }
+        if (registration.userId) {
+          registeredIds.add(String(registration.userId));
+        } else if (
+          !registration.studentEmail &&
+          !registration.studentId &&
+          validObjectId(registration._id)
+        ) {
+          legacyAccountIds.push(registration._id);
+        }
+      });
+
+      if (legacyAccountIds.length) {
+        const legacyAccounts = await User.find({
+          _id: { $in: legacyAccountIds },
+        })
+          .select("email studentId")
+          .lean();
+        legacyAccounts.forEach((account) => {
+          registeredIds.add(String(account._id));
+          if (account.studentId) registeredIds.add(String(account.studentId));
+          if (account.email) {
+            registeredEmails.add(String(account.email).toLowerCase());
+          }
+        });
+      }
+
+      const students = cohortStudents.map((student) => {
+        const email = String(student.email || "").toLowerCase();
+        const account = accountByEmail.get(email);
+        const identities = [
+          student.studentId,
+          account?.studentId,
+          account?._id,
+        ]
+          .filter(Boolean)
+          .map(String);
+
+        return {
+          studentId: student.studentId || account?.studentId || "",
+          studentName: student.name || account?.name || "",
+          studentEmail: student.email || "",
+          department: student.department || "",
+          semester: student.semester || "",
+          registered:
+            registeredEmails.has(email) ||
+            identities.some((identity) => registeredIds.has(identity)),
+        };
+      });
+      const registeredCount = students.filter(
+        (student) => student.registered
+      ).length;
+
+      return res.status(200).json({
+        department: event.attendanceDepartment,
+        total: students.length,
+        registered: registeredCount,
+        unregistered: students.length - registeredCount,
+        students,
+      });
+    } catch (error) {
+      console.error("Fetch event attendance error:", error);
+      return res.status(500).json({
+        message: "Failed to fetch event attendance.",
+      });
+    }
+  }
+);
+
 // =====================================
 // REGISTER FOR EVENT
 // POST /api/events/:eventId/register
@@ -855,9 +1082,30 @@ app.post(
         });
       }
 
+      const event = await Event.findById(req.params.eventId);
+      if (!event) {
+        return res.status(404).json({
+          message: "Event not found.",
+        });
+      }
+
       const directoryStudent = await CollegeUser.findOne({
         email: student.email,
-      }).select("studentId");
+      }).select("studentId department semester");
+      const studentDepartment =
+        directoryStudent?.department || student.department || "";
+
+      if (
+        event.attendanceEnabled &&
+        event.attendanceType === "compulsory" &&
+        String(studentDepartment).trim().toLowerCase() !==
+          String(event.attendanceDepartment).trim().toLowerCase()
+      ) {
+        return res.status(403).json({
+          message: `This event is compulsory for students in ${event.attendanceDepartment}.`,
+        });
+      }
+
       const enrollmentId =
         student.studentId ||
         directoryStudent?.studentId ||
@@ -966,8 +1214,9 @@ app.post(
               studentId: enrollmentId,
               studentName: student.name || "",
               studentEmail: normalizedEmail,
-              department: student.department || "",
-              semester: student.semester || "",
+              department: studentDepartment,
+              semester:
+                directoryStudent?.semester || student.semester || "",
               registeredAt: new Date(),
             },
           },

@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import "./CreateEvent.css";
 import FacultySidebar from "./FacultySidebar";
 import Footer from "../../components/Footer";
+
+const ATTENDANCE_DEPARTMENTS = [
+  "BBA",
+  "BTech",
+  "BCA",
+  "Chemical",
+  "MBA",
+  "Biotech",
+  "MSc",
+];
 
 function CreateEvent() {
   const navigate = useNavigate();
@@ -19,11 +30,20 @@ function CreateEvent() {
     participationFeeRequired: false,
     participationFee: "",
     paymentMode: "",
+    attendanceEnabled: false,
+    attendanceType: "",
+    attendanceDepartment: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
-const [imagePreview, setImagePreview] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
+  const [attendanceModalOpen, setAttendanceModalOpen] = useState(false);
+  const [attendanceDraft, setAttendanceDraft] = useState({
+    attendanceType: "",
+    attendanceDepartment: "",
+  });
+  const [attendanceError, setAttendanceError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -51,6 +71,43 @@ const [imagePreview, setImagePreview] = useState("");
   setImage(file);
   setImagePreview(URL.createObjectURL(file));
 };
+
+  const openAttendanceSettings = () => {
+    setAttendanceDraft({
+      attendanceType: formData.attendanceType,
+      attendanceDepartment: formData.attendanceDepartment,
+    });
+    setAttendanceError("");
+    setAttendanceModalOpen(true);
+  };
+
+  const saveAttendanceSettings = () => {
+    const needsDepartment = ["compulsory", "both"].includes(
+      attendanceDraft.attendanceType
+    );
+
+    if (!attendanceDraft.attendanceType) {
+      setAttendanceError("Choose an attendance option to continue.");
+      return;
+    }
+    if (needsDepartment && !attendanceDraft.attendanceDepartment) {
+      setAttendanceError(
+        "Select the student department for attendance tracking."
+      );
+      return;
+    }
+
+    setFormData((previous) => ({
+      ...previous,
+      attendanceEnabled: true,
+      attendanceType: attendanceDraft.attendanceType,
+      attendanceDepartment: needsDepartment
+        ? attendanceDraft.attendanceDepartment
+        : "",
+    }));
+    setAttendanceError("");
+    setAttendanceModalOpen(false);
+  };
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -123,6 +180,9 @@ const response = await fetch("http://localhost:5000/api/events", {
       participationFeeRequired: false,
       participationFee: "",
       paymentMode: "",
+      attendanceEnabled: false,
+      attendanceType: "",
+      attendanceDepartment: "",
     });
 
     navigate("/faculty/events");
@@ -499,6 +559,47 @@ const response = await fetch("http://localhost:5000/api/events", {
               )}
             </fieldset>
 
+            <fieldset className="form-group participation-fee-group">
+              <legend>Attendance</legend>
+              <label className="fee-checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={formData.attendanceEnabled}
+                  onChange={(event) => {
+                    if (event.target.checked) {
+                      openAttendanceSettings();
+                      return;
+                    }
+
+                    setFormData((previous) => ({
+                      ...previous,
+                      attendanceEnabled: false,
+                      attendanceType: "",
+                      attendanceDepartment: "",
+                    }));
+                  }}
+                />
+                Set attendance requirements
+              </label>
+
+              {formData.attendanceEnabled && (
+                <p className="attendance-summary">
+                  {formData.attendanceType === "compulsory"
+                    ? `Compulsory for ${formData.attendanceDepartment}`
+                    : formData.attendanceType === "both"
+                      ? `Open registration; attendance tracked for ${formData.attendanceDepartment}`
+                      : "Open to anyone who registers"}
+                  <button
+                    type="button"
+                    className="attendance-edit-button"
+                    onClick={openAttendanceSettings}
+                  >
+                    Edit
+                  </button>
+                </p>
+              )}
+            </fieldset>
+
             {/* =================================================
                 BUTTONS
             ================================================= */}
@@ -525,6 +626,156 @@ const response = await fetch("http://localhost:5000/api/events", {
             </div>
 
           </form>
+
+          {attendanceModalOpen && createPortal(
+            <div
+              className="attendance-modal-backdrop"
+              role="presentation"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) {
+                  setAttendanceModalOpen(false);
+                }
+              }}
+            >
+              <section
+                className="attendance-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="attendance-modal-title"
+              >
+                <button
+                  type="button"
+                  className="attendance-modal-close"
+                  onClick={() => setAttendanceModalOpen(false)}
+                  aria-label="Close attendance settings"
+                >
+                  ×
+                </button>
+                <p className="form-label">EVENT ATTENDANCE</p>
+                <h2 id="attendance-modal-title">Attendance Requirements</h2>
+                <p className="attendance-modal-description">
+                  Choose who may register and whether a student department must
+                  be tracked.
+                </p>
+
+                <div className="attendance-options">
+                  <label>
+                    <input
+                      type="radio"
+                      name="attendanceType"
+                      value="compulsory"
+                      checked={attendanceDraft.attendanceType === "compulsory"}
+                      onChange={(event) =>
+                        setAttendanceDraft((previous) => ({
+                          ...previous,
+                          attendanceType: event.target.value,
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>Compulsory</strong>
+                      <small>Only the selected department can register.</small>
+                    </span>
+                  </label>
+
+                  <label>
+                    <input
+                      type="radio"
+                      name="attendanceType"
+                      value="open"
+                      checked={attendanceDraft.attendanceType === "open"}
+                      onChange={(event) =>
+                        setAttendanceDraft((previous) => ({
+                          ...previous,
+                          attendanceType: event.target.value,
+                          attendanceDepartment: "",
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>Anyone with registration</strong>
+                      <small>
+                        Keep registration open without a required cohort.
+                      </small>
+                    </span>
+                  </label>
+
+                  <label>
+                    <input
+                      type="radio"
+                      name="attendanceType"
+                      value="both"
+                      checked={attendanceDraft.attendanceType === "both"}
+                      onChange={(event) =>
+                        setAttendanceDraft((previous) => ({
+                          ...previous,
+                          attendanceType: event.target.value,
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>Both</strong>
+                      <small>
+                        Anyone may register, and the selected department is
+                        tracked as compulsory.
+                      </small>
+                    </span>
+                  </label>
+                </div>
+
+                {["compulsory", "both"].includes(
+                  attendanceDraft.attendanceType
+                ) && (
+                  <div className="attendance-department">
+                    <label htmlFor="attendance-department">
+                      Required student department
+                    </label>
+                    <select
+                      id="attendance-department"
+                      value={attendanceDraft.attendanceDepartment}
+                      onChange={(event) =>
+                        setAttendanceDraft((previous) => ({
+                          ...previous,
+                          attendanceDepartment: event.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">Select department</option>
+                      {ATTENDANCE_DEPARTMENTS.map((department) => (
+                        <option value={department} key={department}>
+                          {department}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {attendanceError && (
+                  <p className="attendance-modal-error" role="alert">
+                    {attendanceError}
+                  </p>
+                )}
+
+                <div className="attendance-modal-actions">
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => setAttendanceModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="save-event-btn"
+                    onClick={saveAttendanceSettings}
+                  >
+                    Save Attendance
+                  </button>
+                </div>
+              </section>
+            </div>,
+            document.body
+          )}
 
         </section>
 

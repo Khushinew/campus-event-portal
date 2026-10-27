@@ -32,6 +32,9 @@ function EventRegistrationDetails() {
 
   const [event, setEvent] = useState(null);
   const [students, setStudents] = useState([]);
+  const [attendance, setAttendance] = useState(null);
+  const [attendanceError, setAttendanceError] = useState("");
+  const [showAttendanceStudents, setShowAttendanceStudents] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -81,6 +84,36 @@ function EventRegistrationDetails() {
                 registrationData.students ||
                 []
         );
+
+        if (
+          eventData.attendanceEnabled &&
+          ["compulsory", "both"].includes(eventData.attendanceType)
+        ) {
+          try {
+            const attendanceResponse = await fetch(
+              `http://localhost:5000/api/events/${eventId}/attendance`,
+              { headers }
+            );
+            const attendanceData = await attendanceResponse.json();
+            if (!attendanceResponse.ok) {
+              throw new Error(
+                attendanceData.message || "Unable to load attendance status."
+              );
+            }
+            setAttendance(attendanceData);
+            setAttendanceError("");
+          } catch (attendanceLoadError) {
+            console.error("Event attendance error:", attendanceLoadError);
+            setAttendance(null);
+            setAttendanceError(
+              attendanceLoadError.message ||
+                "Unable to load attendance status."
+            );
+          }
+        } else {
+          setAttendance(null);
+          setAttendanceError("");
+        }
       } catch (err) {
         console.error("Registration details error:", err);
         setError(err.message || "Failed to load registration details.");
@@ -267,6 +300,118 @@ function renderDepartmentChart(entries) {
                 {event.venue || "Venue not specified"}
               </p>
             </section>
+
+            {event.attendanceEnabled &&
+              ["compulsory", "both"].includes(event.attendanceType) && (
+                <section className="attendance-cohort-panel">
+                  <div className="attendance-cohort-heading">
+                    <div>
+                      <p className="monitor-label">Required Cohort</p>
+                      <h2>{event.attendanceDepartment} Attendance</h2>
+                    </div>
+                    {attendance && (
+                      <span className="attendance-progress-count">
+                        {attendance.registered} / {attendance.total} registered
+                      </span>
+                    )}
+                  </div>
+
+                  {event.attendanceType === "both" && (
+                    <p className="attendance-cohort-note">
+                      Other students may register too; this list tracks the
+                      required department only.
+                    </p>
+                  )}
+
+                  {attendanceError ? (
+                    <p className="attendance-cohort-error" role="alert">
+                      {attendanceError}
+                    </p>
+                  ) : attendance ? (
+                    <>
+                      <p className="attendance-unregistered-count">
+                        {attendance.unregistered} student
+                        {attendance.unregistered === 1 ? "" : "s"} from{" "}
+                        {attendance.department} have not registered.
+                      </p>
+                      <button
+                        type="button"
+                        className="attendance-list-toggle"
+                        aria-expanded={showAttendanceStudents}
+                        onClick={() =>
+                          setShowAttendanceStudents((visible) => !visible)
+                        }
+                      >
+                        {showAttendanceStudents
+                          ? "Hide department list"
+                          : "View department attendance"}
+                      </button>
+
+                      {showAttendanceStudents && (
+                        attendance.students.length ? (
+                          <div className="students-table-wrapper attendance-table-wrapper">
+                            <table className="students-table attendance-table">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Student Name</th>
+                                  <th>Student ID</th>
+                                  <th>Semester</th>
+                                  <th>Registration Status</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {attendance.students.map((student, index) => (
+                                  <tr
+                                    key={
+                                      student.studentEmail ||
+                                      student.studentId ||
+                                      index
+                                    }
+                                  >
+                                    <td className="student-number">
+                                      {index + 1}
+                                    </td>
+                                    <td>
+                                      <strong>
+                                        {student.studentName || "Not provided"}
+                                      </strong>
+                                    </td>
+                                    <td>{student.studentId || "—"}</td>
+                                    <td>{student.semester || "—"}</td>
+                                    <td>
+                                      <span
+                                        className={
+                                          student.registered
+                                            ? "attendance-registered"
+                                            : "attendance-not-registered"
+                                        }
+                                      >
+                                        {student.registered
+                                          ? "✓ Registered"
+                                          : "Not registered"}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p className="attendance-cohort-note">
+                            No students were found in this department in the
+                            college directory.
+                          </p>
+                        )
+                      )}
+                    </>
+                  ) : (
+                    <p className="attendance-cohort-note">
+                      Loading department attendance...
+                    </p>
+                  )}
+                </section>
+              )}
 
             <section className="registration-analytics">
               <article className="analytics-card">

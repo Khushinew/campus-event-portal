@@ -12,6 +12,7 @@
 }
 
 .registration-event-heading,
+.attendance-cohort-panel,
 .capacity-panel,
 .analytics-panel,
 .analytics-card,
@@ -46,6 +47,81 @@
     color: #7186a1;
     line-height: 1.7;
     margin-bottom: 0;
+}
+
+.attendance-cohort-panel {
+    padding: 26px 30px;
+    margin-bottom: 22px;
+}
+
+.attendance-cohort-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.attendance-cohort-heading h2 {
+    margin: 0;
+    color: #172033;
+    font-family: "Playfair Display", serif;
+    font-size: 24px;
+}
+
+.attendance-progress-count {
+    padding: 9px 13px;
+    border-radius: 6px;
+    background: #dff0dc;
+    color: #385b3b;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.attendance-cohort-note,
+.attendance-unregistered-count {
+    margin-top: 14px;
+    color: #718096;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.attendance-unregistered-count {
+    color: #a35436;
+    font-weight: 700;
+}
+
+.attendance-cohort-error {
+    margin-top: 16px;
+    color: #a5332c;
+    font-size: 14px;
+}
+
+.attendance-list-toggle {
+    margin-top: 16px;
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 6px;
+    background: #1b2335;
+    color: #fffdf7;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.attendance-table-wrapper {
+    margin-top: 18px;
+}
+
+.attendance-registered {
+    color: #287044;
+    font-weight: 700;
+}
+
+.attendance-not-registered {
+    color: #a35436;
+    font-weight: 600;
 }
 
 .registration-analytics {
@@ -227,6 +303,7 @@
 
 @media (max-width: 550px) {
     .registration-event-heading,
+    .attendance-cohort-panel,
     .analytics-panel,
     .capacity-panel,
     .registered-students-panel {
@@ -250,6 +327,11 @@
     }
 
     .registered-students-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .attendance-cohort-heading {
         align-items: flex-start;
         flex-direction: column;
     }
