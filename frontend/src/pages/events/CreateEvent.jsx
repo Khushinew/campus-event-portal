@@ -14,6 +14,12 @@ const ATTENDANCE_DEPARTMENTS = [
   "Biotech",
   "MSc",
 ];
+const ATTENDANCE_YEAR_RANGES = [
+  "2024-2028",
+  "2024-2029",
+  "2024-2025",
+  "2022-2025",
+];
 
 function CreateEvent() {
   const navigate = useNavigate();
@@ -32,7 +38,8 @@ function CreateEvent() {
     paymentMode: "",
     attendanceEnabled: false,
     attendanceType: "",
-    attendanceDepartment: "",
+    attendanceDepartments: [],
+    attendanceYears: [],
   });
 
   const [loading, setLoading] = useState(false);
@@ -41,7 +48,8 @@ function CreateEvent() {
   const [attendanceModalOpen, setAttendanceModalOpen] = useState(false);
   const [attendanceDraft, setAttendanceDraft] = useState({
     attendanceType: "",
-    attendanceDepartment: "",
+    attendanceDepartments: [],
+    attendanceYears: [],
   });
   const [attendanceError, setAttendanceError] = useState("");
 
@@ -75,7 +83,8 @@ function CreateEvent() {
   const openAttendanceSettings = () => {
     setAttendanceDraft({
       attendanceType: formData.attendanceType,
-      attendanceDepartment: formData.attendanceDepartment,
+      attendanceDepartments: formData.attendanceDepartments,
+      attendanceYears: formData.attendanceYears,
     });
     setAttendanceError("");
     setAttendanceModalOpen(true);
@@ -90,10 +99,17 @@ function CreateEvent() {
       setAttendanceError("Choose an attendance option to continue.");
       return;
     }
-    if (needsDepartment && !attendanceDraft.attendanceDepartment) {
+    if (needsDepartment && !attendanceDraft.attendanceDepartments.length) {
       setAttendanceError(
-        "Select the student department for attendance tracking."
+        "Select at least one student department for attendance tracking."
       );
+      return;
+    }
+    if (
+      needsDepartment &&
+      !attendanceDraft.attendanceYears.length
+    ) {
+      setAttendanceError("Select at least one student year range.");
       return;
     }
 
@@ -101,9 +117,12 @@ function CreateEvent() {
       ...previous,
       attendanceEnabled: true,
       attendanceType: attendanceDraft.attendanceType,
-      attendanceDepartment: needsDepartment
-        ? attendanceDraft.attendanceDepartment
-        : "",
+      attendanceDepartments: needsDepartment
+        ? attendanceDraft.attendanceDepartments
+        : [],
+      attendanceYears: needsDepartment
+        ? attendanceDraft.attendanceYears
+        : [],
     }));
     setAttendanceError("");
     setAttendanceModalOpen(false);
@@ -141,7 +160,10 @@ function CreateEvent() {
    const payload = new FormData();
 
 Object.entries(formData).forEach(([key, value]) => {
-  payload.append(key, value);
+  payload.append(
+    key,
+    Array.isArray(value) ? JSON.stringify(value) : value
+  );
 });
 
 payload.set("capacity", String(Number(formData.capacity)));
@@ -182,7 +204,8 @@ const response = await fetch("http://localhost:5000/api/events", {
       paymentMode: "",
       attendanceEnabled: false,
       attendanceType: "",
-      attendanceDepartment: "",
+      attendanceDepartments: [],
+      attendanceYears: [],
     });
 
     navigate("/faculty/events");
@@ -575,7 +598,8 @@ const response = await fetch("http://localhost:5000/api/events", {
                       ...previous,
                       attendanceEnabled: false,
                       attendanceType: "",
-                      attendanceDepartment: "",
+                      attendanceDepartments: [],
+                      attendanceYears: [],
                     }));
                   }}
                 />
@@ -585,10 +609,12 @@ const response = await fetch("http://localhost:5000/api/events", {
               {formData.attendanceEnabled && (
                 <p className="attendance-summary">
                   {formData.attendanceType === "compulsory"
-                    ? `Compulsory for ${formData.attendanceDepartment}`
+                    ? `Compulsory for ${formData.attendanceDepartments.join(", ")}`
                     : formData.attendanceType === "both"
-                      ? `Open registration; attendance tracked for ${formData.attendanceDepartment}`
+                      ? `Open registration; attendance tracked for ${formData.attendanceDepartments.join(", ")}`
                       : "Open to anyone who registers"}
+                  {formData.attendanceYears.length > 0 &&
+                    ` · Year ranges: ${formData.attendanceYears.join(", ")}`}
                   <button
                     type="button"
                     className="attendance-edit-button"
@@ -688,7 +714,8 @@ const response = await fetch("http://localhost:5000/api/events", {
                         setAttendanceDraft((previous) => ({
                           ...previous,
                           attendanceType: event.target.value,
-                          attendanceDepartment: "",
+                          attendanceDepartments: [],
+                          attendanceYears: [],
                         }))
                       }
                     />
@@ -726,28 +753,69 @@ const response = await fetch("http://localhost:5000/api/events", {
                 {["compulsory", "both"].includes(
                   attendanceDraft.attendanceType
                 ) && (
-                  <div className="attendance-department">
-                    <label htmlFor="attendance-department">
-                      Required student department
-                    </label>
-                    <select
-                      id="attendance-department"
-                      value={attendanceDraft.attendanceDepartment}
-                      onChange={(event) =>
-                        setAttendanceDraft((previous) => ({
-                          ...previous,
-                          attendanceDepartment: event.target.value,
-                        }))
-                      }
-                    >
-                      <option value="">Select department</option>
-                      {ATTENDANCE_DEPARTMENTS.map((department) => (
-                        <option value={department} key={department}>
-                          {department}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <>
+                    <fieldset className="attendance-multi-select">
+                      <legend>Required student departments</legend>
+                      <div className="attendance-checkbox-grid">
+                        {ATTENDANCE_DEPARTMENTS.map((department) => (
+                          <label key={department}>
+                            <input
+                              type="checkbox"
+                              checked={attendanceDraft.attendanceDepartments.includes(
+                                department
+                              )}
+                              onChange={(event) =>
+                                setAttendanceDraft((previous) => ({
+                                  ...previous,
+                                  attendanceDepartments: event.target.checked
+                                    ? [
+                                        ...previous.attendanceDepartments,
+                                        department,
+                                      ]
+                                    : previous.attendanceDepartments.filter(
+                                        (item) => item !== department
+                                      ),
+                                }))
+                              }
+                            />
+                            {department}
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+
+                    <fieldset className="attendance-multi-select">
+                      <legend>Student year ranges</legend>
+                      <div className="attendance-checkbox-grid">
+                        {ATTENDANCE_YEAR_RANGES.map((yearRange) => (
+                          <label key={yearRange}>
+                            <input
+                              type="checkbox"
+                              checked={attendanceDraft.attendanceYears.includes(
+                                yearRange
+                              )}
+                              onChange={(event) =>
+                                setAttendanceDraft((previous) => ({
+                                  ...previous,
+                                  attendanceYears: event.target.checked
+                                    ? [...previous.attendanceYears, yearRange]
+                                    : previous.attendanceYears.filter(
+                                        (item) => item !== yearRange
+                                      ),
+                                }))
+                              }
+                            />
+                            {yearRange}
+                          </label>
+                        ))}
+                      </div>
+                      <small className="attendance-year-note">
+                        Year ranges are saved with the event. Attendance
+                        counts currently use department only because student
+                        directory records do not identify these ranges.
+                      </small>
+                    </fieldset>
+                  </>
                 )}
 
                 {attendanceError && (

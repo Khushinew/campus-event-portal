@@ -168,6 +168,14 @@ function EventRegistrationDetails() {
     };
   }, [students, event]);
 
+  const attendanceDepartments =
+    event?.attendanceDepartments?.length
+      ? event.attendanceDepartments
+      : event?.attendanceDepartment
+        ? [event.attendanceDepartment]
+        : [];
+  const attendanceYears = event?.attendanceYears || [];
+
   function renderSemesterChart(entries) {
   const data = entries.map(([name, value]) => ({
     name: name === "Not specified" ? name : `Semester ${name}`,
@@ -307,7 +315,7 @@ function renderDepartmentChart(entries) {
                   <div className="attendance-cohort-heading">
                     <div>
                       <p className="monitor-label">Required Cohort</p>
-                      <h2>{event.attendanceDepartment} Attendance</h2>
+                      <h2>{attendanceDepartments.join(", ")} Attendance</h2>
                     </div>
                     {attendance && (
                       <span className="attendance-progress-count">
@@ -320,6 +328,14 @@ function renderDepartmentChart(entries) {
                     <p className="attendance-cohort-note">
                       Other students may register too; this list tracks the
                       required department only.
+                    </p>
+                  )}
+
+                  {attendanceYears.length > 0 && (
+                    <p className="attendance-cohort-note">
+                      Selected year ranges: {attendanceYears.join(", ")}.
+                      Attendance counts are based on department because student
+                      records do not currently identify these year ranges.
                     </p>
                   )}
 
