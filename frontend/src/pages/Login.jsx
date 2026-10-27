@@ -12,6 +12,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [resetInfo, setResetInfo] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
@@ -147,6 +148,24 @@ function Login() {
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
+
+          <div className="forgot-password-option">
+            <button
+              type="button"
+              onClick={() =>
+                setResetInfo(
+                  "Password reset is currently unavailable. Please contact your campus administrator for help."
+                )
+              }
+            >
+              Forgot Password?
+            </button>
+            {resetInfo && (
+              <p role="status" aria-live="polite">
+                {resetInfo}
+              </p>
+            )}
+          </div>
         </div>
       </main>
 
