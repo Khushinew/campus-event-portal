@@ -78,6 +78,20 @@ const eventSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+    participationFeeRequired: {
+      type: Boolean,
+      default: false,
+    },
+    participationFee: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    paymentMode: {
+      type: String,
+      enum: ["", "Online", "Offline"],
+      default: "",
+    },
     facultyId: {
       type: String,
       required: true,
