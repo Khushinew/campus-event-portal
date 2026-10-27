@@ -146,19 +146,29 @@ body {
 }
 
 
-/* Center and enlarge the Campusphere logo on the homepage */
-.home .header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 120px;
-  padding: 20px 32px;
-  box-sizing: border-box;
-}
-
 .home .header .logo {
-  font-size: clamp(42px, 4vw, 54px);
+  font-size: 30px;
   font-weight: 700;
   line-height: 1.1;
-  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .home .header {
+    height: auto;
+    min-height: 76px;
+    padding: 16px 5%;
+    gap: 16px;
+  }
+
+  .home .header .logo {
+    font-size: 24px;
+  }
+
+  .home .nav-links {
+    gap: 14px;
+  }
+
+  .home .nav-links a {
+    font-size: 13px;
+  }
 }

@@ -33,6 +33,12 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
+    studentId: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     semester: {
       type: String,
       default: "",

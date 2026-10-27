@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getDashboardPath } from "../auth";
+import { getDashboardPath, saveAuthSession } from "../auth";
 import "./Login.css";
 import Footer from "../components/Footer";
 
@@ -11,7 +11,6 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -48,8 +47,7 @@ function Login() {
         return;
       }
 
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("token", data.token);
+      saveAuthSession(data.user, data.token);
 
       // Redirect first-time users to change their password.
       if (data.firstLogin || data.user.mustChangePassword) {
@@ -142,15 +140,6 @@ function Login() {
             </div>
 
             <div className="login-options">
-              <label className="remember">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />
-                Remember me
-              </label>
-
               <Link to="/forgot-password">Forgot Password?</Link>
             </div>
 

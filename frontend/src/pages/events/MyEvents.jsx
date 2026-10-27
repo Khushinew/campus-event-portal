@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import "./MyEvent.css";
 import FacultySidebar from "./FacultySidebar";
 import Footer from "../../components/Footer";
-import { useLocation } from "react-router-dom";
 
 function MyEvents() {
   const navigate = useNavigate();
@@ -12,7 +11,7 @@ function MyEvents() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = sessionStorage.getItem("user");
 
     if (!savedUser) {
       navigate("/login");
@@ -25,7 +24,7 @@ function MyEvents() {
       currentUser = JSON.parse(savedUser);
     } catch (error) {
       console.error("Invalid user data:", error);
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
       navigate("/login");
       return;
     }
@@ -40,7 +39,7 @@ fetch(
   `http://localhost:5000/api/events/faculty/${currentUser.id}`,
   {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
     },
   }
 )

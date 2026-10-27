@@ -7,7 +7,7 @@ import Footer from "../../components/Footer";
 function StudentProfile() {
   const [user] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("user")) || {};
+      return JSON.parse(sessionStorage.getItem("user")) || {};
     } catch {
       return {};
     }

@@ -4,75 +4,56 @@ import { Link, useNavigate } from "react-router-dom";
 import FacultySidebar from "./FacultySidebar";
 import Footer from "../../components/Footer";
 import "./MonitorRegistrations.css";
+import { formatEventDate } from "../../eventUtils";
+import { getStoredUser } from "../../auth";
 
 function MonitorRegistrations() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
+  const [user] = useState(() => getStoredUser());
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
-    if (!storedUser || !token) {
+    if (!user || user.role !== "faculty" || !token) {
       navigate("/login");
       return;
     }
 
-    let currentUser;
+    async function loadFacultyEvents() {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/events/faculty/${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
 
-    try {
-      currentUser = JSON.parse(storedUser);
-    } catch {
-      navigate("/login");
-      return;
-    }
-
-    if (currentUser.role !== "faculty") {
-      navigate("/login");
-      return;
-    }
-
-    setUser(currentUser);
-    fetchFacultyEvents(currentUser.id, token);
-  }, [navigate]);
-
-  async function fetchFacultyEvents(facultyId, token) {
-    setLoadingEvents(true);
-    setError("");
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/events/faculty/${facultyId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load events.");
         }
-      );
+        if (!Array.isArray(data)) {
+          throw new Error("The server returned an unexpected events response.");
+        }
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to load events.");
+        setEvents(data);
+      } catch (loadError) {
+        console.error("Error fetching faculty events:", loadError);
+        setError(loadError.message || "Unable to load your events.");
+        setEvents([]);
+      } finally {
+        setLoadingEvents(false);
       }
-
-      if (!Array.isArray(data)) {
-        throw new Error("The server returned an unexpected events response.");
-      }
-
-      setEvents(data);
-    } catch (err) {
-      console.error("Error fetching faculty events:", err);
-      setError(err.message || "Unable to load your events.");
-      setEvents([]);
-    } finally {
-      setLoadingEvents(false);
     }
-  }
+
+    loadFacultyEvents();
+  }, [navigate, user]);
 
   function handleEventClick(event) {
     const eventId = event._id || event.id;
@@ -134,13 +115,14 @@ function MonitorRegistrations() {
                   className="monitor-event-card"
                   onClick={() => handleEventClick(event)}
                 >
+                  {event.isFull && (
+                    <span className="monitor-full-label">FULLY CAPACITY</span>
+                  )}
                   <h3>{event.title}</h3>
 
                   <p>
                     <strong>Date:</strong>{" "}
-                    {event.date
-                      ? new Date(event.date).toLocaleDateString()
-                      : "Not specified"}
+                    {formatEventDate(event.date)}
                   </p>
 
                   <p>
@@ -149,6 +131,21 @@ function MonitorRegistrations() {
 
                   <p>
                     <strong>Venue:</strong> {event.venue || "Not specified"}
+                  </p>
+                  <p>
+                    <strong>Registrations:</strong>{" "}
+                    {event.registrationCount ?? event.registrations?.length ?? 0}
+                    {" / "}
+                    {event.capacity ?? "—"}
+                  </p>
+                  <p>
+                    <strong>Seats remaining:</strong>{" "}
+                    {event.seatsRemaining ??
+                      Math.max(
+                        Number(event.capacity || 0) -
+                          Number(event.registrationCount || 0),
+                        0
+                      )}
                   </p>
 
                   <span className="view-registrations">

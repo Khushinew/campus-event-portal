@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { clearAuthSession, getSessionToken } from "../auth";
 import "./ChangePassword.css";
 
 
@@ -57,7 +58,7 @@ function ChangePassword() {
         try {
 
             
-const token = localStorage.getItem("token");
+const token = getSessionToken();
 
 if (!token) {
     setError("Your session has expired. Please login again.");
@@ -93,8 +94,7 @@ const response = await fetch(
 
            setMessage("Password changed successfully. Please login again.");
 
-localStorage.removeItem("token");
-localStorage.removeItem("user");
+clearAuthSession();
 
 setTimeout(() => {
     navigate("/login", {

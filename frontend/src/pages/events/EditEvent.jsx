@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import FacultySidebar from "./FacultySidebar";
 import "./EditEvent.css";
@@ -17,6 +17,7 @@ function EditEvent() {
     time: "",
     venue: "",
     category: "",
+    domain: "",
     capacity: 100,
   });
 
@@ -29,10 +30,7 @@ function EditEvent() {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        setLoading(true);
-        setError("");
-
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         const response = await fetch(`${API_URL}/${eventId}`, {
           headers: {
@@ -57,6 +55,7 @@ function EditEvent() {
           time: selectedEvent.time || "",
           venue: selectedEvent.venue || "",
           category: selectedEvent.category || "",
+          domain: selectedEvent.domain || "",
           capacity: selectedEvent.capacity ?? 100,
         });
       } catch (err) {
@@ -69,10 +68,9 @@ function EditEvent() {
     if (eventId) {
       fetchEvent();
     } else {
-      setError("Event ID is missing.");
-      setLoading(false);
+      navigate("/faculty/edit-events", { replace: true });
     }
-  }, [eventId]);
+  }, [eventId, navigate]);
 
   // Handle form changes.
   const handleChange = (e) => {
@@ -93,7 +91,7 @@ function EditEvent() {
     setSuccess("");
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         throw new Error("Your session has expired. Please log in again.");
@@ -110,6 +108,7 @@ function EditEvent() {
           time: event.time,
           venue: event.venue.trim(),
           category: event.category.trim(),
+          domain: event.domain.trim(),
           capacity: Number(event.capacity),
         }),
       });
@@ -380,9 +379,42 @@ function EditEvent() {
               />
             </div>
 
+            <div className="form-group">
+              <label htmlFor="domain">Domain Type</label>
+              <select
+                id="domain"
+                name="domain"
+                value={event.domain}
+                onChange={handleChange}
+              >
+                <option value="">Select domain (optional)</option>
+                {[
+                  "Campus",
+                  "Intercollegiate",
+                  "State",
+                  "National",
+                  "International",
+                ].map((domain) => (
+                  <option key={domain} value={domain}>
+                    {domain}
+                  </option>
+                ))}
+                {event.domain &&
+                  ![
+                    "Campus",
+                    "Intercollegiate",
+                    "State",
+                    "National",
+                    "International",
+                  ].includes(event.domain) && (
+                    <option value={event.domain}>{event.domain}</option>
+                  )}
+              </select>
+            </div>
+
             <div className="edit-form-note full-width">
               <span className="note-star">✦</span>
-              Only the date, time, venue, category, and capacity will
+              Only the date, time, venue, category, domain, and capacity will
               be updated. The event name and description will remain
               unchanged.
             </div>

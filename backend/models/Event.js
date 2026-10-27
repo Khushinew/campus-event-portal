@@ -4,19 +4,28 @@ const registrationSchema = new mongoose.Schema(
   {
     studentId: {
       type: String,
-      required: true,
+      default: "",
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
     },
     studentName: {
       type: String,
-      required: true,
+      default: "",
     },
     studentEmail: {
       type: String,
-      required: true,
       lowercase: true,
       trim: true,
+      default: "",
     },
     department: {
+      type: String,
+      default: "",
+    },
+    semester: {
       type: String,
       default: "",
     },
@@ -55,7 +64,12 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-        imageUrl: {
+    domain: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    imageUrl: {
       type: String,
       default: "",
     },

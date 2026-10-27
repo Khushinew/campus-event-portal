@@ -14,6 +14,7 @@ function CreateEvent() {
     time: "",
     venue: "",
     category: "",
+    domain: "",
     capacity: "",
   });
 
@@ -51,8 +52,8 @@ const [imagePreview, setImagePreview] = useState("");
   const handleSubmit = async (e) => {
   e.preventDefault();
 
-  const savedUser = localStorage.getItem("user");
-  const token = localStorage.getItem("token");
+  const savedUser = sessionStorage.getItem("user");
+  const token = sessionStorage.getItem("token");
 
   if (!savedUser || !token) {
     navigate("/login");
@@ -114,6 +115,7 @@ const response = await fetch("http://localhost:5000/api/events", {
       time: "",
       venue: "",
       category: "",
+      domain: "",
       capacity: "",
     });
 
@@ -271,6 +273,23 @@ const response = await fetch("http://localhost:5000/api/events", {
                   required
                 />
 
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="event-domain">Domain Type</label>
+                <select
+                  id="event-domain"
+                  name="domain"
+                  value={formData.domain}
+                  onChange={handleChange}
+                >
+                  <option value="">Select domain (optional)</option>
+                  <option value="Campus">Campus</option>
+                  <option value="Intercollegiate">Intercollegiate</option>
+                  <option value="State">State</option>
+                  <option value="National">National</option>
+                  <option value="International">International</option>
+                </select>
               </div>
 
               <div className="form-group">

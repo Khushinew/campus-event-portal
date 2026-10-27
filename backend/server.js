@@ -9,7 +9,7 @@ const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const personalEventRoutes = require("./models/personalEventRoutes");
 
@@ -130,6 +130,23 @@ function validObjectId(id) {
   return mongoose.isValidObjectId(id);
 }
 
+function eventSummary(event) {
+  const summary = event.toObject ? event.toObject() : { ...event };
+  const registrationCount = Array.isArray(summary.registrations)
+    ? summary.registrations.length
+    : 0;
+
+  delete summary.registrations;
+  summary.registrationCount = registrationCount;
+  summary.seatsRemaining = Math.max(
+    Number(summary.capacity || 0) - registrationCount,
+    0
+  );
+  summary.isFull = registrationCount >= Number(summary.capacity || 0);
+
+  return summary;
+}
+
 function getCampusRole(email) {
   const escapedDomain = CAMPUS_DOMAIN.replace(/\./g, "\\.");
 
@@ -230,6 +247,7 @@ app.post("/api/login", async (req, res) => {
         email: normalizedEmail,
         password: await bcrypt.hash(DEFAULT_INITIAL_PASSWORD, 10),
         role: collegeUser.role,
+        studentId: collegeUser.studentId || "",
         department: collegeUser.department || "",
         semester: collegeUser.semester || "",
         facultyId: collegeUser.facultyId || "",
@@ -274,6 +292,12 @@ app.post("/api/login", async (req, res) => {
       });
     }
 
+    const directoryStudent =
+      user.role === "student"
+        ? await CollegeUser.findOne({ email: normalizedEmail }).select("studentId")
+        : null;
+    const studentId = user.studentId || directoryStudent?.studentId || "";
+
     const token = jwt.sign(
       {
         userId: String(user._id),
@@ -294,6 +318,7 @@ app.post("/api/login", async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        studentId,
         department: user.department,
         semester: user.semester,
         facultyId: user.facultyId,
@@ -374,6 +399,7 @@ app.post(
         time,
         venue,
         category,
+        domain,
         capacity,
         maxStudents,
         max_participants,
@@ -420,6 +446,7 @@ app.post(
   time,
   venue: venue.trim(),
   category,
+  domain: domain || "",
   capacity: requestedCapacity,
   facultyId: String(faculty._id),
   createdBy: faculty.name || faculty.email,
@@ -451,7 +478,7 @@ app.get("/api/events", async (req, res) => {
   try {
     const events = await Event.find().sort({ createdAt: -1 });
 
-    res.json(events);
+    res.json(events.map(eventSummary));
   } catch (error) {
     console.error("Get events error:", error);
 
@@ -487,7 +514,7 @@ app.get(
         eventIds: events.map((event) => String(event._id)),
       });
 
-      return res.status(200).json(events);
+      return res.status(200).json(events.map(eventSummary));
     } catch (error) {
       console.error("Get faculty events error:", error);
 
@@ -518,7 +545,7 @@ app.get("/api/events/:eventId", async (req, res) => {
       });
     }
 
-    res.json(event);
+    res.json(eventSummary(event));
   } catch (error) {
     console.error("Get event error:", error);
 
@@ -579,7 +606,7 @@ app.put(
         });
       }
 
-      const { date, time, venue, category, capacity } = req.body;
+      const { date, time, venue, category, domain, capacity } = req.body;
 
       if (date !== undefined) event.date = date;
       if (time !== undefined) event.time = time;
@@ -600,6 +627,10 @@ app.put(
           });
         }
         event.category = String(category).trim();
+      }
+
+      if (domain !== undefined) {
+        event.domain = String(domain).trim();
       }
 
       if (capacity !== undefined) {
@@ -627,7 +658,7 @@ app.put(
 
       return res.status(200).json({
         message: "Event updated successfully.",
-        event,
+        event: eventSummary(event),
       });
     } catch (error) {
       console.error("Update event error:", error);
@@ -702,11 +733,7 @@ app.get(
         });
       }
 
-      const event = await Event.findById(req.params.eventId)
-        .populate(
-          "registrations",
-          "name email department semester facultyId"
-        );
+      const event = await Event.findById(req.params.eventId);
 
       if (!event) {
         return res.status(404).json({
@@ -720,7 +747,44 @@ app.get(
         });
       }
 
-      res.json(event.registrations);
+      const legacyUserIds = event.registrations
+        .filter(
+          (registration) =>
+            !registration.userId &&
+            !registration.studentEmail &&
+            validObjectId(registration._id)
+        )
+        .map((registration) => registration._id);
+      const legacyUsers = legacyUserIds.length
+        ? await User.find({ _id: { $in: legacyUserIds } }).select(
+            "studentId name email department semester"
+          )
+        : [];
+      const legacyUserById = new Map(
+        legacyUsers.map((student) => [String(student._id), student])
+      );
+
+      res.json(
+        event.registrations.map((registration) => {
+          const legacyStudent = legacyUserById.get(
+            String(registration._id || "")
+          );
+          return {
+            ...registration.toObject(),
+            userId: registration.userId || legacyStudent?._id || null,
+            studentId:
+              registration.studentId || legacyStudent?.studentId || "",
+            studentName:
+              registration.studentName || legacyStudent?.name || "",
+            studentEmail:
+              registration.studentEmail || legacyStudent?.email || "",
+            department:
+              registration.department || legacyStudent?.department || "",
+            semester:
+              registration.semester || legacyStudent?.semester || "",
+          };
+        })
+      );
     } catch (error) {
       console.error("Fetch registrations error:", error);
 
@@ -755,39 +819,153 @@ app.post(
         });
       }
 
-      const event = await Event.findById(req.params.eventId);
-
-      if (!event) {
-        return res.status(404).json({
-          message: "Event not found.",
-        });
-      }
-
-      const alreadyRegistered = event.registrations.some(
-        (studentId) => String(studentId) === String(student._id)
+      const directoryStudent = await CollegeUser.findOne({
+        email: student.email,
+      }).select("studentId");
+      const enrollmentId =
+        student.studentId ||
+        directoryStudent?.studentId ||
+        String(student._id);
+      const normalizedEmail = String(student.email).toLowerCase();
+      const registrations = { $ifNull: ["$registrations", []] };
+      const registrationIds = {
+        $map: {
+          input: registrations,
+          as: "registration",
+          in: {
+            $convert: {
+              input: {
+                $ifNull: [
+                  "$$registration.userId",
+                  {
+                    $cond: [
+                      {
+                        $ne: [
+                          { $ifNull: ["$$registration.studentId", ""] },
+                          "",
+                        ],
+                      },
+                      "$$registration.studentId",
+                      { $ifNull: ["$$registration._id", "$$registration"] },
+                    ],
+                  },
+                ],
+              },
+              to: "string",
+              onError: "",
+              onNull: "",
+            },
+          },
+        },
+      };
+      const registrationStudentIds = {
+        $map: {
+          input: registrations,
+          as: "registration",
+          in: {
+            $convert: {
+              input: "$$registration.studentId",
+              to: "string",
+              onError: "",
+              onNull: "",
+            },
+          },
+        },
+      };
+      const registrationEmails = {
+        $map: {
+          input: registrations,
+          as: "registration",
+          in: {
+            $toLower: {
+              $convert: {
+                input: "$$registration.studentEmail",
+                to: "string",
+                onError: "",
+                onNull: "",
+              },
+            },
+          },
+        },
+      };
+      const updatedEvent = await Event.findOneAndUpdate(
+        {
+          _id: req.params.eventId,
+          $expr: {
+            $and: [
+              {
+                $lt: [
+                  { $size: registrations },
+                  { $ifNull: ["$capacity", 0] },
+                ],
+              },
+              {
+                $not: [
+                  {
+                    $in: [String(student._id), registrationIds],
+                  },
+                ],
+              },
+              {
+                $not: [
+                  {
+                    $in: [String(enrollmentId), registrationStudentIds],
+                  },
+                ],
+              },
+              {
+                $not: [
+                  {
+                    $in: [normalizedEmail, registrationEmails],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          $push: {
+            registrations: {
+              userId: student._id,
+              studentId: enrollmentId,
+              studentName: student.name || "",
+              studentEmail: normalizedEmail,
+              department: student.department || "",
+              semester: student.semester || "",
+              registeredAt: new Date(),
+            },
+          },
+        },
+        { new: true, runValidators: true }
       );
 
-      if (alreadyRegistered) {
+      if (!updatedEvent) {
+        const event = await Event.findById(req.params.eventId);
+        if (!event) {
+          return res.status(404).json({
+            message: "Event not found.",
+          });
+        }
+
+        const alreadyRegistered = event.registrations.some(
+          (registration) =>
+            String(registration.userId || "") === String(student._id) ||
+            String(registration._id || "") === String(student._id) ||
+            String(registration.studentEmail || "").toLowerCase() ===
+              normalizedEmail ||
+            String(registration.studentId || "") === String(enrollmentId)
+        );
+
         return res.status(409).json({
-          message: "You are already registered for this event.",
+          message: alreadyRegistered
+            ? "You are already registered for this event."
+            : "This event has reached its registration capacity.",
         });
       }
-
-      if (
-        Number.isFinite(Number(event.capacity)) &&
-        event.registrations.length >= Number(event.capacity)
-      ) {
-        return res.status(409).json({
-          message: "This event has reached its registration capacity.",
-        });
-      }
-
-      event.registrations.push(student._id);
-      await event.save();
 
       res.status(201).json({
         message: "Registration successful",
-        eventId: event._id,
+        eventId: updatedEvent._id,
       });
     } catch (error) {
       console.error("Student registration error:", error);
@@ -810,13 +988,103 @@ app.get(
   requireRole("student"),
   async (req, res) => {
     try {
+      const userId = String(req.user.userId);
+      const student = await User.findById(userId).select("email studentId");
+      if (!student) {
+        return res.status(404).json({
+          message: "Student account not found.",
+        });
+      }
+      const directoryStudent = await CollegeUser.findOne({
+        email: student.email,
+      }).select("studentId");
+      const enrollmentId =
+        student.studentId || directoryStudent?.studentId || userId;
+      const normalizedEmail = String(student.email).toLowerCase();
       const events = await Event.find({
-        registrations: req.user.userId,
-      })
-        .populate("organizer", "name email department")
-        .sort({ date: 1 });
+        $or: [
+          {
+            $expr: {
+              $in: [
+                userId,
+                {
+                  $map: {
+                    input: { $ifNull: ["$registrations", []] },
+                    as: "registration",
+                    in: {
+                      $convert: {
+                        input: {
+                          $ifNull: [
+                            "$$registration.userId",
+                            {
+                              $cond: [
+                                {
+                                  $ne: [
+                                    {
+                                      $ifNull: [
+                                        "$$registration.studentId",
+                                        "",
+                                      ],
+                                    },
+                                    "",
+                                  ],
+                                },
+                                "$$registration.studentId",
+                                {
+                                  $ifNull: [
+                                    "$$registration._id",
+                                    "$$registration",
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                        to: "string",
+                        onError: "",
+                        onNull: "",
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          { "registrations._id": userId },
+          { "registrations.studentId": { $in: [userId, enrollmentId] } },
+        ],
+      }).sort({ date: 1 });
+      const legacyEvents = await Event.find({
+        "registrations.studentEmail": normalizedEmail,
+      }).sort({ date: 1 });
+      const matchingEvents = [
+        ...new Map(
+          [...events, ...legacyEvents].map((event) => [
+            String(event._id),
+            event,
+          ])
+        ).values(),
+      ];
 
-      res.json(events);
+      res.json(
+        matchingEvents.map((event) => {
+          const result = event.toObject();
+          result.registrationCount = result.registrations.length;
+          result.seatsRemaining = Math.max(
+            Number(result.capacity || 0) - result.registrationCount,
+            0
+          );
+          result.registrations = result.registrations.filter(
+            (registration) =>
+              String(registration.userId || registration._id || "") === userId ||
+              String(registration.studentId || "") === userId ||
+              String(registration.studentId || "") === String(enrollmentId) ||
+              String(registration.studentEmail || "").toLowerCase() ===
+                normalizedEmail
+          );
+          return result;
+        })
+      );
     } catch (error) {
       console.error("Student registrations error:", error);
 
