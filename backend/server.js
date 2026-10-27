@@ -401,6 +401,9 @@ app.post(
         category,
         domain,
         capacity,
+        participationFeeRequired,
+        participationFee,
+        paymentMode,
         maxStudents,
         max_participants,
       } = req.body;
@@ -439,6 +442,36 @@ app.post(
         });
       }
 
+      const hasParticipationFee = participationFeeRequired === "true";
+      if (
+        participationFeeRequired !== undefined &&
+        participationFeeRequired !== "true" &&
+        participationFeeRequired !== "false"
+      ) {
+        return res.status(400).json({
+          message: "Participation fee selection is invalid.",
+        });
+      }
+
+      const requestedFee = hasParticipationFee
+        ? Number(participationFee)
+        : 0;
+      const normalizedPaymentMode = hasParticipationFee
+        ? String(paymentMode || "")
+        : "";
+
+      if (
+        hasParticipationFee &&
+        (!Number.isFinite(requestedFee) ||
+          requestedFee <= 0 ||
+          !["Online", "Offline"].includes(normalizedPaymentMode))
+      ) {
+        return res.status(400).json({
+          message:
+            "Enter a participation fee greater than zero and select Online or Offline payment.",
+        });
+      }
+
       const event = await Event.create({
   title: title.trim(),
   description: description.trim(),
@@ -448,6 +481,9 @@ app.post(
   category,
   domain: domain || "",
   capacity: requestedCapacity,
+  participationFeeRequired: hasParticipationFee,
+  participationFee: requestedFee,
+  paymentMode: normalizedPaymentMode,
   facultyId: String(faculty._id),
   createdBy: faculty.name || faculty.email,
   imageUrl: req.file ? `/uploads/${req.file.filename}` : "",

@@ -486,6 +486,45 @@ form {
   padding-left: 12px;
 }
 
+.participation-fee-group {
+  min-width: 0;
+  padding: 0 0 0 12px;
+  border: 0;
+}
+
+.participation-fee-group > legend {
+  margin-bottom: 8px;
+  font-family: "Caveat", cursive;
+  font-size: 21px;
+  font-weight: 600;
+  color: #394456;
+}
+
+.fee-checkbox-label {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px !important;
+  font-family: "DM Sans", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+}
+
+.fee-checkbox-label input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  accent-color: #1b2335;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.fee-details-row .form-group {
+  margin-bottom: 0;
+}
+
 .form-group label {
   display: block;
 

@@ -16,6 +16,9 @@ function CreateEvent() {
     category: "",
     domain: "",
     capacity: "",
+    participationFeeRequired: false,
+    participationFee: "",
+    paymentMode: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -117,6 +120,9 @@ const response = await fetch("http://localhost:5000/api/events", {
       category: "",
       domain: "",
       capacity: "",
+      participationFeeRequired: false,
+      participationFee: "",
+      paymentMode: "",
     });
 
     navigate("/faculty/events");
@@ -430,6 +436,68 @@ const response = await fetch("http://localhost:5000/api/events", {
               />
 
             </div>
+
+            <fieldset className="form-group participation-fee-group">
+              <legend>Participation Fee</legend>
+              <label className="fee-checkbox-label">
+                <input
+                  type="checkbox"
+                  name="participationFeeRequired"
+                  checked={formData.participationFeeRequired}
+                  onChange={(event) =>
+                    setFormData((previous) => ({
+                      ...previous,
+                      participationFeeRequired: event.target.checked,
+                      participationFee: event.target.checked
+                        ? previous.participationFee
+                        : "",
+                      paymentMode: event.target.checked
+                        ? previous.paymentMode
+                        : "",
+                    }))
+                  }
+                />
+                Charge a participation fee
+              </label>
+
+              {formData.participationFeeRequired && (
+                <div className="form-row fee-details-row">
+                  <div className="form-group">
+                    <label htmlFor="participation-fee-amount">
+                      Fee Amount
+                    </label>
+                    <input
+                      id="participation-fee-amount"
+                      type="number"
+                      name="participationFee"
+                      placeholder="Enter fee amount"
+                      min="0.01"
+                      step="0.01"
+                      value={formData.participationFee}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="payment-mode">
+                      Payment Method
+                    </label>
+                    <select
+                      id="payment-mode"
+                      name="paymentMode"
+                      value={formData.paymentMode}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select payment method</option>
+                      <option value="Online">Online</option>
+                      <option value="Offline">Offline</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+            </fieldset>
 
             {/* =================================================
                 BUTTONS
