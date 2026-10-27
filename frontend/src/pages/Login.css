@@ -785,6 +785,38 @@ body::after {
     translateY(0);
 }
 
+.forgot-password-option {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.forgot-password-option button {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: #2867e6;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.forgot-password-option button:hover {
+  text-decoration: underline;
+}
+
+.forgot-password-option button:focus-visible {
+  outline: 2px solid #2867e6;
+  outline-offset: 3px;
+}
+
+.forgot-password-option p {
+  margin: 10px 0 0;
+  color: #68778b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 
 /* =========================================================
    REGISTER TEXT
