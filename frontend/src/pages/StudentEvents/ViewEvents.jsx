@@ -11,7 +11,7 @@ import dotsImage from "../../assets/dots.jpg";
 import "./ViewEvents.css";
 import Footer from "../../components/Footer";
 
-function ViewEvents({ showPastEvents = false }) {
+function ViewEvents({ showPastEvents = false, facultyBrowse = false }) {
   const user = getStoredUser();
   const token = getSessionToken();
   const [events, setEvents] = useState([]);
@@ -80,7 +80,14 @@ function ViewEvents({ showPastEvents = false }) {
         }
 
         if (!cancelled) {
-          setEvents(data);
+          const visibleEvents =
+            facultyBrowse && user?.role === "faculty"
+              ? data.filter(
+                  (event) => String(event.facultyId) !== String(user.id)
+                )
+              : data;
+
+          setEvents(visibleEvents);
           setRegisteredEventIds(registeredIds);
         }
       } catch (err) {
@@ -97,7 +104,7 @@ function ViewEvents({ showPastEvents = false }) {
     return () => {
       cancelled = true;
     };
-  }, [user?.role, token]);
+  }, [facultyBrowse, user?.id, user?.role, token]);
 
   const categories = useMemo(
     () => [...new Set(events.map((event) => event.category).filter(Boolean))],
@@ -253,7 +260,7 @@ function ViewEvents({ showPastEvents = false }) {
                   </p>
 
                   <div className="event-actions">
-                    {registered ? (
+                    {facultyBrowse && user?.role === "faculty" ? null : registered ? (
                       <button
                         type="button"
                         className="event-register-button registered-button"

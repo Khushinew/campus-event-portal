@@ -149,6 +149,15 @@ function App() {
         />
 
         <Route
+          path="/faculty/view-events"
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <ViewEvents facultyBrowse />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/faculty/create-event"
           element={
             <ProtectedRoute roles={["faculty"]}>
